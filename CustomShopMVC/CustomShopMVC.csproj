@@ -45,10 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\react\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="react-views\src\components\globalInputComponents.tsx" />
   </ItemGroup>
 
