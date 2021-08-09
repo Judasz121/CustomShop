@@ -1,0 +1,18 @@
+﻿
+== EASY ==
+create user managment in admin panel
+
+== FOCUS DEMANDING ==
+
+== TECHNICAL PLAN ==
+implement authorization in controllers
+user settings panel: darkMode, changing(password, username, personal data ) 
+implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
+
+== REQUIREMENTS ==
+
+1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,
+2. customizable category tree
+3. each product in each category can have fully custom parameters by which it can be filtered
+4. (optional) allegro-like functionality - various user account types ( also vendors )
+5. product and vendors reviews

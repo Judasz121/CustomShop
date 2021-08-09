@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="react-views\src\components\categoriesManagmentComponents.jsx" />
+    <None Remove="react-views\src\components\LogInPage.tsx" />
+    <None Remove="react-views\src\pages\Register.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Remove="react-views\src\components\globalInputComponents.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\rolesManagmentComponents.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\usersManagmentComponents.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="react-views\src\pages\AdminPanel\CategoriesManagmentPanel.jsx" />
+    <Content Include="react-views\src\pages\AdminPanel\RolesManagmentPanel.tsx" />
+    <Content Include="react-views\src\pages\AdminPanel\UsersManagmentPanel.tsx" />
+    <Content Include="react-views\src\components\userPanelSettings.jsx" />
+    <Content Include="react-views\src\components\authComponents.jsx" />
+    <Content Include="react-views\src\components\globalInputComponents.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="IdentityModel" Version="5.1.0" />
+    <PackageReference Include="JavaScriptEngineSwitcher.Extensions.MsDependencyInjection" Version="3.3.0" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8" Version="3.12.4" />
+    <PackageReference Include="JavaScriptEngineSwitcher.V8.Native.win-x64" Version="3.12.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.16" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.16" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="React.AspNet" Version="5.2.11" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\react\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="react-views\src\components\globalInputComponents.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="react-views\src\pages\Register.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="react-views\src\pages\LogIn.tsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Update="react-views\src\pages\AdminPanel.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Update="react-views\src\pages\Home.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+  </ItemGroup>
+
+</Project>

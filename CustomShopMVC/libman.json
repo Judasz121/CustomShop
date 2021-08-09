@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootstrap-icons@1.5.0",
+      "destination": "wwwroot/lib/bootstrap-icons/"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "react-sortable-tree@2.8.0",
+      "destination": "wwwroot/lib/react-sortable-tree/"
+    }
+  ]
+}
