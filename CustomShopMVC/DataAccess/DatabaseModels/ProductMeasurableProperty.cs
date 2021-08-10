@@ -12,7 +12,6 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string PropertyNameAbbreviation { get; set; }
 		public string UnitFullName { get; set; }
 		public string UnitName { get; set; }
-		public string UnitNameAbbreviation { get; set; }
 		public bool IsMetric { get; set; }
 		public float ToMetricModifier { get; set; }
 	}

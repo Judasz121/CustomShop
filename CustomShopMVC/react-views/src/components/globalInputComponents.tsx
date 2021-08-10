@@ -1,6 +1,9 @@
 ﻿import React from 'react';
 import style from '../styles/global.module.css';
+import { X as XIcon } from 'react-bootstrap-icons';
 
+
+// #region TextInfoInput
 type TextInfoInputProps = {
     onChange: Function,
     editingEnabled: boolean,
@@ -42,6 +45,10 @@ export class TextInfoInput extends React.Component <TextInfoInputProps, TextInfo
         )
     }
 }
+
+// #endregion TextInfoInput
+
+// #region CheckBoxInfoInput
 
 type CheckBoxInfoInputProps = {
     onChange: Function,
@@ -85,6 +92,9 @@ export class CheckBoxInfoInput extends React.Component<CheckBoxInfoInputProps, C
         )
     }
 }
+// #endregion CheckBoxInfoInput
+
+// #region CheckBoxSwitch
 type CheckBoxSwitchProps = {
     value: boolean,
     label: string,
@@ -122,3 +132,106 @@ export class CheckBoxSwitch extends React.Component<CheckBoxSwitchProps, CheckBo
         )
     }
 }
+// #endregion CheckBoxSwitch
+
+// #region EditableList
+
+type EditableListProps = {
+    items: EditableListPropItem[],
+    editingEnabled: boolean,
+    onChange: Function,
+    inputName: string,
+}
+type EditableListState = {
+
+}
+type EditableListPropItem = {
+    value: string,
+    id: string | number,
+}
+
+export class EditableList extends React.Component<EditableListProps, EditableListState> {
+    constructor(props: EditableListProps) {
+        super(props);
+        this.deleteListItem = this.deleteListItem.bind(this);
+    }
+    deleteListItem(id: string | number) {
+        let arrayToSend: EditableListPropItem[] = this.props.items.filter((item) => {
+            return item.id != id;
+        });
+        this.props.onChange(this.props.inputName, arrayToSend);
+    }
+    onChange(id: string | number) {
+        let arrayToSend: EditableListPropItem[] = this.props.items;
+        let itemToChange = arrayToSend.filter((item) => {
+            return item.id == id;
+        })[0];
+        let index = arrayToSend.indexOf(itemToChange);
+        arrayToSend[index] = itemToChange;
+
+        this.props.onChange(this.props.inputName, arrayToSend);
+    }
+    render() {
+        if (this.props.editingEnabled)
+            return (
+                <div className={style.editableList} >
+                    {this.props.items.map((item) => (
+                        <EditableListItem
+                            value={item.value}
+                            id={item.id}
+                            deleteItem={this.deleteListItem}
+                            onChange={this.onChange}
+                        />
+                    ))}
+
+                </div>
+            )
+        else
+            return (
+                <div className={style.editableList + " " + style.editingDisabled} >
+                    {this.props.items.map((item) => (
+                        <div className={style.editableListItem + " " + style.editingDisabled} >
+                            {item.value}
+                        </div>
+                    ))}
+                </div>
+            )
+    }
+}
+
+
+type EditableListItemProps = {
+    onChange: Function,
+    deleteItem: Function,
+    value: string,
+    id: number | string,
+}
+type EditableListItemState = {
+
+}
+
+class EditableListItem extends React.Component<EditableListItemProps, EditableListItemState>{
+    constructor(props: EditableListItemProps) {
+        super(props);
+
+        this.onChange = this.onChange.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
+    }
+    onChange(e: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(this.props.id, e.target.value)
+    }
+    deleteItem(e: React.MouseEvent<HTMLButtonElement>) {
+        this.props.deleteItem(this.props.id)
+    }
+
+    render() {
+        return (
+            <div className={style.editableListItem}>
+                <input onChange={this.onChange} value={this.props.value} type="text" />
+                <button onClick={this.deleteItem} ><XIcon /> </button>
+            </div>
+        )
+    }
+}
+
+// #endregion EditableList

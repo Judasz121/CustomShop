@@ -20,7 +20,7 @@ type RolesManagmentPanelState = {
 
 
 export class RolesManagmentPanel extends React.Component<RolesManagmentPanelProps, RolesManagmentPanelState> {
-    constructor(props: RolesManagmentPanelState) {
+    constructor(props: RolesManagmentPanelProps) {
         super(props);
 
         this.state = {

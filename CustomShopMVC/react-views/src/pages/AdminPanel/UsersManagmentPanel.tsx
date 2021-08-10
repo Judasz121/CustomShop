@@ -195,7 +195,7 @@ type UserManagmentPanelState = {
 
 
 export class UsersManagmentPanel extends React.Component<UserManagmentPanelProps, UserManagmentPanelState> {
-    constructor(props: UserManagmentPanelState) {
+    constructor(props: UserManagmentPanelProps) {
         super(props);
 
         this.state = {

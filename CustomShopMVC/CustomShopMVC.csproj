@@ -14,11 +14,13 @@
     <TypeScriptCompile Remove="react-views\src\components\globalInputComponents.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\rolesManagmentComponents.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\usersManagmentComponents.tsx" />
+    <TypeScriptCompile Remove="react-views\src\pages\AdminPanel\CategoryPropertiesEditPanel.tsx" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="react-views\src\pages\AdminPanel\CategoriesManagmentPanel.jsx" />
     <Content Include="react-views\src\pages\AdminPanel\RolesManagmentPanel.tsx" />
+    <Content Include="react-views\src\pages\AdminPanel\CategoryPropertiesEditPanel.tsx" />
     <Content Include="react-views\src\pages\AdminPanel\UsersManagmentPanel.tsx" />
     <Content Include="react-views\src\components\userPanelSettings.jsx" />
     <Content Include="react-views\src\components\authComponents.jsx" />

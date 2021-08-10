@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch, Link, useRouteMatch } from "rea
 import Constants from '../router/constants';
 import style from "../styles/nav.module.css";
 import { INavItem } from '../types/navTypes';
+import { PersonCircle, Gear } from 'react-bootstrap-icons'
 
 class MainUpperNavbar extends React.Component{
     constructor(props:any) {
