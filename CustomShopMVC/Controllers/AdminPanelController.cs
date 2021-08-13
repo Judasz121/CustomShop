@@ -178,7 +178,7 @@ namespace CustomShopMVC.Controllers
 
 
 					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
-					int count = conn.ExecuteScalar<int>(sql, param);
+					count = conn.ExecuteScalar<int>(sql, param);
 					if(count > 0)
 					{
 						result.Success = false;
