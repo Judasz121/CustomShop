@@ -15,26 +15,51 @@ namespace CustomShopMVC.Helpers
 		{
 			return new MapperConfiguration(cfg =>
 			{
+				#region category
 				cfg.CreateMap<CategoryViewModel, Category>()
 					.ForMember(c => c.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 				;
 				cfg.CreateMap<Category, CategoryViewModel>()
 					
 				;
+				#endregion category
 
+				#region user
 				cfg.CreateMap<ApplicationUser, UserViewModel>()
 					.ForMember(u => u.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 				;
 				cfg.CreateMap<UserViewModel, ApplicationUser>()
 					.ForMember(u => u.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 				;
-
+				#endregion user
+				#region role
 				cfg.CreateMap<ApplicationUserRole, RoleViewModel>()
 					.ForMember(r => r.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 				;
 				cfg.CreateMap<RoleViewModel, ApplicationUserRole>()
 					.ForMember(r => r.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 				;
+				#endregion role
+
+				#region categoryProperty
+				cfg.CreateMap<ProductChoosableProperty, CategoryChoosablePropertyViewModel>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+				;
+				cfg.CreateMap<CategoryChoosablePropertyViewModel, ProductChoosableProperty>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => Guid.Parse(src.CategoryId)))
+				;
+
+				cfg.CreateMap<ProductMeasurableProperty, CategoryMeasurablePropertyViewModel>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+				;
+				cfg.CreateMap<CategoryMeasurablePropertyViewModel, ProductMeasurableProperty>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => Guid.Parse(src.CategoryId)))
+				;
+				#endregion categoryProperty
 			});
 		}
 		public static MapperConfiguration Auth()

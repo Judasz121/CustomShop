@@ -116,9 +116,54 @@ namespace CustomShopMVC.Controllers
 				}
 				#endregion
 				return result;
+			}			
+		}
+
+
+
+		[HttpPost]
+		[Route("{action}")]
+		public async Task<ActionResult<GetCategoryPropertiesDataOut>> GetCategoryProperties(GetCategoryPropertiesDataIn model)
+		{
+			GetCategoryPropertiesDataOut result = new GetCategoryPropertiesDataOut();
+			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
+
+			if (string.IsNullOrEmpty(model.CategoryId))
+			{
+				result.Error = "Category Id is requierd";
+				return result;
+			}
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				string sql = "SELECT * FROM [ProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@CategoryId", model.CategoryId);
+				IEnumerable<ProductChoosableProperty> sqlSelect = conn.Query<ProductChoosableProperty>(sql, param);
+				result.ChoosableProperties = mapper.Map<IEnumerable<ProductChoosableProperty>, List<CategoryChoosablePropertyViewModel>>(sqlSelect);
+
+				sql = "SELECT * FROM [ProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+				param = new DynamicParameters();
+				param.Add("@CategoryId", model.CategoryId);
+				IEnumerable<ProductMeasurableProperty> sqlSelect2 = conn.Query<ProductMeasurableProperty>(sql, param);
+				result.MeasurableProperties = mapper.Map<IEnumerable<ProductMeasurableProperty>, List<CategoryMeasurablePropertyViewModel>>(sqlSelect2);
+				result.Success = true;
 			}
 			
+			return result;
+		}
 
+		public async Task<ActionResult<SaveCategoryProductMeasurablePropertyDataOut>> SaveCategoryProductMeasurableProperty(SaveCategoryProductMeasurablePropertyDataIn model)
+		{
+			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
+			SaveCategoryProductMeasurablePropertyDataOut result = new SaveCategoryProductMeasurablePropertyDataOut();
+			if (model.MeasurableProperty.Id.Contains("new"))
+			{
+				
+			}
+			else
+			{
+
+			}
 		}
 		#endregion
 

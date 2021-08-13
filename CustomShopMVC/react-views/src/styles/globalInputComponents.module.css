@@ -1,45 +1,9 @@
-﻿.rootContent {
-	padding-top: 70px;
-}
-
-.rootNavigation {
-}
-
+﻿
 .hidden {
 	display: none !important;
 }
 
-.decorationNone {
-	text-decoration: none;
-	border: none;
-	background: inherit;
-	display: inline-block;
-	color:black;
-	border:none;
-	padding: 0px;
-	margin:0px;
-}
-.decorationNone:hover{
-	color:black;
 
-}
-.decorationNone:active{
-	color:black;
-}
-/* #region button*/
-.button{
-	border: black 1px solid;
-	padding: 1px 6px;
-	border-radius: 2px;
-}
-.button:hover{
-	background: black;
-	color: white;
-}
-.button:active{
-	color:yellow;
-}
-/* #endregion button */
 /* #region checkBoxSwitch */
 .switchCheckbox {
 	position: relative;

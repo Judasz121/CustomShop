@@ -1,15 +1,17 @@
 ﻿import { type } from 'os';
 import React from 'react';
-import { Route, Switch, BrowserRouter as Router, useRouteMatch, useParams, match, Link } from 'react-router-dom';
+import { Route, Switch, BrowserRouter as Router, useRouteMatch, useParams, match, Link, RouteComponentProps, } from 'react-router-dom';
 import { CategoriesManagmentPanel } from "./AdminPanel/CategoriesManagmentPanel";
 import { UsersManagmentPanel } from "./AdminPanel/UsersManagmentPanel";
 import { RolesManagmentPanel } from "./AdminPanel/RolesManagmentPanel";
 import { SubNavMenu } from "../components/navComponents";
 import Constants from "../router/constants";
 import { INavItem } from "../types/navTypes";
+import { useHistory, useLocation } from 'react-router';
+import  CategoryPropertiesManagmentPanel   from './AdminPanel/CategoryPropertiesManagmentPanel';
 
-type AdminPanelPageProps = {
-    match: match
+interface AdminPanelPageProps extends RouteComponentProps {
+
 }
 type AdminPanelPageState = {
 
@@ -37,6 +39,8 @@ class AdminPanelPage extends React.Component<AdminPanelPageProps, AdminPanelPage
                     </Route>
                     <Route path={`${this.props.match.url}/roles`} >
                         <RolesManagmentPanel />
+                    </Route>
+                    <Route path={`${this.props.match.url}/categoryProps/:categoryId`} component={CategoryPropertiesManagmentPanel}>
                     </Route>
                 </Switch>
             </div>

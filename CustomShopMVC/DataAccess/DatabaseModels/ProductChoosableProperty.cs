@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CustomShopMVC.DataAccess.DatabaseModels
 {
-	public class ProductChoosableProperty : IProductProperty
+	public class ProductChoosableProperty : ICategoryProductProperty
 	{
 		public Guid Id { get; set; }
 		public Guid CategoryId { get; set; }

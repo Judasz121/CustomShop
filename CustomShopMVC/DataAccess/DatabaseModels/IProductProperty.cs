@@ -4,10 +4,10 @@ using System.Text;
 
 namespace CustomShopMVC.DataAccess.DatabaseModels
 {
-	public interface IProductProperty
+	public interface ICategoryProductProperty
 	{
 		public Guid Id { get; set; }
-		public string PropertyName { get; set; }
 		public Guid CategoryId { get; set; }
+		public string PropertyNameAbbreviation { get; set; }
 	}
 }

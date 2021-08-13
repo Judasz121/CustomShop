@@ -28,6 +28,8 @@ export default class UserPanelPage extends React.Component <UserPanelPageProps, 
 
                 <Switch>
                     <Route path={`${this.props.match.url}/settings`} >
+                        {console.log("route props:")}
+
                         <AccountSettingsPanel />
                     </Route>
 

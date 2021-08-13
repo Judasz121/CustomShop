@@ -1,7 +1,6 @@
 ﻿import React from 'react';
-import style from '../styles/global.module.css';
+import style from '../styles/globalInputs.module.css';
 import { X as XIcon } from 'react-bootstrap-icons';
-
 
 
 // #region TextInfoInput
@@ -135,46 +134,44 @@ export class CheckBoxSwitch extends React.Component<CheckBoxSwitchProps, CheckBo
 }
 // #endregion CheckBoxSwitch
 
-// #region InfoInputList
+// #region EditableList
 
-type InfoInputListProps = {
-    items: InfoInputListPropsItem[],
+type EditableListProps = {
+    items: EditableListPropItem[],
     editingEnabled: boolean,
     onChange: Function,
     inputName: string,
 }
-type InfoInputListState = {
+type EditableListState = {
 
 }
-type InfoInputListPropsItem = {
+type EditableListPropItem = {
     value: string,
     id: string | number,
 }
 
-export class InfoInputList extends React.Component<InfoInputListProps, InfoInputListState> {
-    constructor(props: InfoInputListProps) {
+export class EditableList extends React.Component<EditableListProps, EditableListState> {
+    constructor(props: EditableListProps) {
         super(props);
         this.deleteListItem = this.deleteListItem.bind(this);
         this.addListItem = this.addListItem.bind(this);
-        this.onChange = this.onChange.bind(this);
     }
     deleteListItem(id: string | number) {
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.filter((item) => {
+        let arrayToSend: EditableListPropItem[] = this.props.items.filter((item) => {
             return item.id != id;
         });
         this.props.onChange(this.props.inputName, arrayToSend);
     }
     addListItem() {
-        let newItem: InfoInputListPropsItem = {
-            id: "new",
-            value: ""
-        };
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.slice();
-        arrayToSend.push(newItem);
-        this.props.onChange(this.props.inputName, arrayToSend);
+        var newItem: EditableListPropItem;
+        if (typeof this.props.items[0].id == 'number') {
+            //newItem = {
+            //    id
+            //}
+        }
     }
     onChange(id: string | number) {
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.slice();
+        let arrayToSend: EditableListPropItem[] = this.props.items;
         let itemToChange = arrayToSend.filter((item) => {
             return item.id == id;
         })[0];
@@ -188,7 +185,7 @@ export class InfoInputList extends React.Component<InfoInputListProps, InfoInput
             return (
                 <div className={style.editableList} >
                     {this.props.items.map((item) => (
-                        <InfoInputList_InputItem
+                        <EditableListItem
                             value={item.value}
                             id={item.id}
                             deleteItem={this.deleteListItem}
@@ -213,19 +210,19 @@ export class InfoInputList extends React.Component<InfoInputListProps, InfoInput
 }
 
 
-type InfoInputList_InputItemProps = {
+type EditableListItemProps = {
     onChange: Function,
     deleteItem: Function,
     addItem: Function,
     value: string,
     id: number | string,
 }
-type InfoInputList_InputItemState = {
+type EditableListItemState = {
 
 }
-// this is only input ( no info "part" here )
-class InfoInputList_InputItem extends React.Component<InfoInputList_InputItemProps, InfoInputList_InputItemState>{
-    constructor(props: InfoInputList_InputItemProps) {
+
+class EditableListItem extends React.Component<EditableListItemProps, EditableListItemState>{
+    constructor(props: EditableListItemProps) {
         super(props);
 
         this.onChange = this.onChange.bind(this);
@@ -245,24 +242,10 @@ class InfoInputList_InputItem extends React.Component<InfoInputList_InputItemPro
         return (
             <div className={style.editableListItem}>
                 <input onChange={this.onChange} value={this.props.value} type="text" />
-                <button onClick={this.deleteItem} ><XIcon color="red" size={25} /> </button>
+                <button onClick={this.deleteItem} ><XIcon /> </button>
             </div>
         )
     }
 }
 
-// #endregion InfoInputList
-
-//#region ClickDropDown
-type ClickDropDownProps = {
-    clickContent: any,
-    dropDownContent: any,
-
-}
-export class ClickDropDown extends React.Component {
-
-}
-
-
-
-//endregion ClickDropDown
+// #endregion EditableList

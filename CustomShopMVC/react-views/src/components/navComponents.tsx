@@ -3,8 +3,9 @@ import AppRouter from "../router";
 import { BrowserRouter as Router, Route, Switch, Link, useRouteMatch } from "react-router-dom";
 import Constants from '../router/constants';
 import style from "../styles/nav.module.css";
+import globalStyle from "../styles/global.module.css";
 import { INavItem } from '../types/navTypes';
-import { PersonCircle, Gear } from 'react-bootstrap-icons'
+import * as Icon from 'react-bootstrap-icons'
 
 class MainUpperNavbar extends React.Component{
     constructor(props:any) {
@@ -13,7 +14,7 @@ class MainUpperNavbar extends React.Component{
     render() {
         return (
             <div className={style.mainNavbar}>
-                <HomeLogo  />
+                <HomeLogo />
                     <div className="mainNavItems">
                         <nav>
                         <ul className={style.navItemsList}>
@@ -81,23 +82,33 @@ class AuthInfoHorizontal extends React.Component<{}, AuthInfoHorizontalState> {
             })
     }
     render() {
+        let iconSize: number = 35;
         if (this.state.ajaxResponse.isLoggedIn == true)
             return (
                 <div className={style.authInfoHorizontal}>
-                    user is logged in
                     <div className={style.linksContainer} >
-                        <button title="log out" onClick={this.logOut} > Log out </button>
-                        <Link to="/userPanel">UserPanel link</Link>
+                        <Link
+                            to="/userPanel"
+                            className={globalStyle.decorationNone}
+                        >
+                            <Icon.PersonCircle size={iconSize} />
+                        </Link>
+
+                        <button
+                            title="log out"
+                            onClick={this.logOut}
+                            className={globalStyle.decorationNone}
+                        >
+                            <Icon.BoxArrowRight size={iconSize} />
+                        </button>
                     </div>
                 </div>
-
             )
         else
             return (
                 <div className={style.authInfoHorizontal}>
-                    user is not logged in
-                    <Link to="/register">RegisterPage link</Link>
-                    <Link to="/logIn">LogInPage link</Link>
+                    <Link to="/register">Register</Link>
+                    <Link to="/logIn">Log in</Link>
                 </div>
             )
     }

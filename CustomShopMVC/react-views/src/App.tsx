@@ -8,7 +8,7 @@ import LogInPage from "./pages/LogIn";
 import RegisterPage from "./pages/Register";
 import AdminPanelPage from "./pages/AdminPanel";
 import UserPanelPage from "./pages/UserPanel";
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Switch, match } from 'react-router-dom';
 import style from "./styles/global.module.css"
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
                         <Route path="/adminPanel" component={AdminPanelPage} />
                         <Route path="/userPanel" component={UserPanelPage} />
 
-                        <Route path="/" >
+                        <Route path="/"  >
                             <HomePage />
                         </Route>
                     </Switch>

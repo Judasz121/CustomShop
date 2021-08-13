@@ -2,6 +2,9 @@
 import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../router/constants';
+import * as Icon from 'react-bootstrap-icons';
+import { Link, useRouteMatch } from 'react-router-dom';
+import globalStyle from "../../styles/global.module.css";
 
 
 
@@ -30,7 +33,6 @@ export class CategoriesManagmentPanel extends React.Component {
                 if (data.success) {
                     alert("tree data saved");
                 }
-
             })
     }
     render() {
@@ -44,6 +46,8 @@ export class CategoriesManagmentPanel extends React.Component {
         )
     }
 }
+
+
 class CategoryTree extends React.Component {
     constructor(props) {
         super(props);
@@ -52,6 +56,7 @@ class CategoryTree extends React.Component {
             treeData: [],
             addAsFirstChild: true,
             newNodeKey: 1,
+            iconSize: 30,
         };
 
 
@@ -94,10 +99,12 @@ class CategoryTree extends React.Component {
 
     generateTreeNodeProps({ node, path }) {
         const getNodeKey = ({ treeIndex }) => treeIndex;
+        console.log(node);
         let result =
         {
             buttons: [
                 <button
+                    className={globalStyle.decorationNone + " " + globalStyle.button}
                     onClick={() => {
                         this.setState((state) => ({
                             treeData: addNodeUnderParent({
@@ -119,6 +126,8 @@ class CategoryTree extends React.Component {
                     Add subcategory
                 </button>,
                 <button
+                    title="Delete"
+                    className={globalStyle.decorationNone}
                     onClick={() => {
                         this.setState((state) => ({
                             treeData: removeNodeAtPath({
@@ -129,8 +138,14 @@ class CategoryTree extends React.Component {
                         }));
                     }}
                 >
-                    Remove
+                    <Icon.X color="red" size={this.state.iconSize} />
                 </button>,
+                <Link to={"./categoryProps/" + node.id} className={globalStyle.decorationNone} >
+                    <button className={globalStyle.decorationNone + " " + globalStyle.button}>
+                        Edit props
+                    </button>
+                </Link>
+                
             ],
             title: (
                 <input
@@ -155,16 +170,16 @@ class CategoryTree extends React.Component {
     }
 
     render() {
-       // const getNodeKey = ({ treeIndex }) => treeIndex;
+        // const getNodeKey = ({ treeIndex }) => treeIndex;
         return (
             <div style={{ height: 400 }}>
-                    <SortableTree
-                        treeData={this.state.treeData}
-                        onChange={(treeData) => this.setState({ treeData })}
+                <SortableTree
+                    treeData={this.state.treeData}
+                    onChange={(treeData) => this.setState({ treeData })}
                     generateNodeProps={({ node, path }) => this.generateTreeNodeProps({ node, path })}
 
-                    />
-                </div>
+                />
+            </div>
         );
     }
 }

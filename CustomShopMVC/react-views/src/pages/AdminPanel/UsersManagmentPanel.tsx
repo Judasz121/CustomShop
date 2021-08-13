@@ -207,6 +207,9 @@ export class UsersManagmentPanel extends React.Component<UserManagmentPanelProps
         this.newUserAdded = this.newUserAdded.bind(this);
         this.userEdited = this.userEdited.bind(this);
     }
+    componentDidUpdate() {
+        console.log("users managment panel updated");
+    }
 
     componentDidMount() {
 
@@ -419,8 +422,7 @@ export class UserInfoEditPanel extends React.Component<UserInfoEditPanelProps, U
     }
 
     onInfoinputChange(inputName: string, value: string | boolean | number) {
-        console.log(inputName + " changed to ");
-        console.log(value);
+        console.log(inputName + " changed to " + value);
         this.setState({
             editedData: {
                 ...this.state.editedData,
@@ -434,6 +436,7 @@ export class UserInfoEditPanel extends React.Component<UserInfoEditPanelProps, U
             [inputName]: value,
         }
         this.props.userEdited(editedUser);
+        console.log("after this.props.userEdited called");
     }
 
     render() {

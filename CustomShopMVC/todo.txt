@@ -4,10 +4,12 @@ create user managment in admin panel
 
 == FOCUS DEMANDING ==
 
-== TECHNICAL PLAN ==
+== TO DO ==
 implement authorization in controllers
 user settings panel: darkMode, changing(password, username, personal data ) 
 implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
+do 404 page
+change product[type]property to categoryProduct[type]property names
 
 == REQUIREMENTS ==
 
