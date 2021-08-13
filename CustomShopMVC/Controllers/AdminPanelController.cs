@@ -135,13 +135,13 @@ namespace CustomShopMVC.Controllers
 			}
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
-				string sql = "SELECT * FROM [ProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+				string sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductChoosableProperty> sqlSelect = conn.Query<CategoryProductChoosableProperty>(sql, param);
 				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryChoosablePropertyViewModel>>(sqlSelect);
 
-				sql = "SELECT * FROM [ProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+				sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 				param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductMeasurableProperty> sqlSelect2 = conn.Query<CategoryProductMeasurableProperty>(sql, param);
@@ -158,12 +158,13 @@ namespace CustomShopMVC.Controllers
 			SaveCategoryProductMeasurablePropertyDataOut result = new SaveCategoryProductMeasurablePropertyDataOut();
 			if (model.MeasurableProperty.Id.Contains("new"))
 			{
-				
+				string sql = "INSERT INTO ["
 			}
 			else
 			{
 
 			}
+			return result;
 		}
 		#endregion
 
