@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CustomShopMVC.DataAccess.DatabaseModels
 {
-	public class CategoryProduct
+	public class Category_Product
 	{
 		public Guid ProductId { get; set; }
 		public Product Product { get; set; }

@@ -42,20 +42,20 @@ namespace CustomShopMVC.Helpers
 				#endregion role
 
 				#region categoryProperty
-				cfg.CreateMap<ProductChoosableProperty, CategoryChoosablePropertyViewModel>()
+				cfg.CreateMap<CategoryProductChoosableProperty, CategoryChoosablePropertyViewModel>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
 				;
-				cfg.CreateMap<CategoryChoosablePropertyViewModel, ProductChoosableProperty>()
+				cfg.CreateMap<CategoryChoosablePropertyViewModel, CategoryProductChoosableProperty>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => Guid.Parse(src.CategoryId)))
 				;
 
-				cfg.CreateMap<ProductMeasurableProperty, CategoryMeasurablePropertyViewModel>()
+				cfg.CreateMap<CategoryProductMeasurableProperty, CategoryMeasurablePropertyViewModel>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
 				;
-				cfg.CreateMap<CategoryMeasurablePropertyViewModel, ProductMeasurableProperty>()
+				cfg.CreateMap<CategoryMeasurablePropertyViewModel, CategoryProductMeasurableProperty>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => Guid.Parse(src.CategoryId)))
 				;

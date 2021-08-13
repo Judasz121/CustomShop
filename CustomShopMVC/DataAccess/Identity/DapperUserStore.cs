@@ -77,7 +77,7 @@ namespace CustomShopMVC.Identity
                 if(result == 0)
                     return IdentityResult.Failed(new IdentityError() { Code = "120", Description = "Unknown error occured; cannot create user." });
 
-                query = "INSERT INTO [UserSettings] (Id, UserId) VALUES (@Id, @UserId)";
+                query = "INSERT INTO [UsersSettings] (Id, UserId) VALUES (@Id, @UserId)";
                 param = new DynamicParameters();
                 param.Add("@Id", Guid.NewGuid());
                 param.Add("@UserId", user.Id);

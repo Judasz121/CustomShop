@@ -41,7 +41,7 @@ namespace CustomShopMVC.Controllers
 				string userId = User.Claims.Where(c => c.Type == "Id").First().Value;
 
 				DynamicParameters param = new DynamicParameters();
-				string sql = "SELECT * FROM [UserSettings] WHERE [UserId] = @Id";
+				string sql = "SELECT * FROM [UsersSettings] WHERE [UserId] = @Id";
 				param.Add("@Id", userId);
 				
 				UserSettings queryResult = (await conn.QueryAsync<UserSettings>(sql, param)).First();
@@ -57,7 +57,7 @@ namespace CustomShopMVC.Controllers
 			SaveSettingsDataOut result = new SaveSettingsDataOut();
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
-				string sql = "UPDATE [UserSettings] SET [DarkMode] = @DarkMode  WHERE [Id] = @Id";
+				string sql = "UPDATE [UsersSettings] SET [DarkMode] = @DarkMode  WHERE [Id] = @Id";
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@Id", model.Id);
 				param.Add("@DarkMode", model.DarkMode);

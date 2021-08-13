@@ -14,8 +14,8 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string ThumbnailImage { get; set; }
 		public List<string> Images { get; set; }
 		public int Quantity { get; set; }
-		public Dictionary<ProductChoosableProperty, string> ChoosablePropertiesValues { get; set; }
-		public Dictionary<ProductMeasurableProperty, float> QuantityPropertiesValues { get; set; }
+		public Dictionary<CategoryProductChoosableProperty, string> ChoosablePropertiesValues { get; set; }
+		public Dictionary<CategoryProductMeasurableProperty, float> QuantityPropertiesValues { get; set; }
 	}
 }
 

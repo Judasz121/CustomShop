@@ -138,14 +138,14 @@ namespace CustomShopMVC.Controllers
 				string sql = "SELECT * FROM [ProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
-				IEnumerable<ProductChoosableProperty> sqlSelect = conn.Query<ProductChoosableProperty>(sql, param);
-				result.ChoosableProperties = mapper.Map<IEnumerable<ProductChoosableProperty>, List<CategoryChoosablePropertyViewModel>>(sqlSelect);
+				IEnumerable<CategoryProductChoosableProperty> sqlSelect = conn.Query<CategoryProductChoosableProperty>(sql, param);
+				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryChoosablePropertyViewModel>>(sqlSelect);
 
 				sql = "SELECT * FROM [ProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 				param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
-				IEnumerable<ProductMeasurableProperty> sqlSelect2 = conn.Query<ProductMeasurableProperty>(sql, param);
-				result.MeasurableProperties = mapper.Map<IEnumerable<ProductMeasurableProperty>, List<CategoryMeasurablePropertyViewModel>>(sqlSelect2);
+				IEnumerable<CategoryProductMeasurableProperty> sqlSelect2 = conn.Query<CategoryProductMeasurableProperty>(sql, param);
+				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryMeasurablePropertyViewModel>>(sqlSelect2);
 				result.Success = true;
 			}
 			
