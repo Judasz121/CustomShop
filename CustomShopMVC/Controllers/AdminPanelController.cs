@@ -159,21 +159,23 @@ namespace CustomShopMVC.Controllers
 			if (model.MeasurableProperty.Id.Contains("new"))
 			{
 				Guid newId = Guid.NewGuid();
-				DynamicParameters param = new DynamicParameters();
 				string sql;
 				int insert;
+				int count;
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@Id", newId);
+				param.Add("@CategoryId", model.MeasurableProperty.CategoryId);
+				param.Add("@PropertyName", model.MeasurableProperty.PropertyName);
+				param.Add("@PropertyNameAbbreviation", model.MeasurableProperty.PropertyNameAbbreviation);
+				param.Add("@UnitFullName", model.MeasurableProperty.UnitFullName);
+				param.Add("@UnitName", model.MeasurableProperty.UnitName);
+				param.Add("@IsMetric", model.MeasurableProperty.IsMetric);
+				param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
 
 					int test;
-					param.Add("@Id", newId);
-					param.Add("@CategoryId", model.MeasurableProperty.CategoryId);
-					param.Add("@PropertyName", model.MeasurableProperty.PropertyName);
-					param.Add("@PropertyNameAbbreviation", model.MeasurableProperty.PropertyNameAbbreviation);
-					param.Add("@UnitFullName", model.MeasurableProperty.UnitFullName);
-					param.Add("@UnitName", model.MeasurableProperty.UnitName);
-					param.Add("@IsMetric", model.MeasurableProperty.IsMetric);
-					param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
+
 
 					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
 					int count = conn.ExecuteScalar<int>(sql, param);
@@ -205,7 +207,34 @@ namespace CustomShopMVC.Controllers
 			}
 			else
 			{
-				string sql = "UPDATE [CategoryProductMeasurableProperties] SET "
+				string sql;
+				int update;
+				int count;
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@Id", model.MeasurableProperty.Id);
+				param.Add("@CategoryId", model.MeasurableProperty.CategoryId);
+				param.Add("@PropertyName", model.MeasurableProperty.PropertyName);
+				param.Add("@PropertyNameAbbreviation", model.MeasurableProperty.PropertyNameAbbreviation);
+				param.Add("@UnitFullName", model.MeasurableProperty.UnitFullName);
+				param.Add("@UnitName", model.MeasurableProperty.UnitName);
+				param.Add("@IsMetric", model.MeasurableProperty.IsMetric);
+				param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
+				using (IDbConnection conn = _dataAccess.GetDbConnection())
+				{
+					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [UnitFullName] = @UnitFullName, [IsMetric] = @IsMetric, [ToMetricModifier] = @ToMetricModifier WHERE [Id] = @Id";
+					update = conn.Execute(sql, param);
+					if(update == 0)
+					{
+						result.FormError = "Could not insert into DB";
+						result.Success = false;
+						return result;
+					}
+					else
+					{
+						result.Success = true;
+						return result;
+					}
+				}
 			}
 			return result;
 		}
