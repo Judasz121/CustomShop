@@ -23,8 +23,9 @@ type CategoryPropertiesManagmentPanelState = {
 type CategoryProductPropertiesFetchResponse = {
     choosableProperties: IChoosableProperty[],
     measurableProperties: IMeasurableProperty[],
-    error: string,
+    formError: string,
     success: boolean,
+    nameError: string,
 }
 
 
@@ -36,7 +37,8 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
         this.state = {
             ajaxResponse: {
                 success: false,
-                error: "",
+                formError: "",
+                nameError:"",
                 measurableProperties: [],
                 choosableProperties: [],
             },

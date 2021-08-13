@@ -158,11 +158,54 @@ namespace CustomShopMVC.Controllers
 			SaveCategoryProductMeasurablePropertyDataOut result = new SaveCategoryProductMeasurablePropertyDataOut();
 			if (model.MeasurableProperty.Id.Contains("new"))
 			{
-				string sql = "INSERT INTO ["
+				Guid newId = Guid.NewGuid();
+				DynamicParameters param = new DynamicParameters();
+				string sql;
+				int insert;
+				using (IDbConnection conn = _dataAccess.GetDbConnection())
+				{
+
+					int test;
+					param.Add("@Id", newId);
+					param.Add("@CategoryId", model.MeasurableProperty.CategoryId);
+					param.Add("@PropertyName", model.MeasurableProperty.PropertyName);
+					param.Add("@PropertyNameAbbreviation", model.MeasurableProperty.PropertyNameAbbreviation);
+					param.Add("@UnitFullName", model.MeasurableProperty.UnitFullName);
+					param.Add("@UnitName", model.MeasurableProperty.UnitName);
+					param.Add("@IsMetric", model.MeasurableProperty.IsMetric);
+					param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
+
+					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
+					int count = conn.ExecuteScalar<int>(sql, param);
+					if(count > 0)
+					{
+						result.Success = false;
+						result.NameError = "There already exists property with this name or name abbreviation";
+						return result;
+					}
+					
+					 sql = "INSERT INTO [CategoryProductMeasurableProperties] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @UnitFullName, @UnitName, @IsMetric, ToMetricModifier)";
+
+					
+
+					insert = conn.Execute(sql, param);
+				}
+				if(insert == 0)
+				{
+					result.Success = false;
+					result.FormError = "Could not insert into DB.";
+					return result;
+				}
+				else
+				{
+					result.Success = true;
+					result.NewId = newId.ToString();
+					return result;
+				}
 			}
 			else
 			{
-
+				string sql = "UPDATE [CategoryProductMeasurableProperties] SET "
 			}
 			return result;
 		}

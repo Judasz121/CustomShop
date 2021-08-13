@@ -75,9 +75,10 @@ namespace CustomShopMVC.Models
 
 	public class SaveCategoryProductMeasurablePropertyDataOut
 	{
-		public string newId { get; set; }
-		public bool success { get; set; }
-		public string formError { get; set; }
+		public string NewId { get; set; }
+		public bool Success { get; set; }
+		public string FormError { get; set; }
+		public string NameError { get; set; }
 	}
 
 	#endregion categories
