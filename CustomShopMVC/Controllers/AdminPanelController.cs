@@ -151,7 +151,9 @@ namespace CustomShopMVC.Controllers
 			
 			return result;
 		}
-
+		
+		[HttpPost]
+		[Route("{action}")]
 		public async Task<ActionResult<SaveCategoryProductMeasurablePropertyDataOut>> SaveCategoryProductMeasurableProperty(SaveCategoryProductMeasurablePropertyDataIn model)
 		{
 			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
@@ -174,8 +176,6 @@ namespace CustomShopMVC.Controllers
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
 
-					int test;
-
 
 					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
 					count = conn.ExecuteScalar<int>(sql, param);
@@ -186,7 +186,7 @@ namespace CustomShopMVC.Controllers
 						return result;
 					}
 					
-					 sql = "INSERT INTO [CategoryProductMeasurableProperties] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @UnitFullName, @UnitName, @IsMetric, ToMetricModifier)";
+					 sql = "INSERT INTO [CategoryProductMeasurableProperties] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @UnitFullName, @UnitName, @IsMetric, @ToMetricModifier)";
 
 					
 
@@ -221,7 +221,7 @@ namespace CustomShopMVC.Controllers
 				param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
-					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [UnitFullName] = @UnitFullName, [IsMetric] = @IsMetric, [ToMetricModifier] = @ToMetricModifier WHERE [Id] = @Id";
+					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [UnitFullName] = @UnitFullName, [UnitName] = @UnitName, [IsMetric] = @IsMetric, [ToMetricModifier] = @ToMetricModifier WHERE [Id] = @Id";
 					update = conn.Execute(sql, param);
 					if(update == 0)
 					{
