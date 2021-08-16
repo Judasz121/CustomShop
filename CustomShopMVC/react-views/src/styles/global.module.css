@@ -33,11 +33,11 @@
 	border-radius: 2px;
 }
 .button:hover{
-	background: black;
-	color: white;
+	background:white;
 }
 .button:active{
-	color:yellow;
+	background: black;
+	color: white;
 }
 /* #endregion button */
 /* #region checkBoxSwitch */

@@ -132,7 +132,7 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
         console.log("add new choosable end");
     }
 
-    addNewMeasurableProperty() {
+    addNewMeasurableProperty() {        
         var newProp: IMeasurableProperty = {
             id: "new" + this.state.newMeasurablePropertyId,
             categoryId: this.props.match.params.categoryId,
@@ -168,7 +168,7 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                 <div className="CategoryPropertiesManagmentPanelList">
                     categoryId: {this.props.match.params.categoryId}
                     <div className={style.buttonGroup}>
-                        <div className="header">Add new</div>
+                        <h1>Add new</h1>
                         <button className={globalStyle.button} onClick={this.addNewChoosableProperty}>Choosable Property</button>
                         <button className={globalStyle.button} onClick={this.addNewMeasurableProperty}>Measurable Property</button>
                     </div>
@@ -202,6 +202,7 @@ type MeasurablePropertyInfoEditPanelProps = {
 }
 type MeasurablePropertyInfoEditPanelState = {
     editingEnabled: boolean,
+    measurableProperty: IMeasurableProperty,
     saveResponse: {
         formError: string,
         success: boolean,
@@ -214,6 +215,7 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
 
         this.state = {
             editingEnabled: false,
+            measurableProperty: this.props.measurableProperty,
             saveResponse: {
                 formError: "",
                 success: false,
@@ -234,11 +236,32 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
     }
 
     saveProperty() {
-
+        let url = Constants.baseUrl + "/AdminPanel/SaveCategoryProductMeasurableProperty";
+        let dataToSend = { measurableProperty: this.state.measurableProperty };
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("choosable property save response:");
+                console.log(data);
+            })
     }
 
     onInfoinputChange(inputName: string, value: string | boolean | number) {
+        let newProp: IMeasurableProperty = {
+            ...this.state.measurableProperty,
+            [inputName]: value,
+        }
+        this.setState({
+            measurableProperty: newProp
+        })
 
+        this.props.onChange(newProp);
     }
 
     render() {
@@ -358,17 +381,32 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
         this.cancelEditing = this.cancelEditing.bind(this);
     }
     onInfoinputChange(inputName: string, value: string | number | boolean) {
+        let newProp: IChoosableProperty = {
+            ...this.state.choosableProperty,
+            [inputName]: value,
+        }
         this.setState({
-            choosableProperty: {
-                ...this.state.choosableProperty,
-                [inputName]: value,
-            },
-
+            choosableProperty: newProp,
         });
-        this.props.onChange(this.state.choosableProperty);
+        this.props.onChange(newProp);
     }
     saveProperty() {
-
+        let url = Constants.baseUrl + "/AdminPanel/SaveCategoryProductChoosableProperty";
+        let dataToSend = {
+            choosableProperty: this.state.choosableProperty,
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then((response) => response.json())
+        .then((data) => {
+            console.log("choosable property save response:");
+            console.log(data);
+        })
     }
     enableEditing() {
         this.setState({
