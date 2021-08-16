@@ -238,6 +238,8 @@ namespace CustomShopMVC.Controllers
 			}
 			return result;
 		}
+		[HttpPost]
+		[Route("{action}")]
 		public async Task<ActionResult<SaveCategoryProductChoosablePropertyDataOut>> SaveCategoryProductChoosableProperty(SaveCategoryProductChoosablePropertyDataIn model)
 		{
 			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
@@ -258,7 +260,7 @@ namespace CustomShopMVC.Controllers
 				{
 
 
-					sql = "SELECT COUNT(*) FROM [CategoryProductChoosableProperty] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
+					sql = "SELECT COUNT(*) FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
 					count = conn.ExecuteScalar<int>(sql, param);
 					if (count > 0)
 					{
@@ -267,7 +269,7 @@ namespace CustomShopMVC.Controllers
 						return result;
 					}
 
-					sql = "INSERT INTO [CategoryProductChoosableProperty] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @ItemsToChoose)";
+					sql = "INSERT INTO [CategoryProductChoosableProperties] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @ItemsToChoose)";
 
 
 
@@ -299,7 +301,7 @@ namespace CustomShopMVC.Controllers
 				param.Add("@ItemsToChoose", model.ChoosableProperty.ItemsToChoose);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
-					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [ItemsToChoose] = @ItemsToChoose, WHERE [Id] = @Id";
+					sql = "UPDATE [CategoryProductChoosableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [ItemsToChoose] = @ItemsToChoose, WHERE [Id] = @Id";
 					update = conn.Execute(sql, param);
 					if (update == 0)
 					{
