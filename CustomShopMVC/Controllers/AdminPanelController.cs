@@ -145,7 +145,7 @@ namespace CustomShopMVC.Controllers
 				param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductMeasurableProperty> sqlSelect2 = conn.Query<CategoryProductMeasurableProperty>(sql, param);
-				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryMeasurablePropertyViewModel>>(sqlSelect2);
+				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(sqlSelect2);
 				result.Success = true;
 			}
 			
@@ -224,6 +224,84 @@ namespace CustomShopMVC.Controllers
 					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [UnitFullName] = @UnitFullName, [UnitName] = @UnitName, [IsMetric] = @IsMetric, [ToMetricModifier] = @ToMetricModifier WHERE [Id] = @Id";
 					update = conn.Execute(sql, param);
 					if(update == 0)
+					{
+						result.FormError = "Could not insert into DB";
+						result.Success = false;
+						return result;
+					}
+					else
+					{
+						result.Success = true;
+						return result;
+					}
+				}
+			}
+			return result;
+		}
+		public async Task<ActionResult<SaveCategoryProductChoosablePropertyDataOut>> SaveCategoryProductChoosableProperty(SaveCategoryProductChoosablePropertyDataIn model)
+		{
+			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
+			SaveCategoryProductChoosablePropertyDataOut result = new SaveCategoryProductChoosablePropertyDataOut();
+			if (model.ChoosableProperty.Id.Contains("new"))
+			{
+				Guid newId = Guid.NewGuid();
+				string sql;
+				int insert;
+				int count;
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@Id", newId);
+				param.Add("@CategoryId", model.ChoosableProperty.CategoryId);
+				param.Add("@PropertyName", model.ChoosableProperty.PropertyName);
+				param.Add("@PropertyNameAbbreviation", model.ChoosableProperty.PropertyNameAbbreviation);
+				param.Add("@ItemsToChoose", model.ChoosableProperty.ItemsToChoose);
+				using (IDbConnection conn = _dataAccess.GetDbConnection())
+				{
+
+
+					sql = "SELECT COUNT(*) FROM [CategoryProductChoosableProperty] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
+					count = conn.ExecuteScalar<int>(sql, param);
+					if (count > 0)
+					{
+						result.Success = false;
+						result.NameError = "There already exists property with this name or name abbreviation";
+						return result;
+					}
+
+					sql = "INSERT INTO [CategoryProductChoosableProperty] VALUES(@Id, @CategoryId, @PropertyName, @PropertyNameAbbreviation, @ItemsToChoose)";
+
+
+
+					insert = conn.Execute(sql, param);
+				}
+				if (insert == 0)
+				{
+					result.Success = false;
+					result.FormError = "Could not insert into DB.";
+					return result;
+				}
+				else
+				{
+					result.Success = true;
+					result.NewId = newId.ToString();
+					return result;
+				}
+			}
+			else
+			{
+				string sql;
+				int update;
+				int count;
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@Id", model.ChoosableProperty.Id);
+				param.Add("@CategoryId", model.ChoosableProperty.CategoryId);
+				param.Add("@PropertyName", model.ChoosableProperty.PropertyName);
+				param.Add("@PropertyNameAbbreviation", model.ChoosableProperty.PropertyNameAbbreviation);
+				param.Add("@ItemsToChoose", model.ChoosableProperty.ItemsToChoose);
+				using (IDbConnection conn = _dataAccess.GetDbConnection())
+				{
+					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [ItemsToChoose] = @ItemsToChoose, WHERE [Id] = @Id";
+					update = conn.Execute(sql, param);
+					if (update == 0)
 					{
 						result.FormError = "Could not insert into DB";
 						result.Success = false;

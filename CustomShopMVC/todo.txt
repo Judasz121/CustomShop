@@ -9,7 +9,7 @@ implement authorization in controllers
 user settings panel: darkMode, changing(password, username, personal data ) 
 implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
 do 404 page
-change product[type]property to categoryProduct[type]property names
+sort classes from /Models folder to /Models/ControllerDataModels and /Models/ViewModels
 
 == REQUIREMENTS ==
 

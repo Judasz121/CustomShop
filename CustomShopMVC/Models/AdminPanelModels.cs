@@ -21,7 +21,7 @@ namespace CustomShopMVC.Models
 	{
 		public string Id { get; set; }
 		public string ParentId { get; set; }
-		public string Name { get;set; }
+		public string Name { get; set; }
 
 	}
 
@@ -43,7 +43,7 @@ namespace CustomShopMVC.Models
 	public class GetCategoryPropertiesDataOut
 	{
 		public List<CategoryChoosablePropertyViewModel> ChoosableProperties { get; set; }
-		public List<CategoryMeasurablePropertyViewModel> MeasurableProperties { get; set; }
+		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
 		public string Error { get; set; }
 		public bool Success { get; set; }
 	}
@@ -55,7 +55,7 @@ namespace CustomShopMVC.Models
 		public string PropertyNameAbbreviation { get; set; }
 		public List<string> ItemsToChoose { get; set; }
 	}
-	public class CategoryMeasurablePropertyViewModel
+	public class CategoryProductMeasurablePropertyViewModel
 	{
 		public string Id { get; set; }
 		public string CategoryId { get; set; }
@@ -70,7 +70,7 @@ namespace CustomShopMVC.Models
 
 	public class SaveCategoryProductMeasurablePropertyDataIn
 	{
-		public CategoryMeasurablePropertyViewModel MeasurableProperty { get; set; }
+		public CategoryProductMeasurablePropertyViewModel MeasurableProperty { get; set; }
 	}
 
 	public class SaveCategoryProductMeasurablePropertyDataOut
@@ -79,6 +79,28 @@ namespace CustomShopMVC.Models
 		public bool Success { get; set; }
 		public string FormError { get; set; }
 		public string NameError { get; set; }
+	}
+
+	public class CategoryProductChoosablePropertyViewModel
+	{
+		public string Id { get; set; }
+		public string CategoryId { get; set; }
+		public string PropertyName { get; set; }
+		public string PropertyNameAbbreviation { get; set; }
+		public List<string> ItemsToChoose { get; set; }
+	}
+	public class SaveCategoryProductChoosablePropertyDataIn
+	{
+		public CategoryProductChoosablePropertyViewModel ChoosableProperty { get; set; }
+	}
+
+	public class SaveCategoryProductChoosablePropertyDataOut
+	{
+		public bool Success { get; set; }
+		public string NewId { get; set; }
+		public string FormError { get; set; }
+		public string NameError { get; set; }
+
 	}
 
 	#endregion categories

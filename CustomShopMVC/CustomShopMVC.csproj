@@ -68,4 +68,9 @@
     </TypeScriptCompile>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\ControllerDataModels\" />
+    <Folder Include="Models\ViewModels\" />
+  </ItemGroup>
+
 </Project>
