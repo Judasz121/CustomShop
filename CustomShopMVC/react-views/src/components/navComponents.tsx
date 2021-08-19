@@ -64,6 +64,9 @@ class AuthInfoHorizontal extends React.Component<{}, AuthInfoHorizontalState> {
         }
 
         this.checkIfLoggedIn = this.checkIfLoggedIn.bind(this);
+        
+    }
+    componentDidMount() {
         this.checkIfLoggedIn();
     }
 

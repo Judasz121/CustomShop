@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../router/constants';
-import { TextInfoInput, CheckBoxInfoInput } from '../../components/globalInputComponents';
+import { TextInfoInput, CheckBoxInfoInput, InfoInputStringList } from '../../components/globalInputComponents';
 import style from "../../styles/adminPanel.module.css";
 import { IMeasurableProperty, IChoosableProperty, ICategoryProductProperty } from "../../types/categoryPropertyTypes";
 import { RouteComponentProps, useParams } from 'react-router-dom';
@@ -388,12 +388,12 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                         />
                     </div>
                     <div className="inputGroup">
+                        <span>Is Unit Metric?</span>
                         <CheckBoxInfoInput
                             inputName="isMetric"
                             value={this.props.measurableProperty.isMetric}
                             editingEnabled={this.state.editingEnabled}
                             onChange={this.onInfoinputChange}
-                            label="Is Unit Metric?"
                         />
                     </div>
                     <div className="inputGroup">
@@ -550,7 +550,14 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                     </div>
                     <div className="inputGroup">
                         <span>Items to choose</span>
+                        <InfoInputStringList
+                            items={this.props.choosableProperty.itemsToChoose}
+                            onChange={this.onInfoinputChange}
+                            inputName="itemsToChoose"
+                            
+                            editingEnabled={this.state.editingEnabled}
 
+                        />
                     </div>
                 </div>
                 <div className="formError">

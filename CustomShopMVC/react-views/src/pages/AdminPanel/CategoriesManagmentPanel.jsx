@@ -99,7 +99,6 @@ class CategoryTree extends React.Component {
 
     generateTreeNodeProps({ node, path }) {
         const getNodeKey = ({ treeIndex }) => treeIndex;
-        console.log(node);
         let result =
         {
             buttons: [

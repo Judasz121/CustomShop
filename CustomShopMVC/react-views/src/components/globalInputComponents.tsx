@@ -1,6 +1,6 @@
-﻿import React from 'react';
+﻿import React, { ReactNode } from 'react';
 import style from '../styles/global.module.css';
-import { X as XIcon } from 'react-bootstrap-icons';
+import { Key, X as XIcon } from 'react-bootstrap-icons';
 
 
 
@@ -56,7 +56,6 @@ type CheckBoxInfoInputProps = {
     editingEnabled:boolean,
     value: boolean,
     inputName: string,
-    label: string,
 }
 type CheckBoxInfoInputState = {
 
@@ -77,19 +76,18 @@ export class CheckBoxInfoInput extends React.Component<CheckBoxInfoInputProps, C
                 name={this.props.inputName}
                 onChange={this.handleValueChange}
                 checked={this.props.value}
+                className="CheckBoxInfoInput"
             />
         else
             input = <input
                 type="checkbox"
                 disabled
                 checked={this.props.value}
+                className="CheckBoxInfoInput"
             />
 
         return (
-            <label className="CheckBoxInfoInput">
-                {this.props.label + " "} 
                 {input}
-            </label>
         )
     }
 }
@@ -135,97 +133,124 @@ export class CheckBoxSwitch extends React.Component<CheckBoxSwitchProps, CheckBo
 }
 // #endregion CheckBoxSwitch
 
-// #region InfoInputList
+// #region InfoInputPrimitiveList
+type InfoInputPrimitiveList_PropsItem = {
+    id: string,
+    value: string | boolean | number,
+    viewName: string,
+}
+// #endregion
 
-type InfoInputListProps = {
-    items: InfoInputListPropsItem[],
+// #region InfoInputStringList
+
+type InfoInputStringListProps = {
+    items: string[],
     editingEnabled: boolean,
     onChange: Function,
     inputName: string,
 }
-type InfoInputListState = {
-
+type InfoInputStringListState = {
+    editedItems: InfoInputStringList_StateItem[],
 }
-type InfoInputListPropsItem = {
+type InfoInputStringList_StateItem = {
+    id: number,
     value: string,
-    id: string | number,
 }
 
-export class InfoInputList extends React.Component<InfoInputListProps, InfoInputListState> {
-    constructor(props: InfoInputListProps) {
+
+export class InfoInputStringList extends React.Component<InfoInputStringListProps, InfoInputStringListState> {
+    constructor(props: InfoInputStringListProps) {
         super(props);
+        this.state = {
+            editedItems: this.props.items.map((item, index) => {
+                let newItem: InfoInputStringList_StateItem = {
+                    id: index,
+                    value: item,
+                }
+                return newItem;
+            }),
+
+        }
+
+
         this.deleteListItem = this.deleteListItem.bind(this);
         this.addListItem = this.addListItem.bind(this);
         this.onChange = this.onChange.bind(this);
     }
-    deleteListItem(id: string | number) {
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.filter((item) => {
-            return item.id != id;
+    deleteListItem(id: number) {
+        let filtered = this.state.editedItems.filter((item) => {
+            return id != item.id;
         });
-        this.props.onChange(this.props.inputName, arrayToSend);
+        let toSend = filtered.map((item) => item.value);
+        //this.setState({
+        //    editedItems: filtered,
+        //});
+
+        this.props.onChange(this.props.inputName, toSend);
     }
     addListItem() {
-        let newItem: InfoInputListPropsItem = {
-            id: "new",
-            value: ""
+        let newItem: InfoInputStringList_StateItem = {
+            id: Math.max.apply(Math, this.state.editedItems.map((item) => item.id)),
+            value: "",
         };
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.slice();
-        arrayToSend.push(newItem);
+        //this.setState({
+        //    editedItems: [
+        //        ...this.state.editedItems,
+        //        newItem,
+        //    ],
+        //});
+
+        let arrayToSend: string[] = this.state.editedItems.map((item) => item.value);
+        arrayToSend.push(newItem.value);
         this.props.onChange(this.props.inputName, arrayToSend);
     }
-    onChange(id: string | number) {
-        let arrayToSend: InfoInputListPropsItem[] = this.props.items.slice();
-        let itemToChange = arrayToSend.filter((item) => {
+    onChange(id: number, value: string) {
+
+        let editedItems: InfoInputStringList_StateItem[] = this.state.editedItems.slice();
+        let itemToChange = editedItems.filter((item) => {
             return item.id == id;
         })[0];
-        let index = arrayToSend.indexOf(itemToChange);
-        arrayToSend[index] = itemToChange;
+        let index = editedItems.indexOf(itemToChange);
+        editedItems[index] = itemToChange;
 
-        this.props.onChange(this.props.inputName, arrayToSend);
+        //this.setState({
+        //    editedItems: editedItems,
+        //});
+
+        this.props.onChange(this.props.inputName, editedItems.map((item) => item.value));
     }
     render() {
-        if (this.props.editingEnabled)
-            return (
-                <div className={style.editableList} >
-                    {this.props.items.map((item) => (
-                        <InfoInputList_InputItem
-                            value={item.value}
-                            id={item.id}
-                            deleteItem={this.deleteListItem}
-                            onChange={this.onChange}
-                            addItem={this.addListItem}
-                        />
-                    ))}
+        return (
+            <div className={"InfoInputStringList " + style.editableList} >
+                <button className={style.button} onClick={this.addListItem} >Add new</button>
+                {this.state.editedItems.map((item) => (
+                    <InfoInputStringList_InfoInputItem
+                        value={item.value}
+                        id={item.id}
+                        deleteItem={this.deleteListItem}
+                        onChange={this.onChange}
+                        editingEnabled={this.props.editingEnabled}
+                    />
+                ))}
 
-                </div>
-            )
-        else
-            return (
-                <div className={style.editableList + " " + style.editingDisabled} >
-                    {this.props.items.map((item) => (
-                        <div className={style.editableListItem + " " + style.editingDisabled} >
-                            {item.value}
-                        </div>
-                    ))}
-                </div>
-            )
+            </div>
+        )
     }
 }
 
 
-type InfoInputList_InputItemProps = {
+type InfoInputStringList_InputItemProps = {
     onChange: Function,
     deleteItem: Function,
-    addItem: Function,
     value: string,
     id: number | string,
+    editingEnabled: boolean,
 }
-type InfoInputList_InputItemState = {
+type InfoInputStringList_InputItemState = {
 
 }
-// this is only input ( no info "part" here )
-class InfoInputList_InputItem extends React.Component<InfoInputList_InputItemProps, InfoInputList_InputItemState>{
-    constructor(props: InfoInputList_InputItemProps) {
+class InfoInputStringList_InfoInputItem extends React.Component<InfoInputStringList_InputItemProps, InfoInputStringList_InputItemState>{
+    constructor(props: InfoInputStringList_InputItemProps) {
         super(props);
 
         this.onChange = this.onChange.bind(this);
@@ -237,14 +262,202 @@ class InfoInputList_InputItem extends React.Component<InfoInputList_InputItemPro
     deleteItem(e: React.MouseEvent<HTMLButtonElement>) {
         this.props.deleteItem(this.props.id)
     }
-    addItem() {
-        this.props.addItem();
+
+    render() {
+        if (this.props.editingEnabled)
+            return (
+                <div className={"InfoInputStringList_Item"}>
+                    <input onChange={this.onChange} value={this.props.value} type="text" />
+                    <button onClick={this.deleteItem} ><XIcon color="red" size={25} /> </button>
+                </div>
+            )
+        else
+            return (
+                <div className={"InfoInputStringList_Item"}>
+                    {this.props.value}
+                </div>
+                )
+    }
+}
+
+// #endregion InfoInputStringList
+
+// #region InfoInputObjectList
+
+type InfoInputObjectListProps = {
+    items: InfoInputObjectList_PropsItem[],
+    viewNames: InfoInputObjectListViewNames,
+    editingEnabled: boolean,
+    onChange: Function,
+    inputName: string,
+}
+type InfoInputObjectListState = {
+    newItemIdNumber: number,
+}
+type InfoInputObjectListViewNames = Record<string, string>
+
+type InfoInputObjectList_PropsItem = {
+    id: string,
+    [key:string]: any,
+}
+export class InfoInputObjectList extends React.Component<InfoInputObjectListProps, InfoInputObjectListState> {
+    constructor(props: InfoInputObjectListProps) {
+        super(props);
+        this.state = {
+            newItemIdNumber: 0,
+        }
+
+        this.deleteListItem = this.deleteListItem.bind(this);
+        this.addListItem = this.addListItem.bind(this);
+        this.onChange = this.onChange.bind(this);
+
+        this.clearObjectProperties = this.clearObjectProperties.bind(this);
+        this.getViewName = this.getViewName.bind(this);
+    }
+    deleteListItem(id: string | number) {
+        let arrayToSend: any[] = this.props.items.filter((item) => {
+            return item.id != id;
+        });
+        this.props.onChange(this.props.inputName, arrayToSend);
     }
 
+    clearObjectProperties(object: any) {
+        var thisComponent = this;
+        Object.keys(object).forEach(function (key, index) {
+            if (typeof object[key] == "string")
+                object[key] = "";
+            else if (typeof object[key] == "number")
+                object[key] = 0;
+            else if (typeof object[key] == typeof "Object")
+                object[key] = thisComponent.clearObjectProperties(object[key])
+        });
+        return object;
+    }
+
+    getViewName(name: string) {
+        return name;
+    }
+    addListItem() {
+        var newItem = this.props.items[0];
+
+        this.clearObjectProperties(newItem);
+        newItem.id = "new" + this.state.newItemIdNumber;
+        this.setState({
+            newItemIdNumber: this.state.newItemIdNumber + 1,
+        });
+
+        let arrayToSend: InfoInputObjectList_PropsItem[] = this.props.items.slice();
+        arrayToSend.push(newItem);
+        this.props.onChange(this.props.inputName, arrayToSend);
+    }
+    onChange(id: string) {
+        let arrayToSend: InfoInputObjectList_PropsItem[] = this.props.items.slice();
+        let itemToChange = arrayToSend.filter((item) => {
+            return item.id == id;
+        })[0];
+        let index = arrayToSend.indexOf(itemToChange);
+        arrayToSend[index] = itemToChange;
+
+        this.props.onChange(this.props.inputName, arrayToSend);
+    }
+    render() {
+        return (
+            <div className={"InfoInputStringList " + style.editableList} >
+                <button className={style.button} onClick={this.addListItem} >Add new</button>
+                {this.props.items.map((item) => (
+                    <InfoInputObjectList_InfoInputItem
+                        data={item}
+                        viewNames={this.props.viewNames}
+                        editingEnabled={this.props.editingEnabled}
+                        deleteItem={this.deleteListItem}
+                        onChange={this.onChange}
+                    />
+                ))}
+
+            </div>
+        )
+    }
+}
+
+
+type InfoInputObjectList_InfoInputItemProps = {
+    onChange: Function,
+    deleteItem: Function,
+    editingEnabled: boolean,
+    data: InfoInputObjectList_PropsItem,
+    viewNames: InfoInputObjectListViewNames,
+}
+type InfoInputObjectList_InfoInputItemState = {
+
+}
+class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectList_InfoInputItemProps, InfoInputObjectList_InfoInputItemState>{
+    constructor(props: InfoInputObjectList_InfoInputItemProps) {
+        super(props);
+
+        this.onChange = this.onChange.bind(this);
+        this.deleteItem = this.deleteItem.bind(this);
+        this.getObjectInputHtml = this.getObjectInputHtml.bind(this);
+    }
+    onChange(e: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(this.props.data.id, e.target.value)
+    }
+    deleteItem(e: React.MouseEvent<HTMLButtonElement>) {
+        this.props.deleteItem(this.props.data.id)
+    }
+    getObjectInputHtml(obj: any) {
+        var thisComponent = this;
+        return (
+            <div className="InfoInputObjectList_InfoInputItem">
+                {
+                    Object.keys(this.props.data).map((item, index) => {
+                        var viewName = item;
+                        var inputType;
+                        var input;
+
+                        if (typeof obj[item] == "string")
+                            inputType = "text";
+                        else if (typeof obj[item] == "number")
+                            inputType = "number"
+                        else if (typeof obj[item] == "boolean")
+                            inputType = "checkbox";
+
+                        if (typeof thisComponent.props.viewNames[item] != "undefined" && thisComponent.props.viewNames[item] != "")
+                            viewName = thisComponent.props.viewNames[item];
+
+                        if (typeof obj[item] == "string" || typeof obj[item] == "number")
+                            input = <TextInfoInput
+                                inputName={item}
+                                editingEnabled={thisComponent.props.editingEnabled}
+                                onChange={thisComponent.onChange}
+                                value={obj[item]}
+                                placeholderValue={viewName}
+                            />
+                        else if (typeof obj[item] == "boolean")
+                            input = <CheckBoxInfoInput
+                                inputName={item}
+                                editingEnabled={thisComponent.props.editingEnabled}
+                                onChange={thisComponent.onChange}
+                                value={obj[item]}
+                            />
+                        else
+                            input = thisComponent.getObjectInputHtml(obj[item])
+
+                        return (
+                            <div className="InfoInputObjectList_InfoInputItemProperty">
+                                    <span>{viewName}</span>
+                                    {input}
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+    
     render() {
         return (
             <div className={style.editableListItem}>
-                <input onChange={this.onChange} value={this.props.value} type="text" />
+                {this.getObjectInputHtml(this.props.data)}
                 <button onClick={this.deleteItem} ><XIcon color="red" size={25} /> </button>
             </div>
         )
@@ -252,8 +465,7 @@ class InfoInputList_InputItem extends React.Component<InfoInputList_InputItemPro
 }
 
 // #endregion InfoInputList
-
-//#region ClickDropDown
+// #region ClickDropDown
 type ClickDropDownProps = {
     clickContent: any,
     dropDownContent: any,
@@ -265,4 +477,4 @@ export class ClickDropDown extends React.Component {
 
 
 
-//endregion ClickDropDown
+// #endregion ClickDropDown

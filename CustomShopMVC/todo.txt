@@ -10,6 +10,7 @@ user settings panel: darkMode, changing(password, username, personal data )
 implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
 do 404 page
 sort classes from /Models folder to /Models/ControllerDataModels and /Models/ViewModels
+test globalInputComponents/InfoInputObjectList
 
 == REQUIREMENTS ==
 
