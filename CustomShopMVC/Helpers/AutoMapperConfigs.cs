@@ -94,9 +94,12 @@ namespace CustomShopMVC.Helpers
 		public string Resolve(CategoryProductChoosablePropertyViewModel source, CategoryProductChoosableProperty destination, string member, ResolutionContext context)
 		{
 			string result = "";
-			foreach(string item in source.ItemsToChoose)
+			for (int i = 0; i < source.ItemsToChoose.Count; i++)
 			{
-				result += item;
+				if (i == 0)
+					result = source.ItemsToChoose[i];
+				else
+					result += "," + source.ItemsToChoose[i];
 			}
 			return result;
 		}
