@@ -10,6 +10,6 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid CategoryId { get; set; }
 		public string PropertyName { get; set; }
 		public string PropertyNameAbbreviation { get; set; }
-		public List<string> ItemsToChoose { get; set; }
+		public string ItemsToChoose { get; set; }
 	}
 }

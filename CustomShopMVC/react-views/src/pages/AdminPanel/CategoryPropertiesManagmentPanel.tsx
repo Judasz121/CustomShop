@@ -554,9 +554,7 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                             items={this.props.choosableProperty.itemsToChoose}
                             onChange={this.onInfoinputChange}
                             inputName="itemsToChoose"
-                            
                             editingEnabled={this.state.editingEnabled}
-
                         />
                     </div>
                 </div>

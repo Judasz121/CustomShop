@@ -87,7 +87,9 @@ export class CheckBoxInfoInput extends React.Component<CheckBoxInfoInputProps, C
             />
 
         return (
+            <div className="CheckBoxInfoInput">
                 {input}
+            </div>
         )
     }
 }
@@ -171,7 +173,7 @@ export class InfoInputStringList extends React.Component<InfoInputStringListProp
             }),
 
         }
-
+        
 
         this.deleteListItem = this.deleteListItem.bind(this);
         this.addListItem = this.addListItem.bind(this);
@@ -182,23 +184,26 @@ export class InfoInputStringList extends React.Component<InfoInputStringListProp
             return id != item.id;
         });
         let toSend = filtered.map((item) => item.value);
-        //this.setState({
-        //    editedItems: filtered,
-        //});
+        this.setState({
+            editedItems: filtered,
+        });
 
         this.props.onChange(this.props.inputName, toSend);
     }
     addListItem() {
+        let newId = Math.max.apply(Math, this.state.editedItems.map((item) => item.id)) + 1;
+        if (newId == -Infinity)
+            newId = 0;
         let newItem: InfoInputStringList_StateItem = {
-            id: Math.max.apply(Math, this.state.editedItems.map((item) => item.id)),
+            id: newId,
             value: "",
         };
-        //this.setState({
-        //    editedItems: [
-        //        ...this.state.editedItems,
-        //        newItem,
-        //    ],
-        //});
+        this.setState({
+            editedItems: [
+                ...this.state.editedItems,
+                newItem,
+            ],
+        });
 
         let arrayToSend: string[] = this.state.editedItems.map((item) => item.value);
         arrayToSend.push(newItem.value);
@@ -211,11 +216,12 @@ export class InfoInputStringList extends React.Component<InfoInputStringListProp
             return item.id == id;
         })[0];
         let index = editedItems.indexOf(itemToChange);
+        itemToChange.value = value;
         editedItems[index] = itemToChange;
 
-        //this.setState({
-        //    editedItems: editedItems,
-        //});
+        this.setState({
+            editedItems: editedItems,
+        });
 
         this.props.onChange(this.props.inputName, editedItems.map((item) => item.value));
     }
@@ -230,6 +236,7 @@ export class InfoInputStringList extends React.Component<InfoInputStringListProp
                         deleteItem={this.deleteListItem}
                         onChange={this.onChange}
                         editingEnabled={this.props.editingEnabled}
+                        key={item.id}
                     />
                 ))}
 

@@ -42,13 +42,15 @@ namespace CustomShopMVC.Helpers
 				#endregion role
 
 				#region categoryProperty
-				cfg.CreateMap<CategoryProductChoosableProperty, CategoryChoosablePropertyViewModel>()
+				cfg.CreateMap<CategoryProductChoosableProperty, CategoryProductChoosablePropertyViewModel>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+					.ForMember(p => p.ItemsToChoose, opt => opt.MapFrom(src => src.ItemsToChoose.Split(',', StringSplitOptions.None).ToList()))
 				;
-				cfg.CreateMap<CategoryChoosablePropertyViewModel, CategoryProductChoosableProperty>()
+				cfg.CreateMap<CategoryProductChoosablePropertyViewModel, CategoryProductChoosableProperty>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => Guid.Parse(src.CategoryId)))
+					.ForMember(p => p.ItemsToChoose, opt => opt.MapFrom<CategoryChoosablePropertyValueResolver>())
 				;
 
 				cfg.CreateMap<CategoryProductMeasurableProperty, CategoryProductMeasurablePropertyViewModel>()
@@ -85,6 +87,18 @@ namespace CustomShopMVC.Helpers
 					.ForMember(us => us.UserId, opt => opt.MapFrom(src => Guid.Parse(src.UserId)))
 				;
 			});
+		}
+	}
+	public class CategoryChoosablePropertyValueResolver : IValueResolver<CategoryProductChoosablePropertyViewModel, CategoryProductChoosableProperty, string>
+	{
+		public string Resolve(CategoryProductChoosablePropertyViewModel source, CategoryProductChoosableProperty destination, string member, ResolutionContext context)
+		{
+			string result = "";
+			foreach(string item in source.ItemsToChoose)
+			{
+				result += item;
+			}
+			return result;
 		}
 	}
 }

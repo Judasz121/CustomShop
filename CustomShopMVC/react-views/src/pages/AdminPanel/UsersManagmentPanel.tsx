@@ -501,22 +501,26 @@ export class UserInfoEditPanel extends React.Component<UserInfoEditPanelProps, U
                         </span>
                     </div>
                     <div className="inputGroup lock">
-                        <CheckBoxInfoInput
-                            inputName="lock"
-                            value={this.props.user.lock}
-                            editingEnabled={this.state.editingEnabled}
-                            onChange={this.onInfoinputChange}
-                            label="Is Locked"
-                        />
+                        <label>
+                            <span>Is Locked</span>
+                            <CheckBoxInfoInput
+                                inputName="lock"
+                                value={this.props.user.lock}
+                                editingEnabled={this.state.editingEnabled}
+                                onChange={this.onInfoinputChange}
+                            />
+                        </label>
                     </div>
                     <div className="inputGroup emailConfirmed">
-                        <CheckBoxInfoInput
-                            inputName="emailConfirmed"
-                            value={this.props.user.emailConfirmed}
-                            editingEnabled={this.state.editingEnabled}
-                            onChange={this.onInfoinputChange}
-                            label="Confirmed E-mail"
-                        />
+                        <label>
+                            <span>Confirmed E-mail</span>
+                            <CheckBoxInfoInput
+                                inputName="emailConfirmed"
+                                value={this.props.user.emailConfirmed}
+                                editingEnabled={this.state.editingEnabled}
+                                onChange={this.onInfoinputChange}
+                            />
+                        </label>
                     </div>
                 </div>
                 <div className="formError">

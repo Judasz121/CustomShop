@@ -139,7 +139,7 @@ namespace CustomShopMVC.Controllers
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductChoosableProperty> sqlSelect = conn.Query<CategoryProductChoosableProperty>(sql, param);
-				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryChoosablePropertyViewModel>>(sqlSelect);
+				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(sqlSelect);
 
 				sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 				param = new DynamicParameters();
@@ -250,16 +250,15 @@ namespace CustomShopMVC.Controllers
 				string sql;
 				int insert;
 				int count;
+				CategoryProductChoosableProperty newProp = mapper.Map<CategoryProductChoosablePropertyViewModel, CategoryProductChoosableProperty>(model.ChoosableProperty);
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@Id", newId);
-				param.Add("@CategoryId", model.ChoosableProperty.CategoryId);
-				param.Add("@PropertyName", model.ChoosableProperty.PropertyName);
-				param.Add("@PropertyNameAbbreviation", model.ChoosableProperty.PropertyNameAbbreviation);
-				param.Add("@ItemsToChoose", model.ChoosableProperty.ItemsToChoose);
+				param.Add("@CategoryId", newProp.CategoryId);
+				param.Add("@PropertyName", newProp.PropertyName);
+				param.Add("@PropertyNameAbbreviation", newProp.PropertyNameAbbreviation);
+				param.Add("@ItemsToChoose", newProp.ItemsToChoose);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
-
-
 					sql = "SELECT COUNT(*) FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
 					count = conn.ExecuteScalar<int>(sql, param);
 					if (count > 0)
@@ -293,14 +292,16 @@ namespace CustomShopMVC.Controllers
 				string sql;
 				int update;
 				int count;
+				CategoryProductChoosableProperty editedProp = mapper.Map<CategoryProductChoosablePropertyViewModel, CategoryProductChoosableProperty>(model.ChoosableProperty);
 				DynamicParameters param = new DynamicParameters();
-				param.Add("@Id", model.ChoosableProperty.Id);
-				param.Add("@CategoryId", model.ChoosableProperty.CategoryId);
-				param.Add("@PropertyName", model.ChoosableProperty.PropertyName);
-				param.Add("@PropertyNameAbbreviation", model.ChoosableProperty.PropertyNameAbbreviation);
-				param.Add("@ItemsToChoose", model.ChoosableProperty.ItemsToChoose);
+				param.Add("@Id", editedProp.Id);
+				param.Add("@CategoryId", editedProp.CategoryId);
+				param.Add("@PropertyName", editedProp.PropertyName);
+				param.Add("@PropertyNameAbbreviation", editedProp.PropertyNameAbbreviation);
+				param.Add("@ItemsToChoose", editedProp.ItemsToChoose);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
+					
 					sql = "UPDATE [CategoryProductChoosableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [ItemsToChoose] = @ItemsToChoose, WHERE [Id] = @Id";
 					update = conn.Execute(sql, param);
 					if (update == 0)

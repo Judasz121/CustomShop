@@ -42,18 +42,10 @@ namespace CustomShopMVC.Models
 	}
 	public class GetCategoryPropertiesDataOut
 	{
-		public List<CategoryChoosablePropertyViewModel> ChoosableProperties { get; set; }
+		public List<CategoryProductChoosablePropertyViewModel> ChoosableProperties { get; set; }
 		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
 		public string Error { get; set; }
 		public bool Success { get; set; }
-	}
-	public class CategoryChoosablePropertyViewModel
-	{
-		public string Id { get; set; }
-		public string CategoryId { get; set; }
-		public string PropertyName { get; set; }
-		public string PropertyNameAbbreviation { get; set; }
-		public List<string> ItemsToChoose { get; set; }
 	}
 	public class CategoryProductMeasurablePropertyViewModel
 	{
