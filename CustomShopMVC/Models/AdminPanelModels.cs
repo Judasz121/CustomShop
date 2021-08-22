@@ -95,6 +95,19 @@ namespace CustomShopMVC.Models
 
 	}
 
+	public class DeleteCategoryProductPropertyDataIn
+	{
+		public string PropertyId { get; set; }
+		public bool IsChoosableProperty { get; set; }
+	}
+
+	public class DeleteCategoryProductPropertyDataOut
+	{
+		public bool Success { get; set; }
+		public string FormError { get; set; }
+
+	}
+
 	#endregion categories
 
 	#region users

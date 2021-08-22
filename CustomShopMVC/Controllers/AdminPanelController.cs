@@ -327,6 +327,42 @@ namespace CustomShopMVC.Controllers
 			}
 			return result;
 		}
+
+		[HttpPost]
+		[Route("{action}")]
+		public async Task<ActionResult<DeleteCategoryProductPropertyDataOut>> DeleteCategoryProductProperty(DeleteCategoryProductPropertyDataIn model)
+		{
+			DeleteCategoryProductPropertyDataOut result = new DeleteCategoryProductPropertyDataOut();
+			string sql;
+			DynamicParameters param = new DynamicParameters();
+			int delete = 0;
+
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				param.Add("@Id", model.PropertyId);
+				if (model.IsChoosableProperty)
+				{
+					sql = "DELETE FROM [CategoryProductChoosableProperties] WHERE [Id] = @Id";
+					delete = await conn.ExecuteAsync(sql, param);
+				}
+				else
+				{
+					sql = "DELETE FROM [CategoryProductMeasurableProperties] WHERE [Id] = @Id";
+					delete = await conn.ExecuteAsync(sql, param);
+				}
+			}
+			if (delete == 0)
+			{
+				result.Success = false;
+				result.FormError = "Error; couldn't delete the property";
+			}
+			else
+			{
+				result.Success = true;
+			}
+			return result;
+		}
+
 		#endregion
 
 

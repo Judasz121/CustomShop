@@ -6,6 +6,7 @@ import style from "../../styles/adminPanel.module.css";
 import { IMeasurableProperty, IChoosableProperty, ICategoryProductProperty } from "../../types/categoryPropertyTypes";
 import { RouteComponentProps, useParams } from 'react-router-dom';
 import globalStyle from "../../styles/global.module.css";
+import * as Icon from 'react-bootstrap-icons';
 
 interface CategoryPropertiesManagmentPanelProps extends RouteComponentProps<{ categoryId: string }> {
 
@@ -29,6 +30,7 @@ type CategoryProductPropertiesFetchResponse = {
 }
 
 type newItemAddedFunction = (newItemNewId: string, newItemOldId: string) => void;
+type propertyDeletedFunction = (id: string) => void;
 
 export default class CategoryPropertiesManagmentPanel extends React.Component<CategoryPropertiesManagmentPanelProps, CategoryPropertiesManagmentPanelState> {
     constructor(props: CategoryPropertiesManagmentPanelProps) {
@@ -55,6 +57,7 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
         this.newMeasurablePropertyAdded = this.newMeasurablePropertyAdded.bind(this);
         this.addNewChoosableProperty = this.addNewChoosableProperty.bind(this);
         this.addNewMeasurableProperty = this.addNewMeasurableProperty.bind(this);
+        this.propertyDeleted = this.propertyDeleted.bind(this)
     }
 
     componentDidMount() {
@@ -182,6 +185,19 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
         });
     }
 
+    propertyDeleted(id: string) {
+        this.setState({
+            editedProperties: {
+                choosableProperties: this.state.editedProperties.choosableProperties.filter((item, index) => {
+                    return item.id != id;
+                }),
+                measurableProperties: this.state.editedProperties.measurableProperties.filter((item) => {
+                    return item.id != id;
+                }),
+            }
+        });
+    }
+
     render() {
         return (
             <div id="CategoryEditPanel" >
@@ -201,12 +217,13 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                                     choosableProperty={item}
                                     onChange={this.choosablePropertyEdited}
                                     onNewPropertySaved={this.newChoosablePropertyAdded}
+                                    onPropertyDeleted={this.propertyDeleted}
                                 />
                             })
                         }
                     </div>
                     <div className="measurableProperties">
-                        <h2>MeasurableProperty</h2>
+                        <h2>Measurable Properties</h2>
                         {
                             this.state.editedProperties.measurableProperties.map((item: IMeasurableProperty, index: number) => {
                                 return <MeasurablePropertyInfoEditPanel
@@ -214,6 +231,7 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                                     measurableProperty={item}
                                     onChange={this.measurablePropertyEdited}
                                     onNewPropertySaved={this.newChoosablePropertyAdded}
+                                    onPropertyDeleted={this.propertyDeleted}
                                 />
                             })
                         }
@@ -230,6 +248,7 @@ type MeasurablePropertyInfoEditPanelProps = {
     measurableProperty: IMeasurableProperty,
     onChange: Function,
     onNewPropertySaved: newItemAddedFunction,
+    onPropertyDeleted: propertyDeletedFunction,
 }
 type MeasurablePropertyInfoEditPanelState = {
     editingEnabled: boolean,
@@ -243,6 +262,10 @@ type SavePropertyResponse = {
     success: boolean,
     formError: string,
     nameError: string,
+}
+type DeletePropertyResponse = {
+    success: boolean,
+    formError: string,
 }
 
 export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurablePropertyInfoEditPanelProps, MeasurablePropertyInfoEditPanelState>  {
@@ -269,6 +292,7 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
         this.disableEditing = this.disableEditing.bind(this);
         this.saveProperty = this.saveProperty.bind(this);
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
+        this.deleteProperty = this.deleteProperty.bind(this);
     }
     enableEditing() {
         this.setState({
@@ -320,6 +344,37 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                 }
             });
     }
+
+    deleteProperty() {
+        let url = Constants.baseUrl + "/API/AdminPanel/DeleteCategoryProductProperty";
+        let dataToSend = {
+            propertyId: this.props.measurableProperty.id,
+            isChoosableProperty: false,
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    this.props.onPropertyDeleted(this.props.measurableProperty.id);
+                }
+                else {
+                    this.setState({
+                        saveResponse: {
+                            ...this.state.saveResponse,
+                            formError: data.formError,
+                        }
+                    })
+                }
+            });
+
+    }
+
 
     onInfoinputChange(inputName: string, value: string | boolean | number) {
         let newProp: IMeasurableProperty = {
@@ -403,8 +458,11 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                 <div className="formError">
                     {this.state.saveResponse.formError}
                 </div>
-                <button className="" onClick={this.enableEditing}>Edit</button>
-                <button className="" onClick={this.saveProperty}>Save</button>
+                <div className="buttonGroup" >
+                    <button className="" onClick={this.enableEditing}>Edit</button>
+                    <button className="" onClick={this.saveProperty}>Save</button>
+                    <button className="" onClick={this.deleteProperty}><Icon.X width={25} height={25} /></button>
+                </div>
             </div>
         )
     }
@@ -416,6 +474,7 @@ type ChoosablePropertyInfoEditPanelProps = {
     choosableProperty: IChoosableProperty,
     onChange: Function,
     onNewPropertySaved: newItemAddedFunction,
+    onPropertyDeleted: propertyDeletedFunction,
 }
 type ChoosablePropertyInfoEditPanelState = {
     editingEnabled: boolean,
@@ -449,6 +508,7 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
         this.enableEditing = this.enableEditing.bind(this);
         this.disableEditing = this.disableEditing.bind(this);
         this.cancelEditing = this.cancelEditing.bind(this);
+        this.deleteProperty = this.deleteProperty.bind(this);
     }
     onInfoinputChange(inputName: string, value: string | number | boolean) {
         let newProp: IChoosableProperty = {
@@ -500,6 +560,35 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                     })
                 }
             })
+    }
+    deleteProperty() {
+        let url = Constants.baseUrl + "/API/AdminPanel/DeleteCategoryProductProperty";
+        let dataToSend = {
+            propertyId: this.props.choosableProperty.id,
+            isChoosableProperty: true,
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    this.props.onPropertyDeleted(this.props.choosableProperty.id);
+                }
+                else {
+                    this.setState({
+                        saveResponse: {
+                            ...this.state.saveResponse,
+                            formError: data.formError,
+                        }
+                    })
+                }
+            });
+
     }
     enableEditing() {
         this.setState({
@@ -561,8 +650,11 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                 <div className="formError">
                     {this.state.saveResponse.formError}
                 </div>
-                <button className="" onClick={this.enableEditing}>Edit</button>
-                <button className="" onClick={this.saveProperty}>Save</button>
+                <div className="buttonGroup">
+                    <button className="" onClick={this.enableEditing}>Edit</button>
+                    <button className="" onClick={this.saveProperty}>Save</button>
+                    <button className="" onClick={this.deleteProperty} ><Icon.X width={25} height={25} /></button>
+                </div>
             </div>
             
             
