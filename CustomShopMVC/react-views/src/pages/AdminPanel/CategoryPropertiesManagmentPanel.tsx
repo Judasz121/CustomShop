@@ -320,22 +320,40 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                 if (data.success && data.newId != null && data.newId.length > 0) {
                     this.props.onNewPropertySaved(data.newId, this.props.measurableProperty.id);
                     this.setState({
-                        measurableProperty    : {
+                        measurableProperty: {
                             ...this.state.measurableProperty,
                             id: data.newId,
                         },
                         saveResponse: data,
+                        editingEnabled: false,
+                    }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                saveResponse: {
+                                    ...this.state.saveResponse,
+                                    formError: "",
+                                    nameError: "",
+                                }
+                            });
+                        }, 8000)
                     });
-                    this.disableEditing();
-                    setTimeout(() => {
-                        this.setState({
-                            saveResponse: {
-                                ...this.state.saveResponse,
-                                formError: "",
-                                nameError: "",
-                            }
-                        });
-                    }, 8000)
+
+                }
+                else if (data.success) {
+                    this.setState({
+                        saveResponse: data,
+                        editingEnabled: false,
+                    }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                saveResponse: {
+                                    ...this.state.saveResponse,
+                                    formError: "",
+                                    nameError: "",
+                                }
+                            })
+                        }, 8000)
+                    })
                 }
                 else {
                     this.setState({
@@ -542,25 +560,47 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                             id: data.newId,
                         },
                         saveResponse: data,
+                        editingEnabled: false,
+                    }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                saveResponse: {
+                                    ...this.state.saveResponse,
+                                    formError: "",
+                                    nameError: "",
+                                }
+                            });
+                        }, 8000)
                     });
-                    this.disableEditing();
-                    setTimeout(() => {
-                        this.setState({
-                            saveResponse: {
-                                ...this.state.saveResponse,
-                                formError: "",
-                                nameError: "",
-                            }
-                        });
-                    }, 8000)
+
+                }
+                else if (data.success) {
+                    this.setState({
+                        saveResponse: data,
+                        editingEnabled: false,
+                    }, () => {
+                        setTimeout(() => {
+                            this.setState({
+                                saveResponse: {
+                                    ...this.state.saveResponse,
+                                    formError: "",
+                                    nameError: "",
+                                },
+                            });
+                        }, 8000);
+                    }
+                    );
                 }
                 else {
                     this.setState({
                         saveResponse: data,
-                    })
+                    });
                 }
+
             })
     }
+
+    
     deleteProperty() {
         let url = Constants.baseUrl + "/API/AdminPanel/DeleteCategoryProductProperty";
         let dataToSend = {

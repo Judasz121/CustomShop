@@ -202,6 +202,7 @@ namespace CustomShopMVC.Controllers
 				{
 					result.Success = true;
 					result.NewId = newId.ToString();
+					result.FormError = "Saved";
 					return result;
 				}
 			}
@@ -232,6 +233,7 @@ namespace CustomShopMVC.Controllers
 					else
 					{
 						result.Success = true;
+						result.FormError = "Saved.";
 						return result;
 					}
 				}
@@ -283,6 +285,7 @@ namespace CustomShopMVC.Controllers
 				else
 				{
 					result.Success = true;
+					result.FormError = "Saved.";
 					result.NewId = newId.ToString();
 				}
 			}
@@ -320,6 +323,7 @@ namespace CustomShopMVC.Controllers
 					else
 					{
 						result.Success = true;
+						result.FormError = "Saved.";
 						return result;
 					}
 
