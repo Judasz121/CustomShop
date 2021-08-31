@@ -13,6 +13,7 @@ sort classes from /Models folder to /Models/ControllerDataModels and /Models/Vie
 test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
+change inside viewModels and dataOuts string formError to list<formError> or list<Error> 
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,

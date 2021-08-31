@@ -117,40 +117,25 @@ namespace CustomShopMVC.Controllers
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 
 			string sql;
-			int count;
-			int update;
-			int insert;
 			DynamicParameters param = new DynamicParameters();
 
 			if (model.Product.Id.Contains("new"))
 			{
-				model.Product.Id = Guid.NewGuid().ToString();
+				Guid newProductId = Guid.NewGuid();
 				
-				string thumbnailImagePath = "";
-				if (model.Product.NewThumbnailImage.Length > 0)
-					thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
 
-				string imagesPath = "";
-				for (int i = 0; i > model.Product.NewImages.Count; i++)
-				{
-					if (i == 0)
-						imagesPath = _upload.Image(model.Product.NewImages[i]);
-					else
-						imagesPath += "," + _upload.Image(model.Product.NewImages[i]);
-				}
 
-				param.Add("@Id", model.Product.Id);
+				param.Add("@Id", newProductId);
 				param.Add("@AuthorId", model.Product.AuthorId);
 				param.Add("@OwnerId", model.Product.OwnerId);
 				param.Add("@Name", model.Product.Name);
 				param.Add("@Description", model.Product.Description);
-				param.Add("@ThumbnailImagePath",thumbnailImagePath);
-				param.Add("@ImagesPaths", imagesPath);
+
 				param.Add("@Quantity", model.Product.Quantity);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
 					sql = "SELECT COUNT(*) FROM [Products] WHERE [Id] != @Id AND [Name] != Name";
-					count = conn.ExecuteScalar<int>(sql, param);
+					int count = conn.ExecuteScalar<int>(sql, param);
 					if (count > 0)
 					{
 						result.Success = false;
@@ -158,8 +143,13 @@ namespace CustomShopMVC.Controllers
 						return result;
 					}
 
-					sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @ImagesPath, @Quantity)";
-					insert = conn.Execute(sql, param);
+					string thumbnailImagePath = "";
+					if (model.Product.NewThumbnailImage.Length > 0)
+						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
+					param.Add("@ThumbnailImagePath", thumbnailImagePath);
+
+					sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @Quantity)";
+					int insert = conn.Execute(sql, param);
 
 
 					#region properties value 
@@ -198,35 +188,44 @@ namespace CustomShopMVC.Controllers
 						conn.Execute(sql, param);
 					}
 					#endregion properties value
+
+					#region images
+					foreach(IFormFile newImage in model.Product.NewImages)
+					{
+						string path = _upload.Image(newImage);
+						ProductImage newDbImage = new ProductImage()
+						{
+							Id = Guid.NewGuid(),
+							ImagePath = path,
+							ProductId = newProductId
+						};
+
+						param = new DynamicParameters();
+						param.Add("@Id", newDbImage.Id);
+						param.Add("@ImagePath", newDbImage.ImagePath);
+						param.Add("@ProductId", newDbImage.ProductId);
+						sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
+						conn.Execute(sql, param);
+					}
+					#endregion images
 				}
 			}
 			else // update
 			{
-				string thumbnailImagePath = "";
-				if (model.Product.NewThumbnailImage.Length > 0)
-					thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
 
-				string imagesPath = "";
-				for (int i = 0; i > model.Product.NewImages.Count; i++)
-				{
-					if (i == 0)
-						imagesPath = _upload.Image(model.Product.NewImages[i]);
-					else
-						imagesPath += "," + _upload.Image(model.Product.NewImages[i]);
-				}
+
 
 				param.Add("@Id", model.Product.Id);
 				param.Add("@AuthorId", model.Product.AuthorId);
 				param.Add("@OwnerId", model.Product.OwnerId);
 				param.Add("@Name", model.Product.Name);
 				param.Add("@Description", model.Product.Description);
-				param.Add("@ThumbnailImagePath", thumbnailImagePath);
-				param.Add("@ImagesPaths", imagesPath);
+
 				param.Add("@Quantity", model.Product.Quantity);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
 					sql = "SELECT COUNT(*) FROM [Products] WHERE [Id] != @Id AND [Name] != Name";
-					count = conn.ExecuteScalar<int>(sql, param);
+					int count = conn.ExecuteScalar<int>(sql, param);
 					if (count > 0)
 					{
 						result.Success = false;
@@ -234,8 +233,13 @@ namespace CustomShopMVC.Controllers
 						return result;
 					}
 
+					string thumbnailImagePath = "";
+					if (model.Product.NewThumbnailImage.Length > 0)
+						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
+					param.Add("@ThumbnailImagePath", thumbnailImagePath);
+
 					sql = "UPDATE [Prodcuts] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [ThumbnailImagePath] = @ThumbnailImagePath, [ImagesPath] = @ImagesPaths, [Quantity] = @Quantity";
-					update = conn.Execute(sql, param);
+					int update = conn.Execute(sql, param);
 					if(update == 0)
 					{
 						result.Success = false;
@@ -282,6 +286,26 @@ namespace CustomShopMVC.Controllers
 						}
 					}
 					#endregion product properties value
+
+					#region images
+					foreach (IFormFile newImage in model.Product.NewImages)
+					{
+						string path = _upload.Image(newImage);
+						ProductImage newDbImage = new ProductImage()
+						{
+							Id = Guid.NewGuid(),
+							ImagePath = path,
+							ProductId = Guid.Parse(model.Product.Id)
+						};
+
+						param = new DynamicParameters();
+						param.Add("@Id", newDbImage.Id);
+						param.Add("@ImagePath", newDbImage.ImagePath);
+						param.Add("@ProductId", newDbImage.ProductId);
+						sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
+						conn.Execute(sql, param);
+					}
+					#endregion images
 				}
 			}
 				return result;
