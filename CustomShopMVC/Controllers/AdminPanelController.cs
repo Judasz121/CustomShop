@@ -177,7 +177,7 @@ namespace CustomShopMVC.Controllers
 				{
 
 
-					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND [PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation";
+					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND ([PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation)";
 					count = conn.ExecuteScalar<int>(sql, param);
 					if(count > 0)
 					{
@@ -222,6 +222,15 @@ namespace CustomShopMVC.Controllers
 				param.Add("@ToMetricModifier", model.MeasurableProperty.ToMetricModifier);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
+					sql = "SELECT COUNT(*) FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId AND ([PropertyName] = @PropertyName OR [PropertyNameAbbreviation] = @PropertyNameAbbreviation)";
+					count = conn.ExecuteScalar<int>(sql, param);
+					if (count > 0)
+					{
+						result.Success = false;
+						result.NameError = "There already exists property with this name or name abbreviation";
+						return result;
+					}
+
 					sql = "UPDATE [CategoryProductMeasurableProperties] SET [CategoryId] = @CategoryId, [PropertyName] = @PropertyName, [PropertyNameAbbreviation] = @PropertyNameAbbreviation, [UnitFullName] = @UnitFullName, [UnitName] = @UnitName, [IsMetric] = @IsMetric, [ToMetricModifier] = @ToMetricModifier WHERE [Id] = @Id";
 					update = conn.Execute(sql, param);
 					if(update == 0)

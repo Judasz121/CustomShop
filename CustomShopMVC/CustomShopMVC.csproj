@@ -70,7 +70,7 @@
 
   <ItemGroup>
     <Folder Include="Models\ControllerDataModels\" />
-    <Folder Include="Models\ViewModels\" />
+    <Folder Include="DbContent\Images\" />
   </ItemGroup>
 
 </Project>

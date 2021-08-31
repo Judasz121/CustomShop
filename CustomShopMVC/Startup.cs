@@ -19,6 +19,7 @@ using Newtonsoft.Json.Serialization;
 using System.IO;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using CustomShopMVC.DataAccess.Identity;
+using CustomShopMVC.Helpers;
 
 namespace CustomShopMVC
 {
@@ -35,6 +36,7 @@ namespace CustomShopMVC
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddScoped<IDatabaseAccess, DatabaseAccess>();
+			services.AddSingleton<IUpload, Upload>();
 			services.AddIdentity<ApplicationUser, ApplicationUserRole> ()
 				.AddUserStore<DapperUserStore>()
 				.AddRoleStore<DapperRoleStore>()

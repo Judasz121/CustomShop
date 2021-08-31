@@ -78,6 +78,7 @@ namespace CustomShopMVC.Helpers
 		{
 			return new MapperConfiguration((cfg) =>
 			{
+				#region settings
 				cfg.CreateMap<UserSettings, UserSettingsViewModel>()
 					.ForMember(us => us.Id, (opt) => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(us => us.UserId, (opt) => opt.MapFrom(src => src.UserId.ToString()))
@@ -86,6 +87,20 @@ namespace CustomShopMVC.Helpers
 					.ForMember(us => us.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 					.ForMember(us => us.UserId, opt => opt.MapFrom(src => Guid.Parse(src.UserId)))
 				;
+				#endregion settings
+
+				#region products
+				cfg.CreateMap<ProductViewModel, Product>()
+					.ForMember(p => p.AuthorId, opt => opt.MapFrom(src => Guid.Parse(src.AuthorId)))
+					.ForMember(p => p.OwnerId, opt => opt.MapFrom(src => Guid.Parse(src.OwnerId)))
+					
+				;
+				cfg.CreateMap<Product, ProductViewModel>()
+					.ForMember(p => p.AuthorId, opt => opt.MapFrom(src => src.AuthorId.ToString()))
+					.ForMember(p => p.OwnerId, opt => opt.MapFrom(src => src.OwnerId.ToString()))
+					.ForMember(p => p.ImagesPath, opt => opt.MapFrom((src) => src.Images.Select(i => i.ImagePath)))
+				;
+				#endregion products
 			});
 		}
 	}

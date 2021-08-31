@@ -1,12 +1,12 @@
 ﻿import React, { ReactNode } from 'react';
 import style from '../styles/global.module.css';
-import { Key, X as XIcon } from 'react-bootstrap-icons';
+import * as Icon from 'react-bootstrap-icons';
 
-
+type onChangeFunction = (inputName: string, value: string | boolean | number | File[] | File) => void;
 
 // #region TextInfoInput
 type TextInfoInputProps = {
-    onChange: Function,
+    onChange: onChangeFunction,
     editingEnabled: boolean,
     value: string,
     inputName: string,
@@ -48,6 +48,53 @@ export class TextInfoInput extends React.Component <TextInfoInputProps, TextInfo
 }
 
 // #endregion TextInfoInput
+
+//#region TextAreaInfoInput
+type TextAreaInfoInputProps = {
+    onChange: onChangeFunction,
+    editingEnabled: boolean,
+    value: string,
+    inputName: string,
+    placeholderValue: string,
+}
+type TextAreaInfoInputState = {
+
+}
+export class TextAreaInfoInput extends React.Component <TextAreaInfoInputProps, TextAreaInfoInputState> {
+    constructor(props: TextAreaInfoInputProps) {
+        super(props);
+
+        this.handleValueChange = this.handleValueChange.bind(this);
+    }
+
+    handleValueChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+        console.log("textareaChange");
+        console.log(e);
+        this.props.onChange(this.props.inputName, e.target.value);
+    }
+    render() {
+        var content = null;
+        if (this.props.editingEnabled)
+            content = <textarea
+                onChange={this.handleValueChange}
+                value={this.props.value}
+                name={this.props.inputName}
+                placeholder={this.props.placeholderValue}
+            />
+
+        else
+            content = <div className="info">{this.props.value}</div>
+
+        return (
+
+            <span className="TextAreaInfoInput">
+                {content}
+            </span>
+        )
+    }
+}
+
+//#endregion
 
 // #region CheckBoxInfoInput
 
@@ -134,6 +181,139 @@ export class CheckBoxSwitch extends React.Component<CheckBoxSwitchProps, CheckBo
     }
 }
 // #endregion CheckBoxSwitch
+
+//#region ImageInfoInput
+export type ImageInfoInputProps = {
+    onChange: onChangeFunction,
+    editingEnabled: boolean,
+    inputName: string,
+    image: File,
+    imagePath: string,
+}
+type ImageInfoInputState = {
+    uploadedImage: File,
+    imageUrl: string,
+}
+export class ImageInfoInput extends React.Component<ImageInfoInputProps, ImageInfoInputState>{
+    constructor(props: ImageInfoInputProps) {
+        super(props);
+        this.state = {
+            uploadedImage: this.props.image,
+            imageUrl: this.props.imagePath,
+        }
+
+        this.onInputChange = this.onInputChange.bind(this);
+    }
+    onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(this.props.inputName, e.target.files![0]);
+        this.setState({
+            uploadedImage: e.target.files![0],
+            imageUrl: URL.createObjectURL(e.target.files![0]),
+        })
+    }
+    render() {
+        var content;
+        if (this.props.editingEnabled)
+            content = (
+                <div className="inputGroup">
+                    <img src={this.state.imageUrl} className="info" />
+                    <input type="file" onChange={this.onInputChange} />
+                </div>
+                )
+        else
+            content = <img src={""} className="info" />
+        return (
+            <div className="ImageInfoInput">
+                {content}
+            </div>
+        )
+    }
+}
+
+//#endregion
+
+//#region ImagesInput
+export type ImagesInputProps = {
+    onChange: onChangeFunction,
+    editingEnabled: boolean,
+    inputName: string,
+    value: File[],
+}
+type ImagesInputState = {
+    items: ImagesInput_ImageItem[],
+    newItemIdNum: number,
+}
+type ImagesInput_ImageItem = {
+    id: number,
+    file: File,
+}
+export class ImagesInput extends React.Component<ImagesInputProps, ImagesInputState>{
+    constructor(props: ImagesInputProps) {
+        super(props);
+
+        let imageItems: ImagesInput_ImageItem[] = [];
+        let i = 0;
+        for ( ; i < this.props.value.length; i++) {
+            let newItem: ImagesInput_ImageItem = {
+                id: i,
+                file: this.props.value[i],
+            }
+            imageItems.push(newItem);
+        }
+        this.state = {
+            items: imageItems,
+            newItemIdNum: i,
+        }
+
+        this.onInputChange = this.onInputChange.bind(this);
+        this.deleteImages = this.deleteImages.bind(this);
+    }
+
+    deleteImages(id: number) {
+        let itemToDelete = this.state.items.filter((item) => item.id == id)[0];
+        let index = this.state.items.indexOf(itemToDelete)
+        let newItems = this.state.items.slice();
+        newItems.splice(index, 1);
+
+        this.setState({
+            items: newItems,
+        })
+
+        let imagesToSend: File[] = newItems.map((item) => item.file);
+        this.props.onChange(this.props.inputName, imagesToSend);
+    }
+
+    onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+        let idNum = this.state.newItemIdNum;
+        let newItems: ImagesInput_ImageItem[] = [];
+
+        for (var i = 0; i < e.target.files!.length; i++) {
+            let newItem: ImagesInput_ImageItem = {
+                id: idNum,
+                file: e.target.files![i],
+            }
+            newItems.push(newItem);
+            idNum++;
+        }
+        newItems = newItems.concat(this.state.items);
+        this.setState({
+            items: newItems,
+            newItemIdNum: idNum,
+        });
+
+        let filesToReturn: File[] = newItems.map((item) => item.file);
+        this.props.onChange(this.props.inputName, filesToReturn);
+    }
+    render() {
+        return (
+            <div className="ImagesInput">
+                <input type="file" onChange={this.onInputChange} multiple />
+            </div>
+        )
+    }
+}
+
+//#endregion ImagesInput
 
 // #region InfoInputPrimitiveList
 type InfoInputPrimitiveList_PropsItem = {
@@ -275,7 +455,7 @@ class InfoInputStringList_InfoInputItem extends React.Component<InfoInputStringL
             return (
                 <div className={"InfoInputStringList_Item"}>
                     <input onChange={this.onChange} value={this.props.value} type="text" />
-                    <button onClick={this.deleteItem} ><XIcon color="red" size={25} /> </button>
+                    <button onClick={this.deleteItem} ><Icon.Trash color="red" size={25} /> </button>
                 </div>
             )
         else
@@ -290,7 +470,7 @@ class InfoInputStringList_InfoInputItem extends React.Component<InfoInputStringL
 // #endregion InfoInputStringList
 
 // #region InfoInputObjectList
-
+// work in progress
 type InfoInputObjectListProps = {
     items: InfoInputObjectList_PropsItem[],
     viewNames: InfoInputObjectListViewNames,
@@ -401,12 +581,16 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
     constructor(props: InfoInputObjectList_InfoInputItemProps) {
         super(props);
 
-        this.onChange = this.onChange.bind(this);
+        this.onInfoInputChange = this.onInfoInputChange.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
         this.getObjectInputHtml = this.getObjectInputHtml.bind(this);
     }
-    onChange(e: React.ChangeEvent<HTMLInputElement>) {
-        this.props.onChange(this.props.data.id, e.target.value)
+    onInfoInputChange(inputName: string, value: string | number | boolean) {
+        let edited = {
+            ...this.props.data,
+            [inputName]: value,
+        };
+        this.props.onChange(this.props.data.id, edited);
     }
     deleteItem(e: React.MouseEvent<HTMLButtonElement>) {
         this.props.deleteItem(this.props.data.id)
@@ -435,7 +619,7 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
                             input = <TextInfoInput
                                 inputName={item}
                                 editingEnabled={thisComponent.props.editingEnabled}
-                                onChange={thisComponent.onChange}
+                                onChange={thisComponent.onInfoInputChange}
                                 value={obj[item]}
                                 placeholderValue={viewName}
                             />
@@ -443,7 +627,7 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
                             input = <CheckBoxInfoInput
                                 inputName={item}
                                 editingEnabled={thisComponent.props.editingEnabled}
-                                onChange={thisComponent.onChange}
+                                onChange={thisComponent.onInfoInputChange}
                                 value={obj[item]}
                             />
                         else
@@ -451,8 +635,8 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
 
                         return (
                             <div className="InfoInputObjectList_InfoInputItemProperty">
-                                    <span>{viewName}</span>
-                                    {input}
+                                <span>{viewName}</span>
+                                {input}
                             </div>
                         )
                     })
@@ -465,13 +649,14 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
         return (
             <div className={style.editableListItem}>
                 {this.getObjectInputHtml(this.props.data)}
-                <button onClick={this.deleteItem} ><XIcon color="red" size={25} /> </button>
+                <button onClick={this.deleteItem} ><Icon.Trash color="red" size={25} /> </button>
             </div>
         )
     }
 }
 
 // #endregion InfoInputList
+
 // #region ClickDropDown
 type ClickDropDownProps = {
     clickContent: any,

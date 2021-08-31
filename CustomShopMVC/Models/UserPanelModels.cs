@@ -23,5 +23,30 @@ namespace CustomShopMVC.Models
 	{
 		public bool Success { get; set; }
 	}
+
+	public class GetProductsDataOut
+	{
+		public List<ProductViewModel> Products { get; set; }
+		public bool Success { get; set; }
+	}
+
+	public class GetProductDataOut
+	{
+		public ProductEditModel Product { get; set; }
+		public bool Success { get; set; }
+	}
+
+	public class SaveProductDataIn
+	{
+		public ProductEditModel Product { get; set; }
+
+	}
+	public class SaveProductDataOut
+	{
+		public bool Success { get; set; }
+		public string FormError { get; set; }
+		public string NameError { get; set; }
+	}
+	
 	
 }

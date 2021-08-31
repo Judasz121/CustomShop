@@ -11,11 +11,12 @@ implement username, email and phoneNumber checks the proper way ( currently in d
 do 404 page
 sort classes from /Models folder to /Models/ControllerDataModels and /Models/ViewModels
 test globalInputComponents/InfoInputObjectList
+add tags
 
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,
-2. customizable category tree
+2. customizable category tree, each category has its own properties ( no inheritance, but an ability to copy from one category to another )
 3. each product in each category can have fully custom parameters by which it can be filtered
 4. (optional) allegro-like functionality - various user account types ( also vendors )
 5. product and vendors reviews

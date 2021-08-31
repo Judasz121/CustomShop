@@ -11,11 +11,10 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid OwnerId { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
-		public string ThumbnailImage { get; set; }
-		public List<string> Images { get; set; }
+		public string ThumbnailImagePath { get; set; }
 		public int Quantity { get; set; }
-		public Dictionary<Guid, string> ChoosablePropertiesValues { get; set; }
-		public Dictionary<Guid, float> QuantityPropertiesValues { get; set; }
+
+		public ICollection<ProductImage> Images { get; set; }
 	}
 }
 
