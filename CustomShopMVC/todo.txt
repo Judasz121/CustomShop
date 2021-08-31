@@ -12,7 +12,7 @@ do 404 page
 sort classes from /Models folder to /Models/ControllerDataModels and /Models/ViewModels
 test globalInputComponents/InfoInputObjectList
 add tags
-
+add separate table for categoryProductChoosableProperty.itemsToChoose
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,
