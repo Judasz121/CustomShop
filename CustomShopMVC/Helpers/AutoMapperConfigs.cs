@@ -93,11 +93,13 @@ namespace CustomShopMVC.Helpers
 				cfg.CreateMap<ProductViewModel, Product>()
 					.ForMember(p => p.AuthorId, opt => opt.MapFrom(src => Guid.Parse(src.AuthorId)))
 					.ForMember(p => p.OwnerId, opt => opt.MapFrom(src => Guid.Parse(src.OwnerId)))
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 					
 				;
 				cfg.CreateMap<Product, ProductViewModel>()
 					.ForMember(p => p.AuthorId, opt => opt.MapFrom(src => src.AuthorId.ToString()))
 					.ForMember(p => p.OwnerId, opt => opt.MapFrom(src => src.OwnerId.ToString()))
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(p => p.ImagesPath, opt => opt.MapFrom((src) => src.Images.Select(i => i.ImagePath)))
 				;
 				#endregion products

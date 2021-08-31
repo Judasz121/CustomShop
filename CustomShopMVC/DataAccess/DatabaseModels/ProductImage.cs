@@ -9,8 +9,9 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid Id { get; set; }
 		public string ImagePath { get; set; }
 		public Guid ProductId { get; set; }
-
+		#region relations
 		public Product Product { get; set; }
+		#endregion relations
 	}
 }
 

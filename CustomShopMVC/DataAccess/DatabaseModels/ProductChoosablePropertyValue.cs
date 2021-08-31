@@ -12,5 +12,11 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid ProductId { get; set; }
 		public Guid CategoryId { get; set; }
 		public string Value { get; set; }
+
+		#region relations
+		public Product Product { get; set; }
+		public Category Category { get; set; }
+		public CategoryProductChoosableProperty ChoosableProperty { get; set; }
+		#endregion relations
 	}
 }

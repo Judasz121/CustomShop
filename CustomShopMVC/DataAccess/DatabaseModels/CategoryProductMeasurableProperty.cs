@@ -14,5 +14,11 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string UnitName { get; set; }
 		public bool IsMetric { get; set; }
 		public float ToMetricModifier { get; set; }
+
+		#region relations
+		public Category Category { get; set; }
+		
+
+		#endregion
 	}
 }

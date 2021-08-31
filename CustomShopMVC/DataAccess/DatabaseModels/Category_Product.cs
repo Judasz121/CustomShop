@@ -9,9 +9,11 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 	public class Category_Product
 	{
 		public Guid ProductId { get; set; }
-		public Product Product { get; set; }
 		public Guid CategoryId { get; set; }
-		public Category Category { get; set; }
 
+		#region relations
+		public Product Product { get; set; }
+		public Category Category { get; set; }
+		#endregion
 	}
 }

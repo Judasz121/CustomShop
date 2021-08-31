@@ -11,5 +11,10 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string PropertyName { get; set; }
 		public string PropertyNameAbbreviation { get; set; }
 		public string ItemsToChoose { get; set; }
+
+		#region relations
+		public Category Category { get; set; }
+		// public ICollection<CategoryChoosablePropertyItem> { get; set; }
+		#endregion 
 	}
 }

@@ -9,7 +9,12 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid Id { get; set; }
 		public Guid ParentId { get; set; }
 		public string Name { get; set; }
-		public virtual Category ParentCategory { get; set; }
+		public Category ParentCategory { get; set; }
 
+		#region relations
+		public ICollection<Product> Products { get; set; }
+		public ICollection<CategoryProductChoosableProperty> ChoosableProperties { get; set; }
+		public ICollection<CategoryProductMeasurableProperty> MeasurableProperties { get; set; }
+		#endregion
 	}
 }

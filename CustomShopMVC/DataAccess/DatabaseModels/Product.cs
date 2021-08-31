@@ -14,7 +14,12 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string ThumbnailImagePath { get; set; }
 		public int Quantity { get; set; }
 
+		#region relations
 		public ICollection<ProductImage> Images { get; set; }
+		public ICollection<ProductChoosablePropertyValue> ChoosablePropertiesValue { get; set; }
+		public ICollection<ProductMeasurablePropertyValue> MeasurablePropertiesValue { get; set; }
+		public ICollection<Category> Categories { get; set; }
+		#endregion
 	}
 }
 
