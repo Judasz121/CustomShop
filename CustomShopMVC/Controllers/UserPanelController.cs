@@ -307,12 +307,21 @@ namespace CustomShopMVC.Controllers
 				return result;
 		}
 
-
+		[HttpGet]
+		[Route("{action}")]
 		public async Task<GetUsersDataOut> GetUsers()
 		{
 			GetUsersDataOut result = new GetUsersDataOut();
+			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 
-
+			string sql = "SELECT * FROM [Users]";
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				IEnumerable<ApplicationUser> dbUsers = conn.Query<ApplicationUser>(sql);
+				result.Users = mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<UserViewModel>>(dbUsers).ToList();
+				result.Success = true;
+			}
+			
 			return result;
 		}
 

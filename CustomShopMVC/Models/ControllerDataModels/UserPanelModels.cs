@@ -9,7 +9,9 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 { 
 	public class GetUsersDataOut
 	{
-		public List<UserViewModel> users { get; set; }
+		public bool Success { get; set; }
+		public List<UserViewModel> Users { get; set; }
+		public List<string> FormErrors { get; set; }
 	}
 
 	public class SaveSettingsDataIn

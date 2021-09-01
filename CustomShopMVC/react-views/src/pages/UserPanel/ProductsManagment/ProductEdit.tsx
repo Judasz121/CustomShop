@@ -22,17 +22,9 @@ type ProductEditPanelState = {
 
 type AjaxSaveResponse = {
     success: boolean,
-    formError: string,
+    formErrors: string[],
     newId: string,
-    nameError: string,
-}
-type AjaxGetResponse = {
-    product: IProduct,
-    success: boolean,
-}
-type AjaxDeleteResponse = {
-    success: boolean,
-    formError:string,
+    nameErrors: string[],
 }
 
 
@@ -42,9 +34,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.state = {
             ajaxResponse: {
                 success: false,
-                formError: "",
+                formErrors: [],
                 newId: "",
-                nameError: "",
+                nameErrors: [],
             },
             users: [],
             product: {} as IProductEdit,
@@ -59,6 +51,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.deleteProduct = this.deleteProduct.bind(this);
     }
     componentDidMount() {
+        // #region get product
         if (!this.props.match.params.productId.includes("new"))
         {
             let url = Constants + "/API/UserPanel/GetProduct";
@@ -74,13 +67,33 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         });
                     else
                         this.setState({
-                            ajaxResponse: {
-                                ...this.state.ajaxResponse,
-                                formError: "Couldn't get the product data from server",
-                            },
+                            ajaxResponse: data,
                         });
                 })
         }
+        //#endregion
+        //#region get users
+        let url = Constants.baseUrl + "/API/UserPanel/GetUsers"
+        fetch(url, {
+            method: "GET",
+
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success)
+                this.setState({
+                    users: data.users
+                })
+                else
+                    this.setState({
+                        ajaxResponse: {
+                            ...this.state.ajaxResponse,
+                            formErrors: data.formErrors,
+                        }
+                    })
+            })
+
+        //#endregion
     }
     onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] ) {
         let newProduct = {
@@ -117,8 +130,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             this.setState({
                                 ajaxResponse: {
                                     ...this.state.ajaxResponse,
-                                    formError: "",
-                                    nameError: "",
+                                    formErrors: [],
+                                    nameErrors: [],
                                 }
                             });
                         }, 8000)
@@ -133,8 +146,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             this.setState({
                                 ajaxResponse: {
                                     ...this.state.ajaxResponse,
-                                    formError: "",
-                                    nameError: "",
+                                    formErrors: [],
+                                    nameErrors: [],
                                 },
                             });
                         }, 8000);
@@ -164,7 +177,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             body: JSON.stringify(dataToSend),
         })
             .then((response) => response.json())
-            .then((data: AjaxDeleteResponse) => {
+            .then((data) => {
                 if (data.success) {
                     this.setState({
                         redirect: './deletedProduct',
@@ -172,11 +185,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 }
                 else {
                     this.setState({
-                        ajaxResponse: {
-                            ...this.state.ajaxResponse,
-                            success: false,
-                            formError: data.formError,
-                        },
+                        ajaxResponse: data,
 
                     });
                 }
@@ -204,7 +213,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             placeholderValue="name"
                         />
                         <span className="error">
-                            {this.state.ajaxResponse.formError}
+                            {this.state.ajaxResponse.formErrors.map((item) => { return item + "\n" })}
                         </span>
                     </h1>
                 </div>
@@ -262,7 +271,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     </div>
                 </div>
                 <div className="formError">
-                    {this.state.ajaxResponse.formError}
+                    {this.state.ajaxResponse.formErrors.map((item) => { return item + "\n" })}
                 </div>
                 <div className="buttonGroup">
                     <button className="" onClick={() => { this.setState({ editingEnabled: true, }) } }>Edit</button>
