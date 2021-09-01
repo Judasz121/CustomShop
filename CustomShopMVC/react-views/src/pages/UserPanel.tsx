@@ -33,7 +33,7 @@ export default class UserPanelPage extends React.Component <UserPanelPageProps, 
                         <AccountSettingsPanel />
                     </Route>
                     <Route path={`${this.props.match.url}/products`} component={ProductsManagmentPanel} />
-                    <Route path={`${this.props.match.url}/productEdit/:productId`} component={ProductEditPanel} />
+                    <Route path={`${this.props.match.url}/productsManagment/productEdit/:productId`} component={ProductEditPanel} />
 
                 </Switch>
             
