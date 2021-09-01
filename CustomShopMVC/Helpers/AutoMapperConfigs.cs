@@ -2,6 +2,8 @@
 using CustomShopMVC.DataAccess.DatabaseModels;
 using CustomShopMVC.Identity;
 using CustomShopMVC.Models;
+using CustomShopMVC.Models.ControllerDataModels.AdminPanel;
+using CustomShopMVC.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

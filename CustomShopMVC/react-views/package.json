@@ -48,6 +48,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-select": "^4.0.17",
     "@types/react-sortable-tree": "^0.3.14"
   }
 }

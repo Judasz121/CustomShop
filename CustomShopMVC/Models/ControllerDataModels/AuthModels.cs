@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CustomShopMVC.Models
+namespace CustomShopMVC.Models.ControllerDataModels.Auth
 {
-	public class AuthModels
-	{
-	}
 
 	public class UserRegisterDataIn
 	{

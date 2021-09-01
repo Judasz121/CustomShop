@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using CustomShopMVC.DataAccess.DatabaseModels;
-using CustomShopMVC.DataAccess.DatabaseModels;
 using CustomShopMVC.Helpers;
 using CustomShopMVC.Identity;
-using CustomShopMVC.Models;
+using CustomShopMVC.Models.ControllerDataModels.UserPanel;
+using CustomShopMVC.Models.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using static CustomShopMVC.Models.UserPanelModels;
 
 namespace CustomShopMVC.Controllers
 {
@@ -110,7 +109,8 @@ namespace CustomShopMVC.Controllers
 			return result;
 		}
 		
-
+		[HttpPost]
+		[Route("{action}")]
 		public async Task<ActionResult<SaveProductDataOut>> SaveProduct(SaveProductDataIn model)
 		{
 			SaveProductDataOut result = new SaveProductDataOut();
@@ -305,6 +305,15 @@ namespace CustomShopMVC.Controllers
 				}
 			}
 				return result;
+		}
+
+
+		public async Task<GetUsersDataOut> GetUsers()
+		{
+			GetUsersDataOut result = new GetUsersDataOut();
+
+
+			return result;
 		}
 
 		#endregion products

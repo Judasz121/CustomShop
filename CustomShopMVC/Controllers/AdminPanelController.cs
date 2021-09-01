@@ -392,14 +392,14 @@ namespace CustomShopMVC.Controllers
 				string sql = "SELECT * FROM [Users]";
 
 				List<ApplicationUser> dbUsers = conn.Query<ApplicationUser>(sql).ToList();
-				result.users = mapper.Map<List<ApplicationUser>, List<UserViewModel>>(dbUsers);
+				result.users = mapper.Map<List<ApplicationUser>, List<UserViewModels>>(dbUsers);
 			}
 				return result;
 		}
 
 		[HttpPost]
 		[Route("{action}")]
-		public async Task<ActionResult<SaveUserDataOut>> SaveUser(UserViewModel model)
+		public async Task<ActionResult<SaveUserDataOut>> SaveUser(UserViewModels model)
 		{
 			SaveUserDataOut result = new SaveUserDataOut();
 			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
@@ -408,7 +408,7 @@ namespace CustomShopMVC.Controllers
 			if (model.Id.Contains("new"))
 			{
 				model.Id = null;
-				ApplicationUser user = mapper.Map<UserViewModel, ApplicationUser>(model);
+				ApplicationUser user = mapper.Map<UserViewModels, ApplicationUser>(model);
 				user.Id = Guid.NewGuid();
 
 
@@ -449,7 +449,7 @@ namespace CustomShopMVC.Controllers
 					}
 					else
 					{
-						ApplicationUser user = mapper.Map<UserViewModel, ApplicationUser>(model);
+						ApplicationUser user = mapper.Map<UserViewModels, ApplicationUser>(model);
 						IdentityResult IR = await _userManager.UpdateAsync(user);
 						if (!IR.Succeeded)
 						{

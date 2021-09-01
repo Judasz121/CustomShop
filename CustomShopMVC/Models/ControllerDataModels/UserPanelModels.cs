@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CustomShopMVC.DataAccess.DatabaseModels;
+using CustomShopMVC.Models.ViewModels;
 
-namespace CustomShopMVC.Models
-{
-	public class UserPanelModels
+namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
+{ 
+	public class GetUsersDataOut
 	{
+		public List<UserViewModel> users { get; set; }
 	}
-	public class UserSettingsViewModel
-	{
-		public string Id { get; set; }
-		public string UserId { get; set; }
-		public bool DarkMode { get; set; }
-	}
+
 	public class SaveSettingsDataIn
 	{
 		public bool DarkMode { get; set; }

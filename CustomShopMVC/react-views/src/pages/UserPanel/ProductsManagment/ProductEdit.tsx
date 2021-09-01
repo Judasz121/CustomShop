@@ -6,6 +6,8 @@ import globalStyle from '../../styles/global.module.css';
 import { IProduct, IProductEdit } from '../../../types/productTypes';
 import { Link, Redirect, RouteComponentProps } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
+import Select from 'react-select';
+import { IUser } from '../../../types/authTypes';
 
 interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }>{
 
@@ -15,6 +17,7 @@ type ProductEditPanelState = {
     ajaxResponse: AjaxSaveResponse,
     redirect: string,
     editingEnabled: boolean,
+    users: IUser[],
 }
 
 type AjaxSaveResponse = {
@@ -209,6 +212,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     <div className="inputGroup">
                         <span>Author</span>
                         <Link to={`/user/${this.state.product.authorId}`} />
+                        
                     </div>
                     <div className="inputGroup">
                         <span>Owner</span>
