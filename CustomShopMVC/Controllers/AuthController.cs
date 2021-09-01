@@ -1,6 +1,7 @@
 ﻿using CustomShopMVC.Helpers;
 using CustomShopMVC.Identity;
 using CustomShopMVC.Models;
+using CustomShopMVC.Models.ControllerDataModels.Auth;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
