@@ -45,8 +45,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 formError: "",
                 newId: "",
                 nameError: "",
-               
             },
+            users: [],
             product: {} as IProductEdit,
             redirect: "",
             editingEnabled: true,
