@@ -26,5 +26,6 @@ namespace CustomShopMVC.Models
 	{
 		public IFormFile NewThumbnailImage { get; set; }
 		public List<IFormFile> NewImages { get; set; }
+		public List<string> ImagesToDelete { get; set; }
 	}
 }

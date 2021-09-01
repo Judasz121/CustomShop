@@ -2,7 +2,8 @@
 import style from '../styles/global.module.css';
 import * as Icon from 'react-bootstrap-icons';
 
-type onChangeFunction = (inputName: string, value: string | boolean | number | File[] | File) => void;
+//type onChangeFunction = (inputName: string, value: string | boolean | number | File[] | File) => void;
+type onChangeFunction = Function;
 
 // #region TextInfoInput
 type TextInfoInputProps = {
@@ -48,6 +49,50 @@ export class TextInfoInput extends React.Component <TextInfoInputProps, TextInfo
 }
 
 // #endregion TextInfoInput
+
+//#region NumberInfoInput
+type NumberInfoInputProps = {
+    onChange: onChangeFunction,
+    editingEnabled: boolean,
+    value: number,
+    inputName: string,
+
+}
+type NumberInfoInputState = {
+
+}
+export class NumberInfoInput extends React.Component<NumberInfoInputProps, NumberInfoInputState>{
+    constructor(props: NumberInfoInputProps) {
+        super(props);
+
+        this.handleValueChange = this.handleValueChange.bind(this);
+    }
+
+    handleValueChange(e: React.ChangeEvent<HTMLInputElement>) {
+        this.props.onChange(this.props.inputName, e.target.value);
+    }
+    render() {
+        var content = null;
+        if (this.props.editingEnabled)
+            content = <input
+                onChange={this.handleValueChange}
+                type="number"
+                value={this.props.value}
+                name={this.props.inputName}
+            />
+
+        else
+            content = <div className="info">{this.props.value}</div>
+
+        return (
+            <span className="TextInfoInput">
+                {content}
+            </span>
+        )
+    }
+}
+
+//#endregion NumberInfoInput
 
 //#region TextAreaInfoInput
 type TextAreaInfoInputProps = {
@@ -246,6 +291,8 @@ type ImagesInputState = {
 type ImagesInput_ImageItem = {
     id: number,
     file: File,
+
+
 }
 export class ImagesInput extends React.Component<ImagesInputProps, ImagesInputState>{
     constructor(props: ImagesInputProps) {
@@ -253,6 +300,7 @@ export class ImagesInput extends React.Component<ImagesInputProps, ImagesInputSt
 
         let imageItems: ImagesInput_ImageItem[] = [];
         let i = 0;
+        if(this.props.value)
         for ( ; i < this.props.value.length; i++) {
             let newItem: ImagesInput_ImageItem = {
                 id: i,
@@ -266,10 +314,10 @@ export class ImagesInput extends React.Component<ImagesInputProps, ImagesInputSt
         }
 
         this.onInputChange = this.onInputChange.bind(this);
-        this.deleteImages = this.deleteImages.bind(this);
+        this.deleteImage = this.deleteImage.bind(this);
     }
 
-    deleteImages(id: number) {
+    deleteImage(id: number) {
         let itemToDelete = this.state.items.filter((item) => item.id == id)[0];
         let index = this.state.items.indexOf(itemToDelete)
         let newItems = this.state.items.slice();
@@ -585,7 +633,7 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
         this.deleteItem = this.deleteItem.bind(this);
         this.getObjectInputHtml = this.getObjectInputHtml.bind(this);
     }
-    onInfoInputChange(inputName: string, value: string | number | boolean) {
+    onInfoInputChange(inputName: string, value: string) {
         let edited = {
             ...this.props.data,
             [inputName]: value,
@@ -657,16 +705,33 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
 
 // #endregion InfoInputList
 
-// #region ClickDropDown
-type ClickDropDownProps = {
-    clickContent: any,
-    dropDownContent: any,
+// #region PredefinedSelectInfoInput
+type PredefinedSelectInfoInputProps = {
+    items: PredefinedSelectInfoInput_Item[],
+    selectedItemId: string,
 
 }
-export class ClickDropDown extends React.Component {
+type PredefinedSelectInfoInputState = {
 
 }
+type PredefinedSelectInfoInput_Item = {
+    id: string,
+    value: string,
+    viewText: string,
+}
 
+class PredefinedSelectInfoInput extends React.Component<PredefinedSelectInfoInputProps, PredefinedSelectInfoInputState>{
+    constructor(props: PredefinedSelectInfoInputProps) {
+        super(props);
+    }
 
+    render() {
 
-// #endregion ClickDropDown
+        return (
+            <div className="PredefinedSelectInfoInput">
+
+            </div>
+            )
+    }
+}
+// #endregion PredefinedSelectInfoInput

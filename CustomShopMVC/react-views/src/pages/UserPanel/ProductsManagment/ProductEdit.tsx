@@ -1,18 +1,20 @@
 ﻿import React from 'react';
-import { CheckBoxSwitch, ImageInfoInput, ImagesInput, TextAreaInfoInput, TextInfoInput } from '../../../components/globalInputComponents';
+import { CheckBoxSwitch, ImageInfoInput, ImagesInput, NumberInfoInput, TextAreaInfoInput, TextInfoInput } from '../../../components/globalInputComponents';
 import Constants from '../../../router/constants';
 import style from '../../styles/userPanel.module.css';
 import globalStyle from '../../styles/global.module.css';
 import { IProduct, IProductEdit } from '../../../types/productTypes';
-import { Link, matchPath, Redirect } from 'react-router-dom';
+import { Link, Redirect, RouteComponentProps } from 'react-router-dom';
+import * as Icon from 'react-bootstrap-icons';
 
-type ProductEditPanelProps = {
+interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }>{
+
 }
 type ProductEditPanelState = {
-    editingEnabled: boolean,
     product: IProductEdit ,
     ajaxResponse: AjaxSaveResponse,
     redirect: string,
+    editingEnabled: boolean,
 }
 
 type AjaxSaveResponse = {
@@ -40,10 +42,11 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 formError: "",
                 newId: "",
                 nameError: "",
+               
             },
-            product: {} as IProduct,
-            editingEnabled: false,
+            product: {} as IProductEdit,
             redirect: "",
+            editingEnabled: true,
         };
 
 
@@ -53,25 +56,28 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.deleteProduct = this.deleteProduct.bind(this);
     }
     componentDidMount() {
-        let url = Constants + "/API/UserPanel/GetProduct";
-        fetch(url, {
-            method: "POST",
+        if (!this.props.match.params.productId.includes("new"))
+        {
+            let url = Constants + "/API/UserPanel/GetProduct";
+            fetch(url, {
+                method: "POST",
 
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success)
-                    this.setState({
-                        product: data.product,
-                    });
-                else
-                    this.setState({
-                        ajaxResponse: {
-                            ...this.state.ajaxResponse,
-                            formError: "Couldn't get the product data from server",
-                        },
-                    });
             })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success)
+                        this.setState({
+                            product: data.product,
+                        });
+                    else
+                        this.setState({
+                            ajaxResponse: {
+                                ...this.state.ajaxResponse,
+                                formError: "Couldn't get the product data from server",
+                            },
+                        });
+                })
+        }
     }
     onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] ) {
         let newProduct = {
@@ -103,7 +109,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             id: data.newId,
                         },
                         ajaxResponse: data,
-                        editingEnabled: false,
                     }, () => {
                         setTimeout(() => {
                             this.setState({
@@ -120,7 +125,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 else if (data.success) {
                     this.setState({
                         ajaxResponse: data,
-                        editingEnabled: false,
                     }, () => {
                         setTimeout(() => {
                             this.setState({
@@ -215,7 +219,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         <TextAreaInfoInput
                             value={this.state.product.description}
                             placeholderValue=""
-                            editingEnabled={true}
+                            editingEnabled={this.state.editingEnabled}
                             onChange={this.onInfoinputChange}
                             inputName="description"
                         />
@@ -236,14 +240,16 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             value={this.state.product.newImages}
                             onChange={this.onInfoinputChange}
                             editingEnabled={this.state.editingEnabled}
-                            inputName=""
+                            inputName="newImages"
                         />
                     </div>
                     <div className="inputGroup" >
                         <span>Quantity</span>
                         <NumberInfoInput
                             value={this.state.product.quantity}
-
+                            onChange={this.onInfoinputChange}
+                            editingEnabled={this.state.editingEnabled}
+                            inputName="quantity"
                         />
                     </div>
                     <div className="inputGroup" >
@@ -255,9 +261,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     {this.state.ajaxResponse.formError}
                 </div>
                 <div className="buttonGroup">
-                    <button className="" onClick={this.enableEditing}>Edit</button>
-                    <button className="" onClick={this.saveProperty}>Save</button>
-                    <button className="" onClick={this.deleteProperty} ><Icon.X width={25} height={25} /></button>
+                    <button className="" onClick={() => { this.setState({ editingEnabled: true, }) } }>Edit</button>
+                    <button className="" onClick={this.saveProduct}>Save</button>
+                    <button className="" onClick={this.deleteProduct} ><Icon.X width={25} height={25} /></button>
                 </div>
             </div>
 

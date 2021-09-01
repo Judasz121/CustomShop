@@ -207,9 +207,6 @@ export class UsersManagmentPanel extends React.Component<UserManagmentPanelProps
         this.newUserAdded = this.newUserAdded.bind(this);
         this.userEdited = this.userEdited.bind(this);
     }
-    componentDidUpdate() {
-        console.log("users managment panel updated");
-    }
 
     componentDidMount() {
 

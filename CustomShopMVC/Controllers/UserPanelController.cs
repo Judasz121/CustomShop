@@ -22,8 +22,8 @@ namespace CustomShopMVC.Controllers
 	[Route("API/{controller}")]
 	public class UserPanelController : ControllerBase
 	{
-		private IDatabaseAccess _dataAccess;
-		private IUpload _upload;
+		private readonly IDatabaseAccess _dataAccess;
+		private readonly IUpload _upload;
 		public UserPanelController(IDatabaseAccess dataAccess, IUpload upload)
 		{
 			_dataAccess = dataAccess;
@@ -91,7 +91,7 @@ namespace CustomShopMVC.Controllers
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
-				var selectJoin = await conn.QueryAsync<Product, ProductImage, Product>(sql,
+				IEnumerable<Product> selectJoin = await conn.QueryAsync<Product, ProductImage, Product>(sql,
 					(product, productImage) =>
 					{
 						product.Images.Add(productImage);
@@ -168,7 +168,6 @@ namespace CustomShopMVC.Controllers
 						sql = "INSERT INTO [ProductChoosablePropertyValues] @VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
 
 						conn.Execute(sql, param);
-						
 					}
 
 					foreach (KeyValuePair<string, float> measurableProperty in model.Product.MeasurablePropertiesValue)
@@ -212,9 +211,6 @@ namespace CustomShopMVC.Controllers
 			}
 			else // update
 			{
-
-
-
 				param.Add("@Id", model.Product.Id);
 				param.Add("@AuthorId", model.Product.AuthorId);
 				param.Add("@OwnerId", model.Product.OwnerId);

@@ -19,4 +19,5 @@ export interface IProduct {
 export interface IProductEdit extends IProduct {
     newThumbnailImage: File,
     newImages: File[],
+    imagesToDelete: string[]
 }
