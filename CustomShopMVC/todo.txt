@@ -9,11 +9,11 @@ implement authorization in controllers
 user settings panel: darkMode, changing(password, username, personal data ) 
 implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
 do 404 page
-sort classes from /Models folder to /Models/ControllerDataModels and /Models/ViewModels
 test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
-change inside viewModels and dataOuts string formError to list<formError> or list<Error> 
+change inside viewModels and dataOuts string formError to list<string> formErrors
+add frontEnd checks before object http request to save
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,
