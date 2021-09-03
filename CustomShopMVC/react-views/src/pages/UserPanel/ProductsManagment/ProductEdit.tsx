@@ -6,7 +6,7 @@ import globalStyle from '../../styles/global.module.css';
 import { IProduct, IProductEdit } from '../../../types/productTypes';
 import { Link, Redirect, RouteComponentProps } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
-import Select from 'react-select';
+import ReactSelect from 'react-select';
 import { IUser } from '../../../types/authTypes';
 
 interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }>{
@@ -18,6 +18,8 @@ type ProductEditPanelState = {
     redirect: string,
     editingEnabled: boolean,
     users: IUser[],
+    usersReactSelectItems: ReactSelectItem[],
+
 }
 
 type AjaxSaveResponse = {
@@ -27,6 +29,7 @@ type AjaxSaveResponse = {
     nameErrors: string[],
 }
 
+type ReactSelectItem = { label: string, value: string, }
 
 export default class ProductEditPanel extends React.Component<ProductEditPanelProps, ProductEditPanelState> {
     constructor(props: ProductEditPanelProps) {
@@ -42,6 +45,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             product: {} as IProductEdit,
             redirect: "",
             editingEnabled: true,
+            usersReactSelectItems: [],
         };
 
 
@@ -52,8 +56,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     }
     componentDidMount() {
         // #region get product
-        if (!this.props.match.params.productId.includes("new"))
-        {
+        if (this.props.match.params.productId != "new") {
             let url = Constants + "/API/UserPanel/GetProduct";
             fetch(url, {
                 method: "POST",
@@ -71,6 +74,14 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         });
                 })
         }
+        else {
+            this.setState({
+                product: {
+                    ...this.state.product,
+                    id: "new",
+                }
+            })
+        }
         //#endregion
         //#region get users
         let url = Constants.baseUrl + "/API/UserPanel/GetUsers"
@@ -82,26 +93,36 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             .then(data => {
                 if(data.success)
                 this.setState({
-                    users: data.users
+                    users: data.users,
+                    usersReactSelectItems: data.users.map((item: IUser) => {
+                        let fullName = item.firstName + " " + item.lastName;
+                        let label;
+                        if (fullName.length > 1 && item.lastName != null && item.firstName != null)
+                            label = item.userName + " | " + item.firstName + " " + item.lastName;
+                        else
+                            label = item.userName;
+
+                        return { value: item.id, label: label }
+                    }),
                 })
                 else
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
                             formErrors: data.formErrors,
-                        }
+                        },
+
                     })
             })
 
-        //#endregion
+        //#endregion get users
     }
-    onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] ) {
-        let newProduct = {
-            ...this.state.product,
-            [inputName]: value,
-        }
+    onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] | Object | Array<Object> | null | undefined ) {
         this.setState({
-            product: newProduct,
+            product: {
+                ...this.state.product,
+                [inputName]: value,
+            },
         });
     }
     saveProduct() {
@@ -220,12 +241,15 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 <div className="content">
                     <div className="inputGroup">
                         <span>Author</span>
-                        <Link to={`/user/${this.state.product.authorId}`} />
+
                         
                     </div>
                     <div className="inputGroup">
                         <span>Owner</span>
-                        <Link to={`/user/${this.state.product.ownerId}`} />
+                        <ReactSelect
+                            onChange={(selectedItem) => { this.onInfoinputChange("ownerId", selectedItem?.value) }}
+                            options={this.state.usersReactSelectItems}
+                        />
                     </div>
                     <div className="inputGroup">
                         <span>Description</span>

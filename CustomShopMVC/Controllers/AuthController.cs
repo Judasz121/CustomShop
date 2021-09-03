@@ -1,7 +1,9 @@
-﻿using CustomShopMVC.Helpers;
+﻿using AutoMapper;
+using CustomShopMVC.Helpers;
 using CustomShopMVC.Identity;
 using CustomShopMVC.Models;
 using CustomShopMVC.Models.ControllerDataModels.Auth;
+using CustomShopMVC.Models.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -144,12 +146,12 @@ namespace CustomShopMVC.Controllers
         public async Task<ActionResult<AuthStatusDataOut>> AuthStatus()
         {
             AuthStatusDataOut result = new AuthStatusDataOut() { IsLoggedIn = false };
+            IMapper mapper = AutoMapperConfigs.Auth().CreateMapper();
             result.IsLoggedIn = User.Identity.IsAuthenticated;
             if (result.IsLoggedIn)
             {
                 ApplicationUser user = await _userManager.GetUserAsync(User);
-                result.Username = user.UserName;
-                result.Email = user.Email;
+                result.User = mapper.Map<ApplicationUser, UserViewModel>(user);
             }
 
             return result;

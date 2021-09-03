@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomShopMVC.Models.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,8 +38,7 @@ namespace CustomShopMVC.Models.ControllerDataModels.Auth
 
 	public class AuthStatusDataOut
 	{
-		public string Username { get; set; }
-		public string Email { get; set; }
+		public UserViewModel User { get; set; }
 		public bool IsLoggedIn { get; set; }
 	}
 

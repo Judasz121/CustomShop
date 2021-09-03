@@ -94,7 +94,7 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
     render() {
         var content;
         if (this.state.addNewProduct == true)
-            content = <Redirect to="./productsManagment/productEdit/:new" />
+            content = <Redirect to="./productsManagment/productEdit/new" />
         else
             content = this.state.products.map((item) => {
                 return <ProductEditCard product={item} onDeleteClick={this.deleteProduct}/>

@@ -123,7 +123,7 @@ class AuthInfoHorizontal extends React.Component<{}, AuthInfoHorizontalState> {
         response.json().then(data => {
             this.setState({
                 ajaxResponse: {
-                    userName: data.userName,
+                    userName: data.user.userName,
                     isLoggedIn: data.isLoggedIn
                 }
             });

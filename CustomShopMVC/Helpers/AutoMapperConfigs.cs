@@ -73,6 +73,9 @@ namespace CustomShopMVC.Helpers
 				cfg.CreateMap<UserViewModel, ApplicationUser>()
 					.ForMember(u => u.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 				;
+				cfg.CreateMap<ApplicationUser, UserViewModel>()
+					.ForMember(u => u.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+				;
 			});
 		}
 
@@ -105,6 +108,15 @@ namespace CustomShopMVC.Helpers
 					.ForMember(p => p.ImagesPath, opt => opt.MapFrom((src) => src.Images.Select(i => i.ImagePath)))
 				;
 				#endregion products
+
+				#region users
+				cfg.CreateMap<ApplicationUser, UserViewModel>()
+					.ForMember(u => u.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+				;
+				cfg.CreateMap<UserViewModel, ApplicationUser>()
+					.ForMember(u => u.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
+				;
+				#endregion users
 			});
 		}
 	}
