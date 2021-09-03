@@ -103,6 +103,7 @@ namespace CustomShopMVC.Controllers
 				});
 
 				result.Products = mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewModel>>(dbProducts).ToList();
+				result.Success = true;
 			}
 			return result;
 		}
@@ -142,7 +143,7 @@ namespace CustomShopMVC.Controllers
 					}
 
 					string thumbnailImagePath = "";
-					if (model.Product.NewThumbnailImage.Length > 0)
+					if (model.Product.NewThumbnailImage != null && model.Product.NewThumbnailImage.Length > 0)
 						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
 					param.Add("@ThumbnailImagePath", thumbnailImagePath);
 

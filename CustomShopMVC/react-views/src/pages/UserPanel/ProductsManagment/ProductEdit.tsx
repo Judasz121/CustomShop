@@ -126,62 +126,77 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         });
     }
     saveProduct() {
-        let url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
-        let dataToSend = {
-            product: this.state.product,
-        }
-        fetch(url, {
-            method: "POST",
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify(dataToSend),
-        })
-            .then((response) => response.json())
-            .then((data: AjaxSaveResponse) => {
-                if (data.success && data.newId != null && data.newId.length > 0) {
-                    this.setState({
-                        product: {
-                            ...this.state.product,
-                            id: data.newId,
-                        },
-                        ajaxResponse: data,
-                    }, () => {
-                        setTimeout(() => {
-                            this.setState({
-                                ajaxResponse: {
-                                    ...this.state.ajaxResponse,
-                                    formErrors: [],
-                                    nameErrors: [],
-                                }
-                            });
-                        }, 8000)
-                    });
+        let ok = true;
+        if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
+            ok = false;
+            let nameErrors = this.state.ajaxResponse.nameErrors.slice();
+            nameErrors.push("Name cannot be empty");
 
+            this.setState({
+                ajaxResponse: {
+                    ...this.state.ajaxResponse,
+                    nameErrors: this.state.ajaxResponse.nameErrors.slice()
                 }
-                else if (data.success) {
-                    this.setState({
-                        ajaxResponse: data,
-                    }, () => {
-                        setTimeout(() => {
-                            this.setState({
-                                ajaxResponse: {
-                                    ...this.state.ajaxResponse,
-                                    formErrors: [],
-                                    nameErrors: [],
-                                },
-                            });
-                        }, 8000);
-                    }
-                    );
-                }
-                else {
-                    this.setState({
-                        ajaxResponse: data,
-                    });
-                }
-
             })
+        }
+        if (ok) {
+            let url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
+            let dataToSend = {
+                product: this.state.product,
+            }
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then((response) => response.json())
+                .then((data: AjaxSaveResponse) => {
+                    if (data.success && data.newId != null && data.newId.length > 0) {
+                        this.setState({
+                            product: {
+                                ...this.state.product,
+                                id: data.newId,
+                            },
+                            ajaxResponse: data,
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    ajaxResponse: {
+                                        ...this.state.ajaxResponse,
+                                        formErrors: [],
+                                        nameErrors: [],
+                                    }
+                                });
+                            }, 8000)
+                        });
+
+                    }
+                    else if (data.success) {
+                        this.setState({
+                            ajaxResponse: data,
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    ajaxResponse: {
+                                        ...this.state.ajaxResponse,
+                                        formErrors: [],
+                                        nameErrors: [],
+                                    },
+                                });
+                            }, 8000);
+                        }
+                        );
+                    }
+                    else {
+                        this.setState({
+                            ajaxResponse: data,
+                        });
+                    }
+
+                })
+        }
     }
 
 
