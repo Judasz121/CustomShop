@@ -84,9 +84,7 @@ namespace CustomShopMVC.Controllers
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 			IEnumerable<Product> dbProducts;
 
-			string sql = "SELECT " +
-				"[Products.Id], [Products.AuthorId], [Products.OwnerId], [Products.Name], [Products.Description], [Products.ThumbnailImagePath], [Products.Quantity], [ProductImages.ImagePath] " +
-				"FROM [Products] LEFT OUTER JOIN [ProductImages] ON [Products.Id] = [ProductImages.ProductId]";
+			string sql = "SELECT * FROM [Products] LEFT OUTER JOIN [ProductImages] ON [Products].[Id] = [ProductImages].[ProductId]";
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
