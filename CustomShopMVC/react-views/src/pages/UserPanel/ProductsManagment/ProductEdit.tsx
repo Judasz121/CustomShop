@@ -250,18 +250,19 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         />
                         <span className="error">
                             {this.state.ajaxResponse.formErrors.map((item) => { return item + "\n" })}
+                            {this.state.ajaxResponse.nameErrors.map((item) => { return item + "\n" })}
                         </span>
                     </h1>
                 </div>
                 <div className="content">
                     <div className="inputGroup">
                         <span>Author</span>
-
-                        
+                        <Link to={`/user/${this.state.product.authorId}`} />
                     </div>
                     <div className="inputGroup">
                         <span>Owner</span>
                         <ReactSelect
+                            value={this.state.usersReactSelectItems.filter((item) => { return item.value == this.state.product.ownerId })}
                             onChange={(selectedItem) => { this.onInfoinputChange("ownerId", selectedItem?.value) }}
                             options={this.state.usersReactSelectItems}
                         />
