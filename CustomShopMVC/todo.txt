@@ -12,7 +12,6 @@ do 404 page
 test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
-change inside viewModels and dataOuts string formError to list<string> formErrors
 add frontEnd checks before object http request to save
 == REQUIREMENTS ==
 

@@ -24,9 +24,9 @@ type ProductEditPanelState = {
 
 type AjaxSaveResponse = {
     success: boolean,
-    formErrors: string[],
+    formError: string,
     newId: string,
-    nameErrors: string[],
+    nameError: string,
 }
 
 type ReactSelectItem = { label: string, value: string, }
@@ -37,9 +37,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.state = {
             ajaxResponse: {
                 success: false,
-                formErrors: [],
+                formError: "",
                 newId: "",
-                nameErrors: [],
+                nameError: "",
             },
             users: [],
             product: {} as IProductEdit,
@@ -109,13 +109,29 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formErrors: data.formErrors,
+                            formErrors: data.formError,
                         },
 
                     })
             })
 
         //#endregion get users
+
+        //#region get Author id
+        url = Constants.baseUrl + "/API/Auth/AuthStatus";
+        fetch(url, {
+            method:"GET"
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    product: {
+                        ...this.state.product,
+                        authorId: data.user.id,
+                    }
+                })
+            })
+        //#endregion
     }
     onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] | Object | Array<Object> | null | undefined ) {
         this.setState({
@@ -129,16 +145,16 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         let ok = true;
         if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
             ok = false;
-            let nameErrors = this.state.ajaxResponse.nameErrors.slice();
-            nameErrors.push("Name cannot be empty");
 
             this.setState({
                 ajaxResponse: {
                     ...this.state.ajaxResponse,
-                    nameErrors: this.state.ajaxResponse.nameErrors.slice()
+                    nameError: "Name cannot be empty",
                 }
             })
         }
+        console.log("saveProduct");
+        console.log(ok);
         if (ok) {
             let url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
             let dataToSend = {
@@ -165,8 +181,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formErrors: [],
-                                        nameErrors: [],
+                                        formError: "",
+                                        nameError: "",
                                     }
                                 });
                             }, 8000)
@@ -181,8 +197,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formErrors: [],
-                                        nameErrors: [],
+                                        formError: "",
+                                        nameError: "",
                                     },
                                 });
                             }, 8000);
@@ -249,8 +265,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             placeholderValue="name"
                         />
                         <span className="error">
-                            {this.state.ajaxResponse.formErrors.map((item) => { return item + "\n" })}
-                            {this.state.ajaxResponse.nameErrors.map((item) => { return item + "\n" })}
+                            {this.state.ajaxResponse.nameError}
                         </span>
                     </h1>
                 </div>
@@ -311,7 +326,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     </div>
                 </div>
                 <div className="formError">
-                    {this.state.ajaxResponse.formErrors.map((item) => { return item + "\n" })}
+                    {this.state.ajaxResponse.formError}
                 </div>
                 <div className="buttonGroup">
                     <button className="" onClick={() => { this.setState({ editingEnabled: true, }) } }>Edit</button>
