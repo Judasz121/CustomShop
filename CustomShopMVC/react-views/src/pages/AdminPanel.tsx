@@ -25,7 +25,7 @@ class AdminPanelPage extends React.Component<AdminPanelPageProps, AdminPanelPage
         var navItems: INavItem[] = [
             { text: "Categories Panel", url: `${this.props.match.url}/categories`, },
             { text: "Users Panel", url: `${this.props.match.url}/users`, },
-            {text: "Roles Panel", url: `${this.props.match.url}/roles`,},
+            { text: "Roles Panel", url: `${this.props.match.url}/roles`,},
         ]
         return (
             <div id="adminPanelPage" className="">

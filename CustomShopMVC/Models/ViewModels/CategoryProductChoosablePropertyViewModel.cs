@@ -13,4 +13,9 @@ namespace CustomShopMVC.Models.ViewModels
 		public string PropertyNameAbbreviation { get; set; }
 		public List<string> ItemsToChoose { get; set; }
 	}
+
+	public class ParentCategoryProductChoosablePropertyViewModel : CategoryProductChoosablePropertyViewModel
+	{
+		public string CategoryName { get; set; }
+	}
 }

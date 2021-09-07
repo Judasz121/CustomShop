@@ -18,12 +18,23 @@ type CategoryPropertiesManagmentPanelState = {
     editedProperties: {
         measurableProperties: IMeasurableProperty[],
         choosableProperties: IChoosableProperty[],
-    }
+    },
+    parentProperties: {
+        measurableProperties: IParentMeasurableProperty[],
+        choosableProperties: IParentChoosableProperty[],
+    },
 }
-
+interface IParentMeasurableProperty extends IMeasurableProperty {
+    categoryName: string,
+}
+interface IParentChoosableProperty extends IChoosableProperty {
+    categoryName: string,
+}
 type CategoryProductPropertiesFetchResponse = {
     choosableProperties: IChoosableProperty[],
     measurableProperties: IMeasurableProperty[],
+    parentsMeasurableProperties: IParentMeasurableProperty[],
+    parentsChoosableProperties: IParentChoosableProperty[],
     formError: string,
     success: boolean,
     nameError: string,
@@ -43,12 +54,18 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                 nameError:"",
                 measurableProperties: [],
                 choosableProperties: [],
+                parentsChoosableProperties: [],
+                parentsMeasurableProperties: [],
             },
             newMeasurablePropertyId: 1,
             newChoosablePropertyId: 1,
             editedProperties: {
                 measurableProperties: [],
                 choosableProperties: [],
+            },
+            parentProperties: {
+                measurableProperties:[],
+                choosableProperties:[],
             }
         }
         this.choosablePropertyEdited = this.choosablePropertyEdited.bind(this);
@@ -199,6 +216,20 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
     }
 
     render() {
+        let parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
+            if (!acc[item.categoryName])
+                acc[item.categoryName] = [];
+
+            acc[item.categoryName].push(item);
+            return acc;
+        }, {});
+        let parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
+            if (!acc[item.categoryName])
+                acc[item.categoryName] = [];
+
+            acc[item.categoryName].push(item);
+            return acc;
+        }, {});
         return (
             <div id="CategoryEditPanel" >
                 <div className="CategoryPropertiesManagmentPanelList">
@@ -237,6 +268,17 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                         }
 
                     </div>
+                    <div className="parentsProperties">
+                        <h1>Inherited Properties</h1>
+                        <hr />
+                        <h2>Choosable Properties</h2>
+                        {
+                            either show by every Category and then choosables, measurables of that category
+                            or
+                            show choosable of every category and then every measurable of every category
+                            parentsChoosablesByCategoryName
+                        }
+                    </div>
                 </div>
             </div>
         )
@@ -254,7 +296,6 @@ type MeasurablePropertyInfoEditPanelState = {
     editingEnabled: boolean,
     measurableProperty: IMeasurableProperty,
     saveResponse: SavePropertyResponse,
-    
 }
 
 type SavePropertyResponse = {

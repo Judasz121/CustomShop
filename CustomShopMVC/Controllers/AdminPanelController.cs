@@ -130,6 +130,7 @@ namespace CustomShopMVC.Controllers
 			GetCategoryPropertiesDataOut result = new GetCategoryPropertiesDataOut();
 			IMapper mapper = AutoMapperConfigs.AdminPanel().CreateMapper();
 
+
 			if (string.IsNullOrEmpty(model.CategoryId))
 			{
 				result.Error = "Category Id is requierd";
@@ -148,9 +149,63 @@ namespace CustomShopMVC.Controllers
 				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductMeasurableProperty> sqlSelect2 = conn.Query<CategoryProductMeasurableProperty>(sql, param);
 				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(sqlSelect2);
+				
+
+
+				#region category parents properties
+
+				Category parentCategory;
+				Category category;
+				param = new DynamicParameters();
+				param.Add("@Id", model.CategoryId);
+				sql = "SELECT * FROM [Categories] WHERE [Id] = @Id";
+				category = conn.Query<Category>(sql, param).First();
+
+				param.Add("@ParentId", category.ParentId);
+				sql = "SELECT * FROM [Categories] WHERE [Id] = @ParentId";
+				parentCategory = conn.Query<Category>(sql, param).First();
+
+				do
+				{
+					param = new DynamicParameters();
+					param.Add("@CategoryId", parentCategory.Id);
+
+					sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+					IEnumerable<CategoryProductChoosableProperty> dbChoosables = conn.Query<CategoryProductChoosableProperty>(sql, param);
+					List<ParentCategoryProductChoosablePropertyViewModel> parentChoosables = new List<ParentCategoryProductChoosablePropertyViewModel>();
+					foreach (CategoryProductChoosableProperty item in dbChoosables)
+					{
+						ParentCategoryProductChoosablePropertyViewModel parentProp = mapper.Map<CategoryProductChoosableProperty, ParentCategoryProductChoosablePropertyViewModel>(item);
+						parentProp.CategoryName = parentCategory.Name;
+
+						parentChoosables.Add(parentProp);
+					}
+					result.ParentsChoosableProperties.Concat(parentChoosables);
+
+					sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+					IEnumerable<CategoryProductMeasurableProperty> dbMeasurables = conn.Query<CategoryProductMeasurableProperty>(sql, param);
+					List<ParentCategoryProductMeasurablePropertyViewModel> parentMeasurables = new List<ParentCategoryProductMeasurablePropertyViewModel>();
+					foreach (CategoryProductMeasurableProperty item in dbMeasurables)
+					{
+						ParentCategoryProductMeasurablePropertyViewModel parentProp = mapper.Map<CategoryProductMeasurableProperty, ParentCategoryProductMeasurablePropertyViewModel>(item);
+						parentProp.CategoryName = parentCategory.Name;
+
+						parentMeasurables.Add(parentProp);
+					}
+					result.ParentsMeasurableProperties.Concat(parentMeasurables);
+
+					param = new DynamicParameters();
+					param.Add("@Id", parentCategory.ParentId);
+					sql = "SELECT * FROM [Categories] WHERE [Id] = @Id";
+					parentCategory = conn.Query<Category>(sql, param).First();
+				}
+				while (parentCategory != null);
+
+				#endregion
+
 				result.Success = true;
 			}
-			
+
 			return result;
 		}
 		

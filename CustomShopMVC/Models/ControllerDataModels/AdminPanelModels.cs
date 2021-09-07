@@ -34,6 +34,8 @@ namespace CustomShopMVC.Models.ControllerDataModels.AdminPanel
 	{
 		public List<CategoryProductChoosablePropertyViewModel> ChoosableProperties { get; set; }
 		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
+		public List<ParentCategoryProductChoosablePropertyViewModel> ParentsChoosableProperties { get; set; }
+		public List<ParentCategoryProductMeasurablePropertyViewModel> ParentsMeasurableProperties { get; set; }
 		public string Error { get; set; }
 		public bool Success { get; set; }
 	}

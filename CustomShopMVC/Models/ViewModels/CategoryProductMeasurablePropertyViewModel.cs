@@ -16,4 +16,9 @@ namespace CustomShopMVC.Models.ViewModels
 		public bool IsMetric { get; set; }
 		public float ToMetricModifier { get; set; }
 	}
+
+	public class ParentCategoryProductMeasurablePropertyViewModel : CategoryProductMeasurablePropertyViewModel
+	{
+		public string CategoryName { get; set; }
+	}
 }
