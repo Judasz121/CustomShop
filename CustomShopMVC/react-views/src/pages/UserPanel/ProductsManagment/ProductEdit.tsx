@@ -109,7 +109,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formErrors: data.formError,
+                            formError: data.formError,
                         },
 
                     })
@@ -142,19 +142,27 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         });
     }
     saveProduct() {
+        // #region data checks
         let ok = true;
+        let nameError = "";
+        let formError = "";
         if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
             ok = false;
-
+            nameError += "Name cannot be empty.";
+        }
+        if (this.state.product.ownerId == undefined || this.state.product.ownerId == null || this.state.product.ownerId == "") {
+            ok = false;
+            formError += "The product has to have an Owner.";
+        }
+        if (!ok)
             this.setState({
                 ajaxResponse: {
                     ...this.state.ajaxResponse,
-                    nameError: "Name cannot be empty",
+                    formError: formError,
+                    nameError: nameError,
                 }
-            })
-        }
-        console.log("saveProduct");
-        console.log(ok);
+            });
+        // #endregion data checks
         if (ok) {
             let url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
             let dataToSend = {
