@@ -80,7 +80,7 @@ namespace CustomShopMVC.Controllers
 			#endregion
 
 			#region save to db
-			IEnumerable<Category> dataToQuery = mapper.Map<List<CategoryViewModel>, IEnumerable<Category>>(model.categories);
+			IEnumerable<Category> categoriesToInsert = mapper.Map<List<CategoryViewModel>, IEnumerable<Category>>(model.categories);
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
 				bool categoriesTableEmpty = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM [Categories]") == 0 ? true : false;
@@ -88,32 +88,61 @@ namespace CustomShopMVC.Controllers
 				if (!categoriesTableEmpty)
 					delete = conn.Execute("DELETE FROM [Categories]");
 
-				if (delete == 0 && !categoriesTableEmpty)
+
+				string sql = "INSERT INTO [Categories] VALUES (@Id, @ParentId, @Name)";
+				int insert = 0;
+				foreach (Category item in categoriesToInsert)
 				{
-					result.Success = false;
-					result.ErrorMsg = "Could not clear categories table before updating";
+					DynamicParameters param = new DynamicParameters();
+					param.Add("@Id", item.Id);
+					param.Add("@ParentId", item.ParentId);
+					param.Add("@Name", item.Name);
+					insert = insert + conn.Execute(sql, param);
 				}
-				else
+
+				#endregion
+
+				#region delete deleted categories's properties and property values
+				sql = "SELECT * FROM [CategoryProductChoosableProperties]";
+				IEnumerable<CategoryProductChoosableProperty> dbChoosables = conn.Query<CategoryProductChoosableProperty>(sql);
+
+				List<Guid> handled = new List<Guid>();
+				foreach(CategoryProductChoosableProperty choosableItem in dbChoosables)
 				{
-					string sql = "INSERT INTO [Categories] VALUES (@Id, @ParentId, @Name)";
-					int insert = 0;
-					foreach (Category item in dataToQuery)
+					if (handled.Any(id => id == choosableItem.CategoryId))
+						continue;
+
+					if(!categoriesToInsert.Any(c => c.Id == choosableItem.CategoryId))
 					{
 						DynamicParameters param = new DynamicParameters();
-						param.Add("@Id", item.Id);
-						param.Add("@ParentId", item.ParentId);
-						param.Add("@Name", item.Name);
-						insert = insert + conn.Execute(sql, param);
-					}
+						param.Add("@CategoryId", choosableItem.CategoryId);
+						sql = "DELETE FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+						conn.Execute(sql, param);
+						sql = "DELETE FROM [ProductChoosablePropertyValues] WHERE [CategoryId] = @CategoryId";
+						conn.Execute(sql, param);
 
-					if (insert == 0)
-					{
-						result.Success = false;
-						result.ErrorMsg = "Could not insert into categries.";
+						handled.Add(choosableItem.CategoryId);
 					}
-					else
+				}
+				sql = "SELECT * FROM [CategoryProductMeasurableProperties]";
+				IEnumerable<CategoryProductMeasurableProperty> dbMeasurables = conn.Query<CategoryProductMeasurableProperty>(sql);
+				
+				handled = new List<Guid>();
+				foreach (CategoryProductMeasurableProperty measurableItem in dbMeasurables)
+				{
+					if (handled.Any(id => id == measurableItem.CategoryId))
+						continue;
+
+					if (!categoriesToInsert.Any(c => c.Id == measurableItem.CategoryId))
 					{
-						result.Success = true;
+						DynamicParameters param = new DynamicParameters();
+						param.Add("@CategoryId", measurableItem.CategoryId);
+						sql = "DELETE FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+						conn.Execute(sql, param);
+						sql = "DELETE FROM [ProductMeasurablePropertyValues] WHERE [CategoryId] = @CategoryId";
+						conn.Execute(sql, param);
+
+						handled.Add(measurableItem.CategoryId);
 					}
 				}
 				#endregion

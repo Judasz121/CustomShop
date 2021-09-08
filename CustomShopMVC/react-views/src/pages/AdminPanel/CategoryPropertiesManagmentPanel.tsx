@@ -131,7 +131,6 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
     }
 
     addNewChoosableProperty() {
-        console.log("add new choosable called");
         var newProp: IChoosableProperty = {
             id: "new" + this.state.newMeasurablePropertyId,
             categoryId: this.props.match.params.categoryId,
