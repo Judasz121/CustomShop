@@ -216,17 +216,22 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
     }
 
     render() {
-        let parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
+        const parentCategoriesName: string[] = [];
+        const parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
+            if (typeof parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+                parentCategoriesName.push(item.categoryName);
+
             if (!acc[item.categoryName])
                 acc[item.categoryName] = [];
-
             acc[item.categoryName].push(item);
             return acc;
         }, {});
-        let parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
+        const parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
+            if (typeof parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+                parentCategoriesName.push(item.categoryName);
+
             if (!acc[item.categoryName])
                 acc[item.categoryName] = [];
-
             acc[item.categoryName].push(item);
             return acc;
         }, {});
@@ -268,15 +273,80 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                         }
 
                     </div>
-                    <div className="parentsProperties">
-                        <h1>Inherited Properties</h1>
-                        <hr />
-                        <h2>Choosable Properties</h2>
+                    <div className="parentCategories">
+                        <h1>Inherited</h1>
+                        <hr/>
                         {
-                            either show by every Category and then choosables, measurables of that category
-                            or
-                            show choosable of every category and then every measurable of every category
-                            parentsChoosablesByCategoryName
+                            parentCategoriesName.map((categoryName) => {
+                                let choosables: IParentChoosableProperty[] = parentsChoosablesByCategoryName[categoryName];
+                                let measurables: IParentMeasurableProperty[] = parentsMeasurablesByCategoryName[categoryName];
+
+                                return (
+                                    <div className="parentCategory">
+                                        <h2>{categoryName}</h2>
+
+                                        <h3>choosable properites</h3>
+                                        {choosables.map((item) => {
+                                            <div className="choosableProperty" >
+                                                <div className="header">
+                                                    <h4>
+                                                        {item.propertyName}
+                                                    </h4>
+                                                </div>
+                                                <div className="content">
+                                                    <div className="inputGroup">
+                                                        <span>Property Name Abbrevietion</span>
+                                                        {item.propertyNameAbbreviation}
+                                                    </div>
+                                                    <div className="inputGroup">
+                                                        <span>Items to Choose</span>
+                                                        {item.itemsToChoose.map((itc) => {
+                                                            <ul>
+                                                                <li>
+                                                                    {itc}
+                                                                </li>
+                                                            </ul>
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        })}
+
+                                        <h3>measurable properties</h3>
+                                        {measurables.map((item) => {
+                                            <div className="measurableProperty" >
+                                                <div className="header">
+                                                    <h4>
+                                                        {item.propertyName}
+                                                    </h4>
+                                                </div>
+                                                <div className="content">
+                                                    <div className="inputGroup">
+                                                        <span>Property Name Abbrevietion</span>
+                                                        {item.propertyNameAbbreviation}
+                                                    </div>
+                                                    <div className="inputGroup">
+                                                        <span>Unit Full Name</span>
+                                                        {item.unitFullName}
+                                                    </div>
+                                                    <div className="inputGroup">
+                                                        <span>Unit Name</span>
+                                                        {item.unitName}
+                                                    </div>
+                                                    <div className="inputGroup">
+                                                        <span>isMetric</span>
+                                                        {item.isMetric}
+                                                    </div>
+                                                    <div className="inputGroup">
+                                                        <span>To Metric Modifier</span>
+                                                        {item.toMetricModifier}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        })}
+                                    </div>
+                                    )
+                            })
                         }
                     </div>
                 </div>
@@ -451,7 +521,7 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
         return (
             <div className={`MeasurablePropertyPanel-${this.props.measurableProperty.id}`} >
                 <div className="header">
-                    <h1>
+                    <h4>
                         <TextInfoInput
                             inputName="propertyName"
                             value={this.props.measurableProperty.propertyName}
@@ -462,7 +532,7 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                         <span className="error">
                             {this.state.saveResponse.formError}
                         </span>
-                    </h1>
+                    </h4>
                 </div>
                 <div className="content">
                     <div className="inputGroup">
@@ -691,7 +761,7 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
         return (
             <div className={`ChoosablePropertyPanel-${this.props.choosableProperty.id}`} >
                 <div className="header">
-                    <h1>
+                    <h4>
                         <TextInfoInput
                             inputName="propertyName"
                             value={this.props.choosableProperty.propertyName}
@@ -702,7 +772,7 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                         <span className="error">
                             {this.state.saveResponse.formError}
                         </span>
-                    </h1>
+                    </h4>
                 </div>
                 <div className="content">
                     <div className="inputGroup">
