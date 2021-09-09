@@ -324,6 +324,57 @@ namespace CustomShopMVC.Controllers
 			return result;
 		}
 
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<ActionResult<GetProductCategoriesDataDataOut>> GetProductCategoriesData(GetProductCategoriesDataDataIn model)
+		{
+
+			GetProductCategoriesDataDataOut result = new GetProductCategoriesDataDataOut();
+			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
+
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				string sql = "SELECT * FROM [Categories]";
+				IEnumerable<Category> sqlResult = conn.Query<Category>(sql);
+				result.CategoryTree = mapper.Map<IEnumerable<Category>, IEnumerable<CategoryViewModel>>(sqlResult).ToList();
+
+				DynamicParameters param = new DynamicParameters();
+				param.Add("@ProductId", model.ProductId);
+				sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
+				result.ProductCategoriesId = conn.Query<string>(sql, param).ToList();
+			}
+			return result;
+		}
+
+		public async Task<ActionResult<SaveProductCategoriesDataOut>> SaveProductCategories(SaveProductCategoriesDataIn model)
+		{
+			SaveProductCategoriesDataOut result = new SaveProductCategoriesDataOut();
+
+			DynamicParameters param = new DynamicParameters();
+			param.Add("@ProductId", model.ProductId);
+
+			string sql = "SELECT * FROM [Categories_Products] WHERE [ProductId] = @ProductId";
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				List<Category_Product> dbCategories_Products = conn.Query<Category_Product>(sql, param).ToList();
+				
+				foreach(string categoryIdItem in model.SelectedCategories)
+				{
+					if(!dbCategories_Products.Any(c_p => c_p.CategoryId.ToString() == categoryIdItem))
+					{
+						param = new DynamicParameters();
+						param.Add("CategoryId", categoryIdItem);
+						param.Add("@ProductId", model.ProductId);
+						sql = "INSERT INTO [Categories_Products] VALUES(@ProductId, @CategoryId)";
+						conn.Execute(sql, param);
+					}
+				}
+			}
+
+
+			result.Success = true;
+			return result;
+		}
 		#endregion products
 	}
 }

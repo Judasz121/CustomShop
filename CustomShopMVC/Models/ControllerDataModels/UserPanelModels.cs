@@ -47,5 +47,24 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public string NameError { get; set; }
 	}
 	
+	public class GetProductCategoriesDataDataIn
+	{
+		public string ProductId { get; set; }
+	}
+	public class GetProductCategoriesDataDataOut
+	{
+		public List<string> ProductCategoriesId { get; set; }
+		public List<CategoryViewModel> CategoryTree { get; set; }
+	}
+	public class SaveProductCategoriesDataIn
+	{
+		public string ProductId { get; set; }
+		public List<string> SelectedCategories { get; set; }
+	}
+	public class SaveProductCategoriesDataOut
+	{
+		public bool Success { get; set; }
+		public string Error { get; set; }
+	}
 	
 }
