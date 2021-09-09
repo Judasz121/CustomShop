@@ -94,6 +94,10 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                     editedProperties: {
                         choosableProperties: data.choosableProperties,
                         measurableProperties: data.measurableProperties,
+                    },
+                    parentProperties: {
+                        choosableProperties: data.parentsChoosableProperties,
+                        measurableProperties: data.parentsMeasurableProperties,
                     }
                 })
             })
@@ -215,9 +219,10 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
     }
 
     render() {
+        //#region parents's properties setup
         const parentCategoriesName: string[] = [];
         const parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
-            if (typeof parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+            if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
                 parentCategoriesName.push(item.categoryName);
 
             if (!acc[item.categoryName])
@@ -225,8 +230,9 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
             acc[item.categoryName].push(item);
             return acc;
         }, {});
+
         const parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
-            if (typeof parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+            if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
                 parentCategoriesName.push(item.categoryName);
 
             if (!acc[item.categoryName])
@@ -234,6 +240,11 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
             acc[item.categoryName].push(item);
             return acc;
         }, {});
+        console.log(parentCategoriesName);
+        console.log(parentsMeasurablesByCategoryName);
+        console.log(parentsChoosablesByCategoryName);
+        //#endregion parents's properties setup
+
         return (
             <div id="CategoryEditPanel" >
                 <div className="CategoryPropertiesManagmentPanelList">
@@ -279,14 +290,14 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                             parentCategoriesName.map((categoryName) => {
                                 let choosables: IParentChoosableProperty[] = parentsChoosablesByCategoryName[categoryName];
                                 let measurables: IParentMeasurableProperty[] = parentsMeasurablesByCategoryName[categoryName];
-
+                                console.log(categoryName + " Iteration");
                                 return (
                                     <div className="parentCategory">
                                         <h2>{categoryName}</h2>
 
                                         <h3>choosable properites</h3>
                                         {choosables.map((item) => {
-                                            <div className="choosableProperty" >
+                                            return <div className="choosableProperty" >
                                                 <div className="header">
                                                     <h4>
                                                         {item.propertyName}
@@ -313,7 +324,7 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
 
                                         <h3>measurable properties</h3>
                                         {measurables.map((item) => {
-                                            <div className="measurableProperty" >
+                                            return <div className="measurableProperty" >
                                                 <div className="header">
                                                     <h4>
                                                         {item.propertyName}
@@ -334,7 +345,8 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                                                     </div>
                                                     <div className="inputGroup">
                                                         <span>isMetric</span>
-                                                        {item.isMetric}
+                                                        {item.isMetric ? "true" : "false"}
+
                                                     </div>
                                                     <div className="inputGroup">
                                                         <span>To Metric Modifier</span>

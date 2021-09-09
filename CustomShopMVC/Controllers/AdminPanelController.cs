@@ -210,7 +210,10 @@ namespace CustomShopMVC.Controllers
 
 							parentChoosables.Add(parentProp);
 						}
-						result.ParentsChoosableProperties.Concat(parentChoosables);
+
+						result.ParentsChoosableProperties = new List<ParentCategoryProductChoosablePropertyViewModel>();
+						if(parentChoosables != null)
+							result.ParentsChoosableProperties = result.ParentsChoosableProperties.Concat(parentChoosables).ToList();
 
 						sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 						IEnumerable<CategoryProductMeasurableProperty> dbMeasurables = conn.Query<CategoryProductMeasurableProperty>(sql, param);
@@ -222,12 +225,14 @@ namespace CustomShopMVC.Controllers
 
 							parentMeasurables.Add(parentProp);
 						}
-						result.ParentsMeasurableProperties.Concat(parentMeasurables);
+						result.ParentsMeasurableProperties = new List<ParentCategoryProductMeasurablePropertyViewModel>();
+						if (parentMeasurables != null);
+							result.ParentsMeasurableProperties = result.ParentsMeasurableProperties.Concat(parentMeasurables).ToList();
 
 						param = new DynamicParameters();
 						param.Add("@Id", parentCategory.ParentId);
 						sql = "SELECT * FROM [Categories] WHERE [Id] = @Id";
-						parentCategory = conn.Query<Category>(sql, param).First();
+						parentCategory = conn.Query<Category>(sql, param).FirstOrDefault();
 					}
 					while (parentCategory != null);
 				}
