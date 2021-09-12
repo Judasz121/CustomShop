@@ -19,7 +19,6 @@ type ProductEditPanelState = {
     editingEnabled: boolean,
     users: IUser[],
     usersReactSelectItems: ReactSelectItem[],
-
 }
 
 type AjaxSaveResponse = {
@@ -34,6 +33,10 @@ type ReactSelectItem = { label: string, value: string, }
 export default class ProductEditPanel extends React.Component<ProductEditPanelProps, ProductEditPanelState> {
     constructor(props: ProductEditPanelProps) {
         super(props);
+
+        let categoryRedirect = "";
+        if (this.props.match.params.productId == "new")
+            categoryRedirect = "./../productCategorySelection/new"
         this.state = {
             ajaxResponse: {
                 success: false,
@@ -43,7 +46,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             },
             users: [],
             product: {} as IProductEdit,
-            redirect: "",
+            redirect: categoryRedirect,
             editingEnabled: true,
             usersReactSelectItems: [],
         };
@@ -53,14 +56,20 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
         this.saveProduct = this.saveProduct.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
+        this.onChangeCategoriesClick = this.onChangeCategoriesClick.bind(this);
     }
+
     componentDidMount() {
         // #region get product
         if (this.props.match.params.productId != "new") {
-            let url = Constants + "/API/UserPanel/GetProduct";
+            let url = Constants.baseUrl + "/API/UserPanel/GetProduct";
+            let dataToSend = { productId: this.props.match.params.productId }
             fetch(url, {
                 method: "POST",
-
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
             })
                 .then((response) => response.json())
                 .then((data) => {
@@ -133,6 +142,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             })
         //#endregion
     }
+
     onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] | Object | Array<Object> | null | undefined ) {
         this.setState({
             product: {
@@ -141,6 +151,13 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             },
         });
     }
+
+    onChangeCategoriesClick(e: React.MouseEvent<HTMLButtonElement>) {
+        this.setState({
+            redirect: "./../productCategorySelection/" + this.props.match.params.productId,
+        })
+    }
+
     saveProduct() {
         // #region data checks
         let ok = true;
@@ -223,34 +240,35 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         }
     }
 
-
     deleteProduct() {
-        let url = Constants.baseUrl + "/API/UserPanel/DeleteProduct";
-        let dataToSend = {
-            propertyId: this.state.product.id,
+        let confirmed: boolean = window.confirm("Are you sure you want to delete this product?");
+        if (confirmed) {
+            let url = Constants.baseUrl + "/API/UserPanel/DeleteProduct";
+            let dataToSend = {
+                propertyId: this.state.product.id,
+            }
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        this.setState({
+                            redirect: './deletedProduct',
+                        })
+                    }
+                    else {
+                        this.setState({
+                            ajaxResponse: data,
+
+                        });
+                    }
+                });
         }
-        fetch(url, {
-            method: "POST",
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    this.setState({
-                        redirect: './deletedProduct',
-                    })
-                }
-                else {
-                    this.setState({
-                        ajaxResponse: data,
-
-                    });
-                }
-            });
-
     }
 
     render() {
@@ -328,18 +346,20 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             inputName="quantity"
                         />
                     </div>
-                    <div className="inputGroup" >
-                        <span>Parameters</span>
-                        measurableproperties and choosableProperties values
+                    <div className="Properties">
+                        <h4>Choosable and Measurable Properties</h4>
+                        <hr />
+
+
                     </div>
                 </div>
                 <div className="formError">
                     {this.state.ajaxResponse.formError}
                 </div>
                 <div className="buttonGroup">
-                    <button className="" onClick={() => { this.setState({ editingEnabled: true, }) } }>Edit</button>
+                    <button className="" onClick={this.onChangeCategoriesClick} >Change Categories</button>
                     <button className="" onClick={this.saveProduct}>Save</button>
-                    <button className="" onClick={this.deleteProduct} ><Icon.X width={25} height={25} /></button>
+                    <button className="" onClick={this.deleteProduct} >Delete this Product</button>
                 </div>
             </div>
 

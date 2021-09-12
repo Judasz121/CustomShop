@@ -16,7 +16,7 @@
     <TypeScriptCompile Remove="react-views\src\components\rolesManagmentComponents.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\usersManagmentComponents.tsx" />
     <TypeScriptCompile Remove="react-views\src\pages\AdminPanel\CategoryPropertiesManagmentPanel.tsx" />
-    <TypeScriptCompile Remove="react-views\src\pages\UserPanel\ProductsManagment\ProductCategoryChoice.tsx" />
+    <TypeScriptCompile Remove="react-views\src\pages\UserPanel\ProductsManagment\ProductCategorySelection.tsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +28,7 @@
     <Content Include="react-views\src\components\userPanelSettings.jsx" />
     <Content Include="react-views\src\components\authComponents.jsx" />
     <Content Include="react-views\src\components\globalInputComponents.tsx" />
-    <Content Include="react-views\src\pages\UserPanel\ProductsManagment\ProductCategoryChoice.tsx" />
+    <Content Include="react-views\src\pages\UserPanel\ProductsManagment\ProductCategorySelection.tsx" />
   </ItemGroup>
 
   <ItemGroup>

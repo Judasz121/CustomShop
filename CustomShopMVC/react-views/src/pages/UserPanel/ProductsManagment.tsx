@@ -14,7 +14,7 @@ type ProductsManagmentPanelProps = {
 type ProductsManagmentPanelState = {
     ajaxResponse: ProductsManagmentPanelAjaxResponse,
     products: IProduct[],
-    addNewProduct: boolean,
+    redirect: string,
 }
 
 type ProductsManagmentPanelAjaxResponse = {
@@ -34,9 +34,10 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
                 nameErrors: [],
             },
             products: [],
-            addNewProduct: false,
+            redirect: '',
         };
         this.addProduct = this.addProduct.bind(this);
+        this.onProductEditClick = this.onProductEditClick.bind(this);
     }
     componentDidMount() {
         let dataUrl = Constants.baseUrl + "/API/UserPanel/GetProducts"
@@ -47,12 +48,18 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
             .then((data) => {
                 this.setState({
                     ajaxResponse: data,
+                    products: data.products,
                 });
             });
     }
     addProduct() {
         this.setState({
-            addNewProduct: true,
+            redirect: "./products/productEdit/new",
+        })
+    }
+    onProductEditClick(id: string) {
+        this.setState({
+            redirect: "./products/productEdit/" + id,
         })
     }
     deleteProduct(id: string) {
@@ -93,11 +100,11 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
 
     render() {
         var content;
-        if (this.state.addNewProduct == true)
-            content = <Redirect to="./productsManagment/productEdit/new" />
+        if (this.state.redirect.length > 0)
+            content = <Redirect to={this.state.redirect} />
         else
             content = this.state.products.map((item) => {
-                return <ProductEditCard product={item} onDeleteClick={this.deleteProduct}/>
+                return <ProductEditCard product={item} onDeleteClick={this.deleteProduct} onEditClick={this.onProductEditClick}/>
             })
         return (
             <div className="productManagmentPanel" >

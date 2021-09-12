@@ -92,6 +92,7 @@ namespace CustomShopMVC.Helpers
 		{
 			return new MapperConfiguration((cfg) =>
 			{
+
 				#region settings
 				cfg.CreateMap<UserSettings, UserSettingsViewModel>()
 					.ForMember(us => us.Id, (opt) => opt.MapFrom(src => src.Id.ToString()))
@@ -126,6 +127,13 @@ namespace CustomShopMVC.Helpers
 					.ForMember(u => u.Id, opt => opt.MapFrom(src => Guid.Parse(src.Id)))
 				;
 				#endregion users
+
+				#region categories 
+				cfg.CreateMap<Category, CategoryViewModel>()
+					.ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(c => c.ParentId, opt => opt.MapFrom(src => src.ParentId.ToString()))
+				;
+				#endregion
 			});
 		}
 	}

@@ -36,7 +36,7 @@ namespace CustomShopMVC.Controllers
 		{
 			UserSettingsViewModel result = new UserSettingsViewModel();
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
-			
+
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
 				string userId = User.Claims.Where(c => c.Type == "Id").First().Value;
@@ -44,7 +44,7 @@ namespace CustomShopMVC.Controllers
 				DynamicParameters param = new DynamicParameters();
 				string sql = "SELECT * FROM [UsersSettings] WHERE [UserId] = @Id";
 				param.Add("@Id", userId);
-				
+
 				UserSettings queryResult = (await conn.QueryAsync<UserSettings>(sql, param)).First();
 				result = mapper.Map<UserSettings, UserSettingsViewModel>(queryResult);
 			}
@@ -87,27 +87,61 @@ namespace CustomShopMVC.Controllers
 			string sql = "SELECT * FROM [Products] LEFT OUTER JOIN [ProductImages] ON [Products].[Id] = [ProductImages].[ProductId]";
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
-			{
+			{	
 				IEnumerable<Product> selectJoin = await conn.QueryAsync<Product, ProductImage, Product>(sql,
 					(product, productImage) =>
 					{
-						product.Images.Add(productImage);
+						if (productImage != null)
+							product.Images.Add(productImage);
 						return product;
 					}
 				);
 				dbProducts = selectJoin.GroupBy(p => p.Id).Select(g =>
 				{
 					Product groupedProduct = g.First();
-					groupedProduct.Images = g.Select(g => g.Images.Single()).ToList();
+
+					IEnumerable<ProductImage> productImages = g.Select(g => g.Images.Single());
+					foreach(Product productItem in g)
+					{
+						if (productItem.Images != null) 
+							groupedProduct.Images.Add(productItem.Images.Single());
+					}
+
+					//groupedProduct.Images = productImages.ToList();
+					
 					return groupedProduct;
-				});
+				}).ToList();
 
 				result.Products = mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewModel>>(dbProducts).ToList();
 				result.Success = true;
 			}
 			return result;
 		}
-		
+		[HttpPost]
+		[Route("[action]")]
+		public async Task<ActionResult<GetProductDataOut>> GetProduct(GetProductDataIn model)
+		{
+			GetProductDataOut result = new GetProductDataOut();
+			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
+			if(model.ProductId.Length == 0)
+			{
+				result.Error = "You need to provide Product Id";
+				result.Success = false;
+				return result;
+			}
+
+			DynamicParameters param = new DynamicParameters();
+			param.Add("@Id", model.ProductId);
+			string sql = "SELECT * FROM [Products] WHERE [Id] = @Id";
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				Product dbProduct = conn.QueryFirst<Product>(sql, param);
+				result.Product = mapper.Map<Product, ProductViewModel>(dbProduct);
+			}
+			result.Success = true;
+
+			return result;
+		}
 		[HttpPost]
 		[Route("{action}")]
 		public async Task<ActionResult<SaveProductDataOut>> SaveProduct(SaveProductDataIn model)
@@ -229,11 +263,11 @@ namespace CustomShopMVC.Controllers
 					}
 
 					string thumbnailImagePath = "";
-					if (model.Product.NewThumbnailImage.Length > 0)
+					if (model.Product.NewThumbnailImage != null && model.Product.NewThumbnailImage.Length > 0)
 						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
 					param.Add("@ThumbnailImagePath", thumbnailImagePath);
 
-					sql = "UPDATE [Prodcuts] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [ThumbnailImagePath] = @ThumbnailImagePath, [ImagesPath] = @ImagesPaths, [Quantity] = @Quantity";
+					sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [ThumbnailImagePath] = @ThumbnailImagePath, [Quantity] = @Quantity";
 					int update = conn.Execute(sql, param);
 					if(update == 0)
 					{
@@ -282,24 +316,25 @@ namespace CustomShopMVC.Controllers
 					}
 					#endregion product properties value
 
-					#region images
-					foreach (IFormFile newImage in model.Product.NewImages)
-					{
-						string path = _upload.Image(newImage);
-						ProductImage newDbImage = new ProductImage()
+					#region imagesls
+					if(model.Product.NewImages != null)
+						foreach (IFormFile newImage in model.Product.NewImages)
 						{
-							Id = Guid.NewGuid(),
-							ImagePath = path,
-							ProductId = Guid.Parse(model.Product.Id)
-						};
+							string path = _upload.Image(newImage);
+							ProductImage newDbImage = new ProductImage()
+							{
+								Id = Guid.NewGuid(),
+								ImagePath = path,
+								ProductId = Guid.Parse(model.Product.Id)
+							};
 
-						param = new DynamicParameters();
-						param.Add("@Id", newDbImage.Id);
-						param.Add("@ImagePath", newDbImage.ImagePath);
-						param.Add("@ProductId", newDbImage.ProductId);
-						sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
-						conn.Execute(sql, param);
-					}
+							param = new DynamicParameters();
+							param.Add("@Id", newDbImage.Id);
+							param.Add("@ImagePath", newDbImage.ImagePath);
+							param.Add("@ProductId", newDbImage.ProductId);
+							sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
+							conn.Execute(sql, param);
+						}
 					#endregion images
 				}
 			}
@@ -324,11 +359,10 @@ namespace CustomShopMVC.Controllers
 			return result;
 		}
 
-		[HttpGet]
+		[HttpPost]
 		[Route("[action]")]
 		public async Task<ActionResult<GetProductCategoriesDataDataOut>> GetProductCategoriesData(GetProductCategoriesDataDataIn model)
-		{
-
+		{ 
 			GetProductCategoriesDataDataOut result = new GetProductCategoriesDataDataOut();
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 
@@ -340,12 +374,17 @@ namespace CustomShopMVC.Controllers
 
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@ProductId", model.ProductId);
-				sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
+				if (model.ProductId == "new")
+					sql = "SELECT [CategoryId] FROM [Categories_Products]";
+				else
+					sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
 				result.ProductCategoriesId = conn.Query<string>(sql, param).ToList();
+				result.Success = true;
 			}
 			return result;
 		}
-
+		[HttpPost]
+		[Route("[action]")]
 		public async Task<ActionResult<SaveProductCategoriesDataOut>> SaveProductCategories(SaveProductCategoriesDataIn model)
 		{
 			SaveProductCategoriesDataOut result = new SaveProductCategoriesDataOut();
