@@ -505,7 +505,37 @@ namespace CustomShopMVC.Controllers
 		
 		public async Task<ActionResult<GetProductCustomPropertiesDataOut>> GetProductCustomProperties(GetProductCustomPropertiesDataIn model)
 		{
+			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
+			GetProductCustomPropertiesDataOut result = new GetProductCustomPropertiesDataOut();
 
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				DynamicParameters param = new DynamicParameters();
+				param.Add("ProductId", model.ProductId);
+				string sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
+				IEnumerable<string> productCategoriesId = conn.Query<string>(sql, param);
+
+				IEnumerable<CategoryProductChoosableProperty> choosableProperties = new List<CategoryProductChoosableProperty>();
+				IEnumerable<CategoryProductMeasurableProperty> measurableProperties = new List<CategoryProductMeasurableProperty>();
+				foreach (string categoryIdItem in productCategoriesId)
+				{
+					param = new DynamicParameters();
+					param.Add("@CategoryId", categoryIdItem);
+
+					sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+					IEnumerable<CategoryProductChoosableProperty> dbChProps = conn.Query<CategoryProductChoosableProperty>(sql, param);
+					choosableProperties = choosableProperties.Concat(dbChProps);
+
+					sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+					IEnumerable<CategoryProductMeasurableProperty> dbMProps = conn.Query<CategoryProductMeasurableProperty>(sql, param);
+					measurableProperties = measurableProperties.Concat(dbMProps);
+				}
+
+				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(choosableProperties);
+				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(measurableProperties);
+				result.Success = true;
+
+				return result;
 		}
 
 		#endregion category product properties

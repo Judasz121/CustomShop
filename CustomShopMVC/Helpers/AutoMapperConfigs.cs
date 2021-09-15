@@ -134,6 +134,17 @@ namespace CustomShopMVC.Helpers
 					.ForMember(c => c.ParentId, opt => opt.MapFrom(src => src.ParentId.ToString()))
 				;
 				#endregion
+
+				#region customProperties 
+				cfg.CreateMap<CategoryProductChoosableProperty, CategoryProductChoosablePropertyViewModel>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+				;
+				cfg.CreateMap<CategoryProductMeasurableProperty, CategoryProductMeasurablePropertyViewModel>()
+					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+				;
+				#endregion
 			});
 		}
 	}

@@ -99,8 +99,8 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	public class GetProductCustomPropertiesDataOut
 	{
 		public bool Success { get; set; }
-		public List<CategoryProductChoosableProperty> choosableProperties { get; set; }
-		public List<CategoryProductMeasurableProperty> measurableProperties { get; set; }
+		public List<CategoryProductChoosablePropertyViewModel> ChoosableProperties { get; set; }
+		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
 	}
 	#endregion category product properties
 }
