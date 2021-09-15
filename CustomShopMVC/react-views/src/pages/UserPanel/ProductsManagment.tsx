@@ -24,7 +24,7 @@ type ProductsManagmentPanelAjaxResponse = {
 }
 type NewProductAddedFunction = (newId: string, oldId: string) => void;
 type ProductDeletedFunction = (id: string) => void;
-export default class ProductsManagmentPanel extends React.Component <ProductsManagmentPanelProps, ProductsManagmentPanelState>{
+export default class ProductsManagmentPanel extends React.Component<ProductsManagmentPanelProps, ProductsManagmentPanelState>{
     constructor(props: ProductsManagmentPanelProps) {
         super(props);
         this.state = {
@@ -52,9 +52,10 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
                 });
             });
     }
+
     addProduct() {
         this.setState({
-            redirect: "./products/productEdit/new",
+            redirect: "./products/productEdit/categorySelection/new",
         })
     }
     onProductEditClick(id: string) {
@@ -101,7 +102,7 @@ export default class ProductsManagmentPanel extends React.Component <ProductsMan
     render() {
         var content;
         if (this.state.redirect.length > 0)
-            content = <Redirect to={this.state.redirect} />
+            content = <Redirect push to={this.state.redirect} />
         else
             content = this.state.products.map((item) => {
                 return <ProductEditCard product={item} onDeleteClick={this.deleteProduct} onEditClick={this.onProductEditClick}/>

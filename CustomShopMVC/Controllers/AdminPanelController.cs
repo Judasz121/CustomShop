@@ -118,7 +118,7 @@ namespace CustomShopMVC.Controllers
 						param.Add("@CategoryId", choosableItem.CategoryId);
 						sql = "DELETE FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 						conn.Execute(sql, param);
-						sql = "DELETE FROM [ProductChoosablePropertyValues] WHERE [CategoryId] = @CategoryId";
+						sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [CategoryId] = @CategoryId";
 						conn.Execute(sql, param);
 
 						handled.Add(choosableItem.CategoryId);
@@ -139,7 +139,7 @@ namespace CustomShopMVC.Controllers
 						param.Add("@CategoryId", measurableItem.CategoryId);
 						sql = "DELETE FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 						conn.Execute(sql, param);
-						sql = "DELETE FROM [ProductMeasurablePropertyValues] WHERE [CategoryId] = @CategoryId";
+						sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [CategoryId] = @CategoryId";
 						conn.Execute(sql, param);
 
 						handled.Add(measurableItem.CategoryId);

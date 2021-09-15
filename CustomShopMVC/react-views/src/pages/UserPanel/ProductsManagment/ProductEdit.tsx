@@ -8,8 +8,13 @@ import { Link, Redirect, RouteComponentProps } from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
 import ReactSelect from 'react-select';
 import { IUser } from '../../../types/authTypes';
+import { StaticContext } from 'react-router';
+import { Location } from 'history';
+import { PopupWindow } from '../../../components/globalComponents';
+import { ProductCategorySelectionPanel } from './ProductCategorySelection';
+import { ICategory } from '../../../types/categoryTypes';
 
-interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }>{
+interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { selectedCategories: string[] } >{
 
 }
 type ProductEditPanelState = {
@@ -19,8 +24,10 @@ type ProductEditPanelState = {
     editingEnabled: boolean,
     users: IUser[],
     usersReactSelectItems: ReactSelectItem[],
+    categoryTree: ICategory[],
+    categoriesWindowVisible: boolean,
+    selectedCategories: string[],
 }
-
 type AjaxSaveResponse = {
     success: boolean,
     formError: string,
@@ -34,9 +41,14 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     constructor(props: ProductEditPanelProps) {
         super(props);
 
-        let categoryRedirect = "";
+        if ( this.props.location.state != undefined) {
+            console.log(this.props.location.state);
+        }
+
+        let showCategoriesWindow: boolean = false;
         if (this.props.match.params.productId == "new")
-            categoryRedirect = "./../productCategorySelection/new"
+            showCategoriesWindow = true;
+
         this.state = {
             ajaxResponse: {
                 success: false,
@@ -46,43 +58,29 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             },
             users: [],
             product: {} as IProductEdit,
-            redirect: categoryRedirect,
+            redirect: "",
             editingEnabled: true,
             usersReactSelectItems: [],
+            categoryTree: [],
+            categoriesWindowVisible: showCategoriesWindow,
+            selectedCategories: [],
         };
 
-
-
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
+        this.downloadProduct = this.downloadProduct.bind(this);
         this.saveProduct = this.saveProduct.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
-        this.onChangeCategoriesClick = this.onChangeCategoriesClick.bind(this);
+
+        this.showCategoriesSelectionWindow = this.showCategoriesSelectionWindow.bind(this);
+        this.closeCategoriesSelectionWindow = this.closeCategoriesSelectionWindow.bind(this);
+        this.saveSelectedCategories = this.saveSelectedCategories.bind(this);
+        this.finishedSelectingCategories = this.finishedSelectingCategories.bind(this);
     }
 
     componentDidMount() {
-        // #region get product
-        if (this.props.match.params.productId != "new") {
-            let url = Constants.baseUrl + "/API/UserPanel/GetProduct";
-            let dataToSend = { productId: this.props.match.params.productId }
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify(dataToSend),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.success)
-                        this.setState({
-                            product: data.product,
-                        });
-                    else
-                        this.setState({
-                            ajaxResponse: data,
-                        });
-                })
-        }
+        //#region get product
+        if (this.props.match.params.productId != "new")
+            this.downloadProduct();
         else {
             this.setState({
                 product: {
@@ -91,7 +89,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 }
             })
         }
-        //#endregion
+
+
+        //#endregion get product
         //#region get users
         let url = Constants.baseUrl + "/API/UserPanel/GetUsers"
         fetch(url, {
@@ -142,20 +142,82 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             })
         //#endregion
     }
-
-    onInfoinputChange(inputName: string, value: string | number | boolean | File | File[] | Object | Array<Object> | null | undefined ) {
-        this.setState({
-            product: {
-                ...this.state.product,
-                [inputName]: value,
-            },
-        });
+    downloadProduct() {
+            let url = Constants.baseUrl + "/API/UserPanel/GetProduct";
+            let dataToSend = { productId: this.props.match.params.productId }
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success)
+                        this.setState({
+                            product: data.product,
+                        });
+                    else
+                        this.setState({
+                            ajaxResponse: data,
+                        });
+                })
     }
 
-    onChangeCategoriesClick(e: React.MouseEvent<HTMLButtonElement>) {
+    onInfoinputChange(inputName: string, value: string | number | boolean | string[] | undefined) {
+        if (inputName == "selectedCategories")
+            this.setState({
+                selectedCategories: value as string[],
+            });
+        else
+            this.setState({
+                product: {
+                    ...this.state.product,
+                    [inputName]: value,
+                },
+            });
+    }
+
+    showCategoriesSelectionWindow(e: React.MouseEvent<HTMLButtonElement>) {
         this.setState({
-            redirect: "./../productCategorySelection/" + this.props.match.params.productId,
+            categoriesWindowVisible: true,
+        });
+    }
+    closeCategoriesSelectionWindow(e: React.MouseEvent<HTMLElement>) {
+        this.setState({
+            categoriesWindowVisible: false,
         })
+    }
+    finishedSelectingCategories(selCat: string[]) {
+        this.setState({
+            categoriesWindowVisible: false,
+        });
+        this.saveSelectedCategories(selCat);
+    }
+    saveSelectedCategories(selCat: string[]) {
+        let url = Constants.baseUrl + "/API/UserPanel/";
+        let dataToSend = {
+            productId: this.state.product.id,
+            selectedCategories: selCat,
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    ajaxResponse: {
+                        ...this.state.ajaxResponse,
+                        formError: data.error,
+                        success: data.success,
+                    }
+                })
+            })
     }
 
     saveProduct() {
@@ -239,7 +301,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 })
         }
     }
-
     deleteProduct() {
         let confirmed: boolean = window.confirm("Are you sure you want to delete this product?");
         if (confirmed) {
@@ -273,14 +334,43 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
     render() {
         var redirectElement;
+        // #region redirectElement
         if (this.state.redirect.length > 0)
-            redirectElement = <Redirect to={this.state.redirect} />
+            redirectElement = <Redirect to={{
+                pathname: this.state.redirect,
+                state: { returnUrl: "./../" }
+            }} />
         else
             redirectElement = "";
+        //#endregion redirectElement
+
+        var categoriesSelectionWindow;
+        // #region categoriesSelectionWindow
+        if (this.state.categoriesWindowVisible)
+            categoriesSelectionWindow = (
+                <PopupWindow
+                    onCloseClick={this.closeCategoriesSelectionWindow}
+                    title="Choose Product's Categories"
+                    content={
+                        <ProductCategorySelectionPanel
+                            categoryTree={this.state.categoryTree}
+                            selectedCategories={this.state.selectedCategories}
+                            onChange={this.onInfoinputChange}
+                            onFinishedSelecting={this.finishedSelectingCategories}
+                            onSaveClick={this.saveSelectedCategories}
+                            inputName="selectedCategories"
+                        />
+                    }
+                />
+            )
+        else
+            categoriesSelectionWindow = '';
+        //#endregion categoriesSelectionWindow
         return (
             
             <div className={`ProductPanel-${this.state.product.id}`} >
                 {redirectElement}
+                {categoriesSelectionWindow}
                 <div className="header">
                     <h1>
                         <TextInfoInput
@@ -357,7 +447,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     {this.state.ajaxResponse.formError}
                 </div>
                 <div className="buttonGroup">
-                    <button className="" onClick={this.onChangeCategoriesClick} >Change Categories</button>
+                    <button className="" onClick={this.showCategoriesSelectionWindow} >Change Categories</button>
                     <button className="" onClick={this.saveProduct}>Save</button>
                     <button className="" onClick={this.deleteProduct} >Delete this Product</button>
                 </div>

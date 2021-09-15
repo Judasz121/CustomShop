@@ -11,7 +11,7 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public Guid MeasurablePropertyId { get; set; }
 		public Guid ProductId { get; set; }
 		public Guid CategoryId { get; set; }
-		public string Value { get; set; }
+		public float Value { get; set; }
 
 		#region relations
 		public Product Product { get; set; }

@@ -137,11 +137,73 @@ namespace CustomShopMVC.Controllers
 			{
 				Product dbProduct = conn.QueryFirst<Product>(sql, param);
 				result.Product = mapper.Map<Product, ProductViewModel>(dbProduct);
+
+				#region custom properties 
+
+				param = new DynamicParameters();
+				param.Add("@ProductId", model.ProductId);
+
+				sql = "SELECT [CategoryId], [Value] FROM [ProductChoosablePropertiesValue] WHERE [ProductId] = @ProductId";
+				var dbChoosablesValue = conn.Query<ProductChoosablePropertyValue>(sql, param);
+				foreach(ProductChoosablePropertyValue dbChoosableItem in dbChoosablesValue)
+				{
+					result.Product.ChoosablePropertiesValue.Add(dbChoosableItem.CategoryId.ToString(), dbChoosableItem.Value);
+				}
+
+				sql = "SELECT [CategoryId], [Value] FROM [ProductMeasurablePropertiesValue] WHERE [ProductId] = @ProductId";
+				var dbMeasurablesValue = conn.Query<ProductMeasurablePropertyValue>(sql, param);
+				foreach(ProductMeasurablePropertyValue dbMeasurableItem in dbMeasurablesValue)
+				{
+					result.Product.MeasurablePropertiesValue.Add(dbMeasurableItem.CategoryId.ToString(), dbMeasurableItem.Value);
+				}
+
+				#endregion
 			}
 			result.Success = true;
 
 			return result;
 		}
+
+		[HttpPost]
+		[Route("[action]")]
+		public async Task<ActionResult<DeleteProductDataOut>> DeleteProduct(DeleteProductDataIn model)
+		{
+			DeleteProductDataOut result = new DeleteProductDataOut();
+			if (String.IsNullOrEmpty(model.ProductId))
+			{
+				result.Success = false;
+				result.Error = "You must provide product id";
+				return result;
+			}
+
+			DynamicParameters param = new DynamicParameters();
+			param.Add("@Id", model.ProductId);
+			param.Add("@ProductId", model.ProductId);
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				string sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [ProductId] = @ProductId";
+				Task<int> choosableValueTask = conn.ExecuteAsync(sql, param);
+				choosableValueTask.Start();
+
+				sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [ProductId] = @ProductId";
+				Task<int> measurableValueTask = conn.ExecuteAsync(sql, param);
+				measurableValueTask.Start();
+
+				sql = "DELETE FROM [Categories_Products] WHERE [ProductId] = @ProductId";
+				Task<int> categories_productsTask = conn.ExecuteAsync(sql, param);
+				categories_productsTask.Start();
+
+				sql = "DELTE FROM [Products] WHERE [Id] = @Id";
+				Task<int> productsTask = conn.ExecuteAsync(sql, param);
+				productsTask.Start();
+
+
+				Task.WaitAll(choosableValueTask, measurableValueTask, categories_productsTask, productsTask);
+			}
+			result.Success = true;
+			return result;
+		}
+
 		[HttpPost]
 		[Route("{action}")]
 		public async Task<ActionResult<SaveProductDataOut>> SaveProduct(SaveProductDataIn model)
@@ -155,9 +217,8 @@ namespace CustomShopMVC.Controllers
 			if (model.Product.Id.Contains("new"))
 			{
 				Guid newProductId = Guid.NewGuid();
+				List<Task<int>> insertTasks = new List<Task<int>>();
 				
-
-
 				param.Add("@Id", newProductId);
 				param.Add("@AuthorId", model.Product.AuthorId);
 				param.Add("@OwnerId", model.Product.OwnerId);
@@ -167,6 +228,7 @@ namespace CustomShopMVC.Controllers
 				param.Add("@Quantity", model.Product.Quantity);
 				using (IDbConnection conn = _dataAccess.GetDbConnection())
 				{
+					#region product name check
 					sql = "SELECT COUNT(*) FROM [Products] WHERE [Id] != @Id AND [Name] != Name";
 					int count = conn.ExecuteScalar<int>(sql, param);
 					if (count > 0)
@@ -175,6 +237,7 @@ namespace CustomShopMVC.Controllers
 						result.NameError = "There already exists product with this name";
 						return result;
 					}
+					#endregion
 
 					string thumbnailImagePath = "";
 					if (model.Product.NewThumbnailImage != null && model.Product.NewThumbnailImage.Length > 0)
@@ -182,11 +245,32 @@ namespace CustomShopMVC.Controllers
 					param.Add("@ThumbnailImagePath", thumbnailImagePath);
 
 					sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @Quantity)";
-					int insert = conn.Execute(sql, param);
+					Task<int> insertProduct = conn.ExecuteAsync(sql, param);
+					insertTasks.Add(insertProduct);
+					insertProduct.Start();
+
+					#region product categories 
+					if(model.SelectedCategories != null)
+					{
+						param = new DynamicParameters();
+						foreach(string categoryIdItem in model.SelectedCategories)
+						{
+							param = new DynamicParameters();
+							param.Add("@ProductId", newProductId);
+							param.Add("@CategoryId", categoryIdItem);
+							sql = "INSERT INTO [Categories_Products] VALUES(@ProductId, @CategoryId)";
+							Task<int> insertCategory_Product = conn.ExecuteAsync(sql, param);
+							insertCategory_Product.Start();
+							insertTasks.Add(insertCategory_Product);
+						}
+						
 
 
-					#region properties value 
-					foreach(KeyValuePair<string, string> choosableProperty in model.Product.ChoosablePropertiesValue)
+					}
+					#endregion product categories
+
+					#region custom properties value 
+					foreach (KeyValuePair<string, string> choosableProperty in model.Product.ChoosablePropertiesValue)
 					{
 						param = new DynamicParameters();
 						param.Add("@Id", choosableProperty.Key);
@@ -198,7 +282,7 @@ namespace CustomShopMVC.Controllers
 						param.Add("@Value", choosableProperty.Value);
 						param.Add("@ProductId", model.Product.Id);
 						param.Add("@CategoryId", categoryId);
-						sql = "INSERT INTO [ProductChoosablePropertyValues] @VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
+						sql = "INSERT INTO [ProductChoosablePropertiesValue] @VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
 
 						conn.Execute(sql, param);
 					}
@@ -215,11 +299,11 @@ namespace CustomShopMVC.Controllers
 						param.Add("@Value", measurableProperty.Value);
 						param.Add("@ProductId", model.Product.Id);
 						param.Add("@CategoryId", categoryId);
-						sql = "INSERT INTO [ProductMeasurablePropertyValues] @VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
+						sql = "INSERT INTO [ProductMeasurablePropertiesValue] @VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
 
 						conn.Execute(sql, param);
 					}
-					#endregion properties value
+					#endregion custom properties value
 
 					#region images
 					foreach(IFormFile newImage in model.Product.NewImages)
@@ -283,7 +367,7 @@ namespace CustomShopMVC.Controllers
 						param.Add("@ChoosablePropertyId", choosableProperty.Key);
 						param.Add("@Value", choosableProperty.Value);
 						param.Add("@ProductId", model.Product.Id);
-						sql = "UPDATE [ProductChoosablePropertyValues] SET [Value] = @Value WHERE [ChoosablePropertyId] = @ChoosablePropertyId AND [ProductId] = @ProductId";
+						sql = "UPDATE [ProductChoosablePropertiesValue] SET [Value] = @Value WHERE [ChoosablePropertyId] = @ChoosablePropertyId AND [ProductId] = @ProductId";
 						update = conn.Execute(sql, param);
 						if (update == 0)
 						{
@@ -302,7 +386,7 @@ namespace CustomShopMVC.Controllers
 						param.Add("@MeasurablePropertyId", measurableProperty.Key);
 						param.Add("@Value", measurableProperty.Value);
 						param.Add("@ProductId", model.Product.Id);
-						sql = "UPDATE [ProductMeasurablePropertyValues] SET [Value] = @Value WHERE [MeasurablePropertyId] = @MeasurablePropertyId AND [ProductId] = @ProductId";
+						sql = "UPDATE [ProductMeasurablePropertiesValue] SET [Value] = @Value WHERE [MeasurablePropertyId] = @MeasurablePropertyId AND [ProductId] = @ProductId";
 						update = conn.Execute(sql, param);
 						if (update == 0)
 						{
@@ -378,7 +462,8 @@ namespace CustomShopMVC.Controllers
 					sql = "SELECT [CategoryId] FROM [Categories_Products]";
 				else
 					sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
-				result.ProductCategoriesId = conn.Query<string>(sql, param).ToList();
+				 
+				result.ProductCategoriesId = conn.Query<Guid>(sql, param).Select(id => id.ToString()).ToList();
 				result.Success = true;
 			}
 			return result;
@@ -415,5 +500,14 @@ namespace CustomShopMVC.Controllers
 			return result;
 		}
 		#endregion products
+
+		#region category product properties 
+		
+		public async Task<ActionResult<GetProductCustomPropertiesDataOut>> GetProductCustomProperties(GetProductCustomPropertiesDataIn model)
+		{
+
+		}
+
+		#endregion category product properties
 	}
 }

@@ -6,14 +6,17 @@ using CustomShopMVC.DataAccess.DatabaseModels;
 using CustomShopMVC.Models.ViewModels;
 
 namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
-{ 
+{
+	#region users
 	public class GetUsersDataOut
 	{
 		public bool Success { get; set; }
 		public List<UserViewModel> Users { get; set; }
 		public List<string> FormErrors { get; set; }
 	}
+	#endregion users
 
+	#region settings
 	public class SaveSettingsDataIn
 	{
 		public bool DarkMode { get; set; }
@@ -22,6 +25,9 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	{
 		public bool Success { get; set; }
 	}
+	#endregion settings
+
+	#region products
 
 	public class GetProductsDataOut
 	{
@@ -40,10 +46,20 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public string ProductId { get; set; }
 	}
 
+	public class DeleteProductDataIn
+	{
+		public string ProductId { get; set; }
+	}
+	public class DeleteProductDataOut
+	{
+		public string Error { get; set; }
+		public bool Success { get; set; }
+	}
+
 	public class SaveProductDataIn
 	{
 		public ProductEditModel Product { get; set; }
-
+		public List<string> SelectedCategories { get; set; }
 	}
 	public class SaveProductDataOut
 	{
@@ -72,5 +88,19 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public bool Success { get; set; }
 		public string Error { get; set; }
 	}
-	
+	#endregion products
+
+	#region category product properties
+
+	public class GetProductCustomPropertiesDataIn
+	{
+		public string ProductId { get; set; }
+	}
+	public class GetProductCustomPropertiesDataOut
+	{
+		public bool Success { get; set; }
+		public List<CategoryProductChoosableProperty> choosableProperties { get; set; }
+		public List<CategoryProductMeasurableProperty> measurableProperties { get; set; }
+	}
+	#endregion category product properties
 }
