@@ -13,6 +13,7 @@ import { Location } from 'history';
 import { PopupWindow } from '../../../components/globalComponents';
 import { ProductCategorySelectionPanel } from './ProductCategorySelection';
 import { ICategory } from '../../../types/categoryTypes';
+import { IChoosableProperty, IMeasurableProperty } from '../../../types/categoryPropertyTypes';
 
 interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { selectedCategories: string[] } >{
 
@@ -22,11 +23,16 @@ type ProductEditPanelState = {
     ajaxResponse: AjaxSaveResponse,
     redirect: string,
     editingEnabled: boolean,
+
     users: IUser[],
     usersReactSelectItems: ReactSelectItem[],
+
     categoryTree: ICategory[],
     categoriesWindowVisible: boolean,
     selectedCategories: string[],
+
+    choosableProperties: IChoosableProperty[],
+    measurableProperties: IMeasurableProperty[],
 }
 type AjaxSaveResponse = {
     success: boolean,
@@ -56,18 +62,25 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 newId: "",
                 nameError: "",
             },
-            users: [],
+            
             product: {} as IProductEdit,
             redirect: "",
             editingEnabled: true,
+
             usersReactSelectItems: [],
+            users: [],
+
             categoryTree: [],
             categoriesWindowVisible: showCategoriesWindow,
             selectedCategories: [],
+
+            choosableProperties: [],
+            measurableProperties: [],
         };
+        this.getProduct = this.getProduct.bind(this);
+        this.getProductCustomProperties = this.getProductCustomProperties.bind(this);
 
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
-        this.downloadProduct = this.downloadProduct.bind(this);
         this.saveProduct = this.saveProduct.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
 
@@ -79,8 +92,10 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
     componentDidMount() {
         //#region get product
-        if (this.props.match.params.productId != "new")
-            this.downloadProduct();
+        if (this.props.match.params.productId != "new") {
+            this.getProduct();
+            this.getProductCustomProperties();
+        }
         else {
             this.setState({
                 product: {
@@ -125,7 +140,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             })
 
         //#endregion get users
-
         //#region get Author id
         url = Constants.baseUrl + "/API/Auth/AuthStatus";
         fetch(url, {
@@ -141,8 +155,37 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 })
             })
         //#endregion
+        //#region getCategoryData
+
+        url = Constants.baseUrl + "/API/UserPanel/GetProductCategories"
+        let dataToSend = { productId: this.props.match.params.productId }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        categoryTree: data.categoryTree,
+                        selectedCategories: data.productCategoriesId,
+                    })
+                }
+                else {
+                    this.setState({
+                        ajaxResponse: {
+                            ...this.state.ajaxResponse,
+                            formError: data.error,
+                        }
+                    })
+                }
+            })
+        //#endregion getCategoryData
     }
-    downloadProduct() {
+    getProduct() {
             let url = Constants.baseUrl + "/API/UserPanel/GetProduct";
             let dataToSend = { productId: this.props.match.params.productId }
             fetch(url, {
@@ -164,8 +207,36 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         });
                 })
     }
+    getProductCustomProperties() {
+        let url = Constants.baseUrl + "/API/UserPanel/GetProductCustomProperties"
+        let dataToSend = { productId: this.props.match.params.productId }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        measurableProperties: data.measurableProperties,
+                        choosableProperties: data.choosableProperties,
+                    })
+                }
+                else
+                    this.setState({
+                        ajaxResponse: {
+                            ...this.state.ajaxResponse,
+                            formError: data.formError,
+                        }
+                    })
+            })
 
-    onInfoinputChange(inputName: string, value: string | number | boolean | string[] | undefined) {
+    }
+
+    onInfoinputChange(inputName: string, value: string | number | boolean | string[] | undefined | null) {
         if (inputName == "selectedCategories")
             this.setState({
                 selectedCategories: value as string[],
@@ -189,14 +260,17 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             categoriesWindowVisible: false,
         })
     }
+
     finishedSelectingCategories(selCat: string[]) {
         this.setState({
             categoriesWindowVisible: false,
         });
         this.saveSelectedCategories(selCat);
+        this.getProductCustomProperties();
+
     }
     saveSelectedCategories(selCat: string[]) {
-        let url = Constants.baseUrl + "/API/UserPanel/";
+        let url = Constants.baseUrl + "/API/UserPanel/SaveProductCategories";
         let dataToSend = {
             productId: this.state.product.id,
             selectedCategories: selCat,
@@ -346,28 +420,29 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
         var categoriesSelectionWindow;
         // #region categoriesSelectionWindow
-        if (this.state.categoriesWindowVisible)
+        if (this.state.categoriesWindowVisible) {
+             const content = <ProductCategorySelectionPanel
+                categoryTree={this.state.categoryTree}
+                selectedCategories={this.state.selectedCategories}
+                onChange={this.onInfoinputChange}
+                onFinishedSelecting={this.finishedSelectingCategories}
+                onSaveClick={this.saveSelectedCategories}
+                inputName="selectedCategories"
+            />
+
             categoriesSelectionWindow = (
                 <PopupWindow
                     onCloseClick={this.closeCategoriesSelectionWindow}
                     title="Choose Product's Categories"
-                    content={
-                        <ProductCategorySelectionPanel
-                            categoryTree={this.state.categoryTree}
-                            selectedCategories={this.state.selectedCategories}
-                            onChange={this.onInfoinputChange}
-                            onFinishedSelecting={this.finishedSelectingCategories}
-                            onSaveClick={this.saveSelectedCategories}
-                            inputName="selectedCategories"
-                        />
-                    }
+                    content={content}
                 />
             )
+            
+        }
         else
             categoriesSelectionWindow = '';
         //#endregion categoriesSelectionWindow
         return (
-            
             <div className={`ProductPanel-${this.state.product.id}`} >
                 {redirectElement}
                 {categoriesSelectionWindow}
@@ -437,8 +512,57 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         />
                     </div>
                     <div className="Properties">
-                        <h4>Choosable and Measurable Properties</h4>
+                        <h3>Choosable Properties</h3>
                         <hr />
+                        {
+                            //[1, 2, 3].map(item => { console.log(this.state.choosableProperties); return <div className="test"></div> })
+                        }
+                        {
+                            this.state.choosableProperties.map((choosablePropItem) => {
+                                const options = choosablePropItem.itemsToChoose.map((itemToChooseItem) => {
+                                    return { value: itemToChooseItem, label: itemToChooseItem };
+                                });
+                                console.log("choosable foreach");
+                                return (
+                                    <div className="inputGroup">
+                                        <span>{choosablePropItem.propertyName}</span>
+                                        <ReactSelect
+                                            options={options}
+                                            onChange={
+                                                (selectedItem) => {
+                                                    this.onInfoinputChange("choosablePropertiesValues[" + choosablePropItem.id + "]", selectedItem?.value)
+                                                }
+                                            }
+                                            value={
+                                                options.filter((optionItem) => {
+                                                    return optionItem.value == this.state.product.choosablePropertiesValue[choosablePropItem.id]
+                                                })[0]
+                                            }
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
+
+                        <h3>Measurable Properties</h3>
+                        <hr />
+                        {
+                            this.state.measurableProperties.map((measurablePropItem) => {
+
+                                return (
+                                    <div className="inputGroup">
+                                        <span>{measurablePropItem.propertyName}</span>
+                                        <NumberInfoInput
+                                            value={this.state.product.measurablePropertiesValue[measurablePropItem.id]}
+                                            inputName={"measurablePropertiesValue[" + measurablePropItem.id + "]"}
+                                            onChange={this.onInfoinputChange}
+                                            editingEnabled={this.state.editingEnabled}
+                                        />
+                                    </div>
+                                    )
+                            })
+                        }
+
 
 
                     </div>

@@ -363,14 +363,6 @@ export class ImagesInput extends React.Component<ImagesInputProps, ImagesInputSt
 
 //#endregion ImagesInput
 
-// #region InfoInputPrimitiveList
-type InfoInputPrimitiveList_PropsItem = {
-    id: string,
-    value: string | boolean | number,
-    viewName: string,
-}
-// #endregion
-
 // #region InfoInputStringList
 
 type InfoInputStringListProps = {
@@ -704,34 +696,3 @@ class InfoInputObjectList_InfoInputItem extends React.Component<InfoInputObjectL
 }
 
 // #endregion InfoInputList
-
-// #region PredefinedSelectInfoInput
-type PredefinedSelectInfoInputProps = {
-    items: PredefinedSelectInfoInput_Item[],
-    selectedItemId: string,
-
-}
-type PredefinedSelectInfoInputState = {
-
-}
-type PredefinedSelectInfoInput_Item = {
-    id: string,
-    value: string,
-    viewText: string,
-}
-
-class PredefinedSelectInfoInput extends React.Component<PredefinedSelectInfoInputProps, PredefinedSelectInfoInputState>{
-    constructor(props: PredefinedSelectInfoInputProps) {
-        super(props);
-    }
-
-    render() {
-
-        return (
-            <div className="PredefinedSelectInfoInput">
-
-            </div>
-            )
-    }
-}
-// #endregion PredefinedSelectInfoInput

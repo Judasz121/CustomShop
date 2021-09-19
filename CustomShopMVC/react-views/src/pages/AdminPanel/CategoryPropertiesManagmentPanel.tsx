@@ -220,29 +220,35 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
 
     render() {
         //#region parents's properties setup
-        const parentCategoriesName: string[] = [];
-        const parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
-            if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
-                parentCategoriesName.push(item.categoryName);
+        var parentCategoriesName: string[] = [];
+        var parentsMeasurablesByCategoryName: Record<string, IParentMeasurableProperty[]> = {};
+        var parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = {};
+        console.log(this.state.parentProperties.measurableProperties);
+        if (this.state.parentProperties.measurableProperties != null) 
+            parentsMeasurablesByCategoryName = this.state.parentProperties.measurableProperties.reduce((acc: Record<string, Array<IParentMeasurableProperty>>, item: IParentMeasurableProperty) => {
+                if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+                    parentCategoriesName.push(item.categoryName);
 
-            if (!acc[item.categoryName])
-                acc[item.categoryName] = [];
-            acc[item.categoryName].push(item);
-            return acc;
-        }, {});
+                if (!acc[item.categoryName])
+                    acc[item.categoryName] = [];
+                acc[item.categoryName].push(item);
+                return acc;
+            }, {});
 
-        const parentsChoosablesByCategoryName: Record<string, IParentChoosableProperty[]> = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
-            if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
-                parentCategoriesName.push(item.categoryName);
+        if(this.state.parentProperties.choosableProperties != null)
+            parentsChoosablesByCategoryName = this.state.parentProperties.choosableProperties.reduce((acc: Record<string, IParentChoosableProperty[]>, item: IParentChoosableProperty) => {
+                if (parentCategoriesName.find(cn => cn == item.categoryName) == undefined)
+                    parentCategoriesName.push(item.categoryName);
 
-            if (!acc[item.categoryName])
-                acc[item.categoryName] = [];
-            acc[item.categoryName].push(item);
-            return acc;
-        }, {});
-        console.log(parentCategoriesName);
-        console.log(parentsMeasurablesByCategoryName);
-        console.log(parentsChoosablesByCategoryName);
+                if (!acc[item.categoryName])
+                    acc[item.categoryName] = [];
+                acc[item.categoryName].push(item);
+                return acc;
+            }, {});
+            console.log(parentCategoriesName);
+            console.log(parentsMeasurablesByCategoryName);
+            console.log(parentsChoosablesByCategoryName);
+        
         //#endregion parents's properties setup
 
         return (

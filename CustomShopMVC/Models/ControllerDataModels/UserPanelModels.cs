@@ -68,15 +68,16 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public string NameError { get; set; }
 	}
 	
-	public class GetProductCategoriesDataDataIn
+	public class GetProductCategoriesDataIn
 	{
 		public string ProductId { get; set; }
 	}
-	public class GetProductCategoriesDataDataOut
+	public class GetProductCategoriesDataOut
 	{
 		public bool Success { get; set; }
 		public List<string> ProductCategoriesId { get; set; }
 		public List<CategoryViewModel> CategoryTree { get; set; }
+		public string Error { get; set; }
 	}
 	public class SaveProductCategoriesDataIn
 	{
@@ -91,7 +92,10 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	#endregion products
 
 	#region category product properties
-
+	public class GetCategoryTreeDataOut
+	{
+		public List<CategoryViewModel> CategoryTree { get; set; }
+	}
 	public class GetProductCustomPropertiesDataIn
 	{
 		public string ProductId { get; set; }
@@ -99,6 +103,7 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	public class GetProductCustomPropertiesDataOut
 	{
 		public bool Success { get; set; }
+		public string FormError { get; set; }
 		public List<CategoryProductChoosablePropertyViewModel> ChoosableProperties { get; set; }
 		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
 	}

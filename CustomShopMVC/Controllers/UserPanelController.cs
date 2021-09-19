@@ -87,7 +87,7 @@ namespace CustomShopMVC.Controllers
 			string sql = "SELECT * FROM [Products] LEFT OUTER JOIN [ProductImages] ON [Products].[Id] = [ProductImages].[ProductId]";
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
-			{	
+			{
 				IEnumerable<Product> selectJoin = await conn.QueryAsync<Product, ProductImage, Product>(sql,
 					(product, productImage) =>
 					{
@@ -101,14 +101,14 @@ namespace CustomShopMVC.Controllers
 					Product groupedProduct = g.First();
 
 					IEnumerable<ProductImage> productImages = g.Select(g => g.Images.Single());
-					foreach(Product productItem in g)
+					foreach (Product productItem in g)
 					{
-						if (productItem.Images != null) 
+						if (productItem.Images != null)
 							groupedProduct.Images.Add(productItem.Images.Single());
 					}
 
 					//groupedProduct.Images = productImages.ToList();
-					
+
 					return groupedProduct;
 				}).ToList();
 
@@ -123,7 +123,7 @@ namespace CustomShopMVC.Controllers
 		{
 			GetProductDataOut result = new GetProductDataOut();
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
-			if(model.ProductId.Length == 0)
+			if (model.ProductId.Length == 0)
 			{
 				result.Error = "You need to provide Product Id";
 				result.Success = false;
@@ -145,14 +145,14 @@ namespace CustomShopMVC.Controllers
 
 				sql = "SELECT [CategoryId], [Value] FROM [ProductChoosablePropertiesValue] WHERE [ProductId] = @ProductId";
 				var dbChoosablesValue = conn.Query<ProductChoosablePropertyValue>(sql, param);
-				foreach(ProductChoosablePropertyValue dbChoosableItem in dbChoosablesValue)
+				foreach (ProductChoosablePropertyValue dbChoosableItem in dbChoosablesValue)
 				{
 					result.Product.ChoosablePropertiesValue.Add(dbChoosableItem.CategoryId.ToString(), dbChoosableItem.Value);
 				}
 
 				sql = "SELECT [CategoryId], [Value] FROM [ProductMeasurablePropertiesValue] WHERE [ProductId] = @ProductId";
 				var dbMeasurablesValue = conn.Query<ProductMeasurablePropertyValue>(sql, param);
-				foreach(ProductMeasurablePropertyValue dbMeasurableItem in dbMeasurablesValue)
+				foreach (ProductMeasurablePropertyValue dbMeasurableItem in dbMeasurablesValue)
 				{
 					result.Product.MeasurablePropertiesValue.Add(dbMeasurableItem.CategoryId.ToString(), dbMeasurableItem.Value);
 				}
@@ -182,23 +182,17 @@ namespace CustomShopMVC.Controllers
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
 				string sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [ProductId] = @ProductId";
-				Task<int> choosableValueTask = conn.ExecuteAsync(sql, param);
-				choosableValueTask.Start();
+				await conn.ExecuteAsync(sql, param);
 
 				sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [ProductId] = @ProductId";
-				Task<int> measurableValueTask = conn.ExecuteAsync(sql, param);
-				measurableValueTask.Start();
+				await conn.ExecuteAsync(sql, param);
 
 				sql = "DELETE FROM [Categories_Products] WHERE [ProductId] = @ProductId";
-				Task<int> categories_productsTask = conn.ExecuteAsync(sql, param);
-				categories_productsTask.Start();
+				await conn.ExecuteAsync(sql, param);
 
 				sql = "DELTE FROM [Products] WHERE [Id] = @Id";
-				Task<int> productsTask = conn.ExecuteAsync(sql, param);
-				productsTask.Start();
+				await conn.ExecuteAsync(sql, param);
 
-
-				Task.WaitAll(choosableValueTask, measurableValueTask, categories_productsTask, productsTask);
 			}
 			result.Success = true;
 			return result;
@@ -218,7 +212,7 @@ namespace CustomShopMVC.Controllers
 			{
 				Guid newProductId = Guid.NewGuid();
 				List<Task<int>> insertTasks = new List<Task<int>>();
-				
+
 				param.Add("@Id", newProductId);
 				param.Add("@AuthorId", model.Product.AuthorId);
 				param.Add("@OwnerId", model.Product.OwnerId);
@@ -250,10 +244,10 @@ namespace CustomShopMVC.Controllers
 					insertProduct.Start();
 
 					#region product categories 
-					if(model.SelectedCategories != null)
+					if (model.SelectedCategories != null)
 					{
 						param = new DynamicParameters();
-						foreach(string categoryIdItem in model.SelectedCategories)
+						foreach (string categoryIdItem in model.SelectedCategories)
 						{
 							param = new DynamicParameters();
 							param.Add("@ProductId", newProductId);
@@ -263,7 +257,7 @@ namespace CustomShopMVC.Controllers
 							insertCategory_Product.Start();
 							insertTasks.Add(insertCategory_Product);
 						}
-						
+
 
 
 					}
@@ -306,7 +300,7 @@ namespace CustomShopMVC.Controllers
 					#endregion custom properties value
 
 					#region images
-					foreach(IFormFile newImage in model.Product.NewImages)
+					foreach (IFormFile newImage in model.Product.NewImages)
 					{
 						string path = _upload.Image(newImage);
 						ProductImage newDbImage = new ProductImage()
@@ -353,7 +347,7 @@ namespace CustomShopMVC.Controllers
 
 					sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [ThumbnailImagePath] = @ThumbnailImagePath, [Quantity] = @Quantity";
 					int update = conn.Execute(sql, param);
-					if(update == 0)
+					if (update == 0)
 					{
 						result.Success = false;
 						result.FormError = "Could not update the product serverside.";
@@ -380,7 +374,7 @@ namespace CustomShopMVC.Controllers
 						}
 					}
 
-					foreach(KeyValuePair<string, float> measurableProperty in model.Product.MeasurablePropertiesValue)
+					foreach (KeyValuePair<string, float> measurableProperty in model.Product.MeasurablePropertiesValue)
 					{
 						param = new DynamicParameters();
 						param.Add("@MeasurablePropertyId", measurableProperty.Key);
@@ -401,7 +395,7 @@ namespace CustomShopMVC.Controllers
 					#endregion product properties value
 
 					#region imagesls
-					if(model.Product.NewImages != null)
+					if (model.Product.NewImages != null)
 						foreach (IFormFile newImage in model.Product.NewImages)
 						{
 							string path = _upload.Image(newImage);
@@ -422,7 +416,7 @@ namespace CustomShopMVC.Controllers
 					#endregion images
 				}
 			}
-				return result;
+			return result;
 		}
 
 		[HttpGet]
@@ -439,15 +433,15 @@ namespace CustomShopMVC.Controllers
 				result.Users = mapper.Map<IEnumerable<ApplicationUser>, IEnumerable<UserViewModel>>(dbUsers).ToList();
 				result.Success = true;
 			}
-			
+
 			return result;
 		}
 
 		[HttpPost]
 		[Route("[action]")]
-		public async Task<ActionResult<GetProductCategoriesDataDataOut>> GetProductCategoriesData(GetProductCategoriesDataDataIn model)
-		{ 
-			GetProductCategoriesDataDataOut result = new GetProductCategoriesDataDataOut();
+		public async Task<ActionResult<GetProductCategoriesDataOut>> GetProductCategories(GetProductCategoriesDataIn model)
+		{
+			GetProductCategoriesDataOut result = new GetProductCategoriesDataOut();
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
@@ -462,7 +456,7 @@ namespace CustomShopMVC.Controllers
 					sql = "SELECT [CategoryId] FROM [Categories_Products]";
 				else
 					sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
-				 
+
 				result.ProductCategoriesId = conn.Query<Guid>(sql, param).Select(id => id.ToString()).ToList();
 				result.Success = true;
 			}
@@ -481,43 +475,100 @@ namespace CustomShopMVC.Controllers
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
 				List<Category_Product> dbCategories_Products = conn.Query<Category_Product>(sql, param).ToList();
-				
-				foreach(string categoryIdItem in model.SelectedCategories)
+
+				foreach (string categoryIdItem in model.SelectedCategories)
 				{
-					if(!dbCategories_Products.Any(c_p => c_p.CategoryId.ToString() == categoryIdItem))
+					if (!dbCategories_Products.Any(c_p => c_p.CategoryId.ToString() == categoryIdItem))
 					{
 						param = new DynamicParameters();
-						param.Add("CategoryId", categoryIdItem);
+						param.Add("@CategoryId", categoryIdItem);
 						param.Add("@ProductId", model.ProductId);
 						sql = "INSERT INTO [Categories_Products] VALUES(@ProductId, @CategoryId)";
+
 						conn.Execute(sql, param);
+
+						#region choosables
+						sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+						IEnumerable<CategoryProductChoosableProperty> dbChoosables = conn.Query<CategoryProductChoosableProperty>(sql, param);
+						foreach(CategoryProductChoosableProperty choosablePropItem in dbChoosables)
+						{
+							param = new DynamicParameters();
+							param.Add("@Id", Guid.NewGuid());
+							param.Add("@ProductId", model.ProductId);
+							param.Add("@CategoryId", categoryIdItem);
+							param.Add("@ChoosablePropertyId", choosablePropItem.Id);
+							param.Add("@Value", null);
+							sql = "INSERT INTO [ProductChoosablePropertiesValue] ([Id], [ProductId], [CategoryId], [ChoosablePropertyId], [Value]) VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
+
+							conn.Execute(sql, param);
+						}
+						#endregion
+
+						#region measurables
+						param = new DynamicParameters();
+						param.Add("@CategoryId", categoryIdItem);
+						sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+						IEnumerable<CategoryProductMeasurableProperty> dbMeasurables = conn.Query<CategoryProductMeasurableProperty>(sql, param);
+						foreach (CategoryProductMeasurableProperty measurablePropItem in dbMeasurables)
+						{
+							param = new DynamicParameters();
+							param.Add("@Id", Guid.NewGuid());
+							param.Add("@ProductId", model.ProductId);
+							param.Add("@CategoryId", categoryIdItem);
+							param.Add("@MeasurablePropertyId", measurablePropItem.Id);
+							param.Add("@Value", null);
+							sql = "INSERT INTO [ProductMeasurablePropertiesValue] ([Id], [ProductId], [CategoryId], [MeasurablePropertyId], [Value]) VALUES(@Id, @ProductId, @CategoryId, @MeasurablePropertyId, @Value)";
+
+							conn.Execute(sql, param);
+						}
+						#endregion
+					}
+				}
+				foreach(Category_Product catProdItem in dbCategories_Products)
+				{
+					if(!model.SelectedCategories.Any(c => c == catProdItem.CategoryId.ToString()))
+					{
+						param = new DynamicParameters();
+						param.Add("@CategoryId", catProdItem.CategoryId);
+						param.Add("@ProductId", model.ProductId);
+						sql = "DELETE FROM [Categories_Products] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
+
+						conn.Execute(sql, param);
+
+						#region choosables
+						sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
+						conn.Execute(sql, param);
+						#endregion
+
+						#region measurables
+						sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
+						conn.Execute(sql, param);
+						#endregion
 					}
 				}
 			}
 
-
 			result.Success = true;
 			return result;
 		}
-		#endregion products
-
-		#region category product properties 
-		
+		[Route("[action]")]
+		[HttpPost]
 		public async Task<ActionResult<GetProductCustomPropertiesDataOut>> GetProductCustomProperties(GetProductCustomPropertiesDataIn model)
-		{
+		{ add inheritence
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 			GetProductCustomPropertiesDataOut result = new GetProductCustomPropertiesDataOut();
+			IEnumerable<CategoryProductChoosableProperty> choosableProperties = new List<CategoryProductChoosableProperty>();
+			IEnumerable<CategoryProductMeasurableProperty> measurableProperties = new List<CategoryProductMeasurableProperty>();
 
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
 				DynamicParameters param = new DynamicParameters();
 				param.Add("ProductId", model.ProductId);
 				string sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
-				IEnumerable<string> productCategoriesId = conn.Query<string>(sql, param);
+				IEnumerable<Guid> productCategoriesId = conn.Query<Guid>(sql, param);
 
-				IEnumerable<CategoryProductChoosableProperty> choosableProperties = new List<CategoryProductChoosableProperty>();
-				IEnumerable<CategoryProductMeasurableProperty> measurableProperties = new List<CategoryProductMeasurableProperty>();
-				foreach (string categoryIdItem in productCategoriesId)
+
+				foreach (Guid categoryIdItem in productCategoriesId)
 				{
 					param = new DynamicParameters();
 					param.Add("@CategoryId", categoryIdItem);
@@ -530,14 +581,14 @@ namespace CustomShopMVC.Controllers
 					IEnumerable<CategoryProductMeasurableProperty> dbMProps = conn.Query<CategoryProductMeasurableProperty>(sql, param);
 					measurableProperties = measurableProperties.Concat(dbMProps);
 				}
+			}
 
-				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(choosableProperties);
-				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(measurableProperties);
-				result.Success = true;
+			result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(choosableProperties);
+			result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(measurableProperties);
+			result.Success = true;
 
-				return result;
+			return result;
 		}
-
-		#endregion category product properties
+		#endregion products
 	}
 }

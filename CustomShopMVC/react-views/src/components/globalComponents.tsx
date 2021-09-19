@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { MouseEventHandler } from 'react';
 import style from '../styles/globalComponents.module.css';
 import * as Icon from 'react-bootstrap-icons';
 import { IProduct } from '../types/productTypes';
@@ -6,41 +6,24 @@ import { IProduct } from '../types/productTypes';
 //#region PopupWindow
 
 type PopupWindowProps = {
-    onCloseClick: Function,
+    onCloseClick: MouseEventHandler<HTMLButtonElement>,
     title?: string,
     content: React.ReactNode,
 }
-type PopupWindowState = {
 
-}
+export function PopupWindow(props: PopupWindowProps) {
 
-
-export class PopupWindow extends React.Component<PopupWindowProps, PopupWindowState>{
-    constructor(props: PopupWindowProps) {
-        super(props);
-
-        this.closeWindow = this.closeWindow.bind(this);
-    }
-
-    closeWindow() {
-        this.props.onCloseClick()
-    }
-
-    render() {
-        return (
-            <div className="PopupWindowBackground" >
-                <div className="PopupWindow">
-                    <button className={style.CloseButton}><Icon.X size={35} color="red" /></button>
-                    <main className="content">
-                        {this.props.content}
-                    </main>
-                </div>
+    return (
+        <div className="PopupWindowBackground" >
+            <div className="PopupWindow">
+                <button className={style.CloseButton} onClick={props.onCloseClick}><Icon.X size={35} color="red" /></button>
+                <main className="content">
+                    {props.content}
+                </main>
             </div>
-        )
-    }
-
+        </div>
+    )
 }
-
 
 //#endregion 
 

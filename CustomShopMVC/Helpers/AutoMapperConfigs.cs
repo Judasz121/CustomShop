@@ -139,6 +139,7 @@ namespace CustomShopMVC.Helpers
 				cfg.CreateMap<CategoryProductChoosableProperty, CategoryProductChoosablePropertyViewModel>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(p => p.CategoryId, opt => opt.MapFrom(src => src.CategoryId.ToString()))
+					.ForMember(p => p.ItemsToChoose, opt => opt.MapFrom(src => src.ItemsToChoose.Split(',', StringSplitOptions.None)))
 				;
 				cfg.CreateMap<CategoryProductMeasurableProperty, CategoryProductMeasurablePropertyViewModel>()
 					.ForMember(p => p.Id, opt => opt.MapFrom(src => src.Id.ToString()))

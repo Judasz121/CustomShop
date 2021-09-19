@@ -19,6 +19,8 @@ type ProductCategorySelectionPanelProps = {
 }
 type ProductCategorySelectionPanelState = {
     treeData: TreeItem[],
+    selectedCategories: string[],
+    error: string,
 }
 
 
@@ -39,6 +41,8 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
                 getParentKey: (node) => node.parentId,
                 rootKey: "00000000-0000-0000-0000-000000000000",
             }),
+            selectedCategories: this.props.selectedCategories,
+            error: "",
         };
 
         this.onSelectedCategoriesChange = this.onSelectedCategoriesChange.bind(this);
@@ -78,15 +82,24 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
             let resultData = this.props.selectedCategories.slice();
             resultData.push(e.target.value);
 
+            this.setState((state) => ({
+                selectedCategories: resultData,
+            }))
             this.props.onChange(this.props.inputName, resultData);
         }
         else {
             if (this.props.selectedCategories.length > 1) {
                 let resultData = this.props.selectedCategories.splice(this.props.selectedCategories.indexOf(e.target.value), 1)
 
+                this.setState({
+                    selectedCategories: resultData,
+                })
                 this.props.onChange(this.props.inputName, resultData)
             }
             else {
+                this.setState({
+                    selectedCategories: [],
+                })
                 this.props.onChange(this.props.inputName, []);
             }
         }
