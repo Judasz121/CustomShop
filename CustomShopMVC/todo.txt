@@ -5,14 +5,14 @@ create user managment in admin panel
 == FOCUS DEMANDING ==
 
 == TO DO ==
-implement authorization in controllers
+implement authorization in controllers https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-5.0
 user settings panel: darkMode, changing(password, username, personal data ) 
 implement username, email and phoneNumber checks the proper way ( currently in dapperUserStore )
 do 404 page
 test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
-add frontEnd checks before object http request to save
+add frontEnd checks before sending http request to save
 fix adminpanel/categoryProps inheritance displaying only direct parent
 == REQUIREMENTS ==
 
