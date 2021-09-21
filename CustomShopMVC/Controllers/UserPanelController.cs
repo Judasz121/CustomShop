@@ -554,7 +554,7 @@ namespace CustomShopMVC.Controllers
 		[Route("[action]")]
 		[HttpPost]
 		public async Task<ActionResult<GetProductCustomPropertiesDataOut>> GetProductCustomProperties(GetProductCustomPropertiesDataIn model)
-		{ add inheritence
+		{
 			IMapper mapper = AutoMapperConfigs.UserPanel().CreateMapper();
 			GetProductCustomPropertiesDataOut result = new GetProductCustomPropertiesDataOut();
 			IEnumerable<CategoryProductChoosableProperty> choosableProperties = new List<CategoryProductChoosableProperty>();
@@ -570,17 +570,28 @@ namespace CustomShopMVC.Controllers
 
 				foreach (Guid categoryIdItem in productCategoriesId)
 				{
-					param = new DynamicParameters();
-					param.Add("@CategoryId", categoryIdItem);
+					Guid currCatId = categoryIdItem;
+					do
+					{
+						param = new DynamicParameters();
+						param.Add("@CategoryId", currCatId);
 
-					sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
-					IEnumerable<CategoryProductChoosableProperty> dbChProps = conn.Query<CategoryProductChoosableProperty>(sql, param);
-					choosableProperties = choosableProperties.Concat(dbChProps);
+						sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
+						IEnumerable<CategoryProductChoosableProperty> dbChProps = conn.Query<CategoryProductChoosableProperty>(sql, param);
+						choosableProperties = choosableProperties.Concat(dbChProps);
 
-					sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
-					IEnumerable<CategoryProductMeasurableProperty> dbMProps = conn.Query<CategoryProductMeasurableProperty>(sql, param);
-					measurableProperties = measurableProperties.Concat(dbMProps);
+						sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
+						IEnumerable<CategoryProductMeasurableProperty> dbMProps = conn.Query<CategoryProductMeasurableProperty>(sql, param);
+						measurableProperties = measurableProperties.Concat(dbMProps);
+
+						sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @CategoryId";
+						currCatId = conn.ExecuteScalar<Guid>(sql, param);
+					}
+					while (currCatId != Guid.Empty);
 				}
+
+
+
 			}
 
 			result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(choosableProperties);

@@ -258,7 +258,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     closeCategoriesSelectionWindow(e: React.MouseEvent<HTMLElement>) {
         this.setState({
             categoriesWindowVisible: false,
-        })
+        });
+        this.getProductCustomProperties();
     }
 
     finishedSelectingCategories(selCat: string[]) {

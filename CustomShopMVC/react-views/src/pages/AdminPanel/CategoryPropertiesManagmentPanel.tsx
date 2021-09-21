@@ -296,7 +296,12 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                             parentCategoriesName.map((categoryName) => {
                                 let choosables: IParentChoosableProperty[] = parentsChoosablesByCategoryName[categoryName];
                                 let measurables: IParentMeasurableProperty[] = parentsMeasurablesByCategoryName[categoryName];
-                                console.log(categoryName + " Iteration");
+
+                                if (measurables == undefined)
+                                    measurables = [];
+                                if (choosables == undefined)
+                                    choosables = [];
+
                                 return (
                                     <div className="parentCategory">
                                         <h2>{categoryName}</h2>
@@ -329,7 +334,8 @@ export default class CategoryPropertiesManagmentPanel extends React.Component<Ca
                                         })}
 
                                         <h3>measurable properties</h3>
-                                        {measurables.map((item) => {
+                                        {
+                                            measurables.map((item) => {
                                             return <div className="measurableProperty" >
                                                 <div className="header">
                                                     <h4>

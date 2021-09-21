@@ -167,15 +167,14 @@ namespace CustomShopMVC.Controllers
 			}
 			using (IDbConnection conn = _dataAccess.GetDbConnection())
 			{
-				string sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 				DynamicParameters param = new DynamicParameters();
 				param.Add("@CategoryId", model.CategoryId);
+
+				string sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 				IEnumerable<CategoryProductChoosableProperty> sqlSelect = conn.Query<CategoryProductChoosableProperty>(sql, param);
 				result.ChoosableProperties = mapper.Map<IEnumerable<CategoryProductChoosableProperty>, List<CategoryProductChoosablePropertyViewModel>>(sqlSelect);
 
 				sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
-				param = new DynamicParameters();
-				param.Add("@CategoryId", model.CategoryId);
 				IEnumerable<CategoryProductMeasurableProperty> sqlSelect2 = conn.Query<CategoryProductMeasurableProperty>(sql, param);
 				result.MeasurableProperties = mapper.Map<IEnumerable<CategoryProductMeasurableProperty>, List<CategoryProductMeasurablePropertyViewModel>>(sqlSelect2);
 				
@@ -183,58 +182,63 @@ namespace CustomShopMVC.Controllers
 
 				#region category parents properties
 
-				Category parentCategory;
-				Category category;
+				Category parent;
+				Guid firstParentId;
+				result.ParentsChoosableProperties = new List<ParentCategoryProductChoosablePropertyViewModel>();
+				result.ParentsMeasurableProperties = new List<ParentCategoryProductMeasurablePropertyViewModel>();  
 				param = new DynamicParameters();
 				param.Add("@Id", model.CategoryId);
-				sql = "SELECT * FROM [Categories] WHERE [Id] = @Id";
-				category = conn.Query<Category>(sql, param).First();
-				if (category.ParentId != Guid.Empty)
+				sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @Id";
+				firstParentId = conn.ExecuteScalar<Guid>(sql, param);
+				if (firstParentId != Guid.Empty)
 				{
-					param.Add("@ParentId", category.ParentId);
+					param.Add("@ParentId", firstParentId);
 					sql = "SELECT * FROM [Categories] WHERE [Id] = @ParentId";
-					parentCategory = conn.Query<Category>(sql, param).First();
+					parent = conn.Query<Category>(sql, param).First();
 
 					do
 					{
 						param = new DynamicParameters();
-						param.Add("@CategoryId", parentCategory.Id);
+						param.Add("@CategoryId", parent.Id);
 
+						#region choosables
 						sql = "SELECT * FROM [CategoryProductChoosableProperties] WHERE [CategoryId] = @CategoryId";
 						IEnumerable<CategoryProductChoosableProperty> dbChoosables = conn.Query<CategoryProductChoosableProperty>(sql, param);
 						List<ParentCategoryProductChoosablePropertyViewModel> parentChoosables = new List<ParentCategoryProductChoosablePropertyViewModel>();
 						foreach (CategoryProductChoosableProperty item in dbChoosables)
 						{
 							ParentCategoryProductChoosablePropertyViewModel parentProp = mapper.Map<CategoryProductChoosableProperty, ParentCategoryProductChoosablePropertyViewModel>(item);
-							parentProp.CategoryName = parentCategory.Name;
+							parentProp.CategoryName = parent.Name;
 
 							parentChoosables.Add(parentProp);
 						}
 
-						result.ParentsChoosableProperties = new List<ParentCategoryProductChoosablePropertyViewModel>();
+						
 						if(parentChoosables != null)
 							result.ParentsChoosableProperties = result.ParentsChoosableProperties.Concat(parentChoosables).ToList();
+						#endregion choosables
 
+						#region measurables
 						sql = "SELECT * FROM [CategoryProductMeasurableProperties] WHERE [CategoryId] = @CategoryId";
 						IEnumerable<CategoryProductMeasurableProperty> dbMeasurables = conn.Query<CategoryProductMeasurableProperty>(sql, param);
 						List<ParentCategoryProductMeasurablePropertyViewModel> parentMeasurables = new List<ParentCategoryProductMeasurablePropertyViewModel>();
 						foreach (CategoryProductMeasurableProperty item in dbMeasurables)
 						{
 							ParentCategoryProductMeasurablePropertyViewModel parentProp = mapper.Map<CategoryProductMeasurableProperty, ParentCategoryProductMeasurablePropertyViewModel>(item);
-							parentProp.CategoryName = parentCategory.Name;
+							parentProp.CategoryName = parent.Name;
 
 							parentMeasurables.Add(parentProp);
 						}
-						result.ParentsMeasurableProperties = new List<ParentCategoryProductMeasurablePropertyViewModel>();
+						
 						if (parentMeasurables != null);
 							result.ParentsMeasurableProperties = result.ParentsMeasurableProperties.Concat(parentMeasurables).ToList();
-
+						#endregion measurables
 						param = new DynamicParameters();
-						param.Add("@Id", parentCategory.ParentId);
+						param.Add("@Id", parent.ParentId);
 						sql = "SELECT * FROM [Categories] WHERE [Id] = @Id";
-						parentCategory = conn.Query<Category>(sql, param).FirstOrDefault();
+						parent = conn.Query<Category>(sql, param).FirstOrDefault();
 					}
-					while (parentCategory != null);
+					while (parent != null);
 				}
 				#endregion
 
