@@ -54,7 +54,7 @@ export class TextInfoInput extends React.Component <TextInfoInputProps, TextInfo
 type NumberInfoInputProps = {
     onChange: onChangeFunction,
     editingEnabled: boolean,
-    value: number,
+    value: number | null,
     inputName: string,
 
 }
@@ -77,7 +77,7 @@ export class NumberInfoInput extends React.Component<NumberInfoInputProps, Numbe
             content = <input
                 onChange={this.handleValueChange}
                 type="number"
-                value={this.props.value}
+                value={this.props.value || ''}
                 name={this.props.inputName}
             />
 

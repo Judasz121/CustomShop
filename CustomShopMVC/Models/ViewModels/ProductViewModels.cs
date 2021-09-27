@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CustomShopMVC.Helpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace CustomShopMVC.Models.ViewModels
 {
+
 	public class ProductViewModel
 	{
 		public string Id { get; set; }
@@ -18,9 +21,15 @@ namespace CustomShopMVC.Models.ViewModels
 		public int Quantity { get; set; }
 
 		// key is the property id ( not the propertyValue id )
-		public Dictionary<string, string> ChoosablePropertiesValue { get; set; }
-		public Dictionary<string, float> MeasurablePropertiesValue { get; set; }
+		public dynamic ChoosablePropertiesValue { get; set; }
+		public dynamic MeasurablePropertiesValue { get; set; }
+
+		//[BindProperty(BinderType = typeof(CustomModelBinder))]
+		//public Dictionary<string, string> ChoosablePropertiesValue { get; set; }
+		//[BindProperty(BinderType = typeof(CustomModelBinder))]
+		//public Dictionary<string, float> MeasurablePropertiesValue { get; set; }
 	}
+
 
 	public class ProductEditModel : ProductViewModel
 	{

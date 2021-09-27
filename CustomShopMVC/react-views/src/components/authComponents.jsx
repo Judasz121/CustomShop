@@ -198,7 +198,7 @@ export class LogInUserBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            logInUrl: Constants.logInUrl,
+            logInUrl: Constants.baseUrl + "/API/Auth/LogIn",
             inputs: {
                 usernameOrEmail: "",
                 password: "",
@@ -225,7 +225,6 @@ export class LogInUserBox extends React.Component {
     }
     submit(e) {
         e.preventDefault();
-        console.log("logIn called to url:" + this.state.logInUrl);
         var dataToSend = {
             "UsernameOrEmail": this.state.inputs.usernameOrEmail,
             "Password": this.state.inputs.password,
