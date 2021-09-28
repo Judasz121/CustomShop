@@ -240,7 +240,29 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         if (inputName == "selectedCategories")
             this.setState({
                 selectedCategories: value as string[],
-            });
+            }, () => { })
+        else if (inputName.split(".")[0] == "choosablePropertiesValue") {
+            this.setState({
+                product: {
+                    ...this.state.product,
+                    choosablePropertiesValue: {
+                        ...this.state.product.choosablePropertiesValue,
+                        [inputName.split(".")[1]]: value as string,
+                    }
+                }
+            })
+        }
+        else if (inputName.split(".")[0] == "measurablePropertiesValue") {
+            this.setState({
+                product: {
+                    ...this.state.product,
+                    measurablePropertiesValue: {
+                        ...this.state.product.measurablePropertiesValue,
+                        [inputName.split(".")[1]]: value as number,
+                    }
+                }
+            })
+        }
         else
             this.setState({
                 product: {
@@ -516,14 +538,16 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         <h3>Choosable Properties</h3>
                         <hr />
                         {
-                            //[1, 2, 3].map(item => { console.log(this.state.choosableProperties); return <div className="test"></div> })
-                        }
-                        {
                             this.state.choosableProperties.map((choosablePropItem) => {
                                 const options = choosablePropItem.itemsToChoose.map((itemToChooseItem) => {
                                     return { value: itemToChooseItem, label: itemToChooseItem };
                                 });
-                                console.log("choosable foreach");
+                                var value = null;
+                                if (this.state.product.choosablePropertiesValue)
+                                    value = options.filter((optionItem) => {
+                                        return optionItem.value == this.state.product.choosablePropertiesValue[choosablePropItem.id]
+                                    })[0];
+                            
                                 return (
                                     <div className="inputGroup">
                                         <span>{choosablePropItem.propertyName}</span>
@@ -531,14 +555,11 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                             options={options}
                                             onChange={
                                                 (selectedItem) => {
-                                                    this.onInfoinputChange("choosablePropertiesValues[" + choosablePropItem.id + "]", selectedItem?.value)
+                                                    this.onInfoinputChange("choosablePropertiesValue." + choosablePropItem.id, selectedItem?.value)
                                                 }
                                             }
-                                            value={
-                                                options.filter((optionItem) => {
-                                                    return optionItem.value == this.state.product.choosablePropertiesValue[choosablePropItem.id]
-                                                })[0]
-                                            }
+                                            value={value}
+                                                
                                         />
                                     </div>
                                 )
@@ -549,13 +570,15 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         <hr />
                         {
                             this.state.measurableProperties.map((measurablePropItem) => {
-
+                                var value = null;
+                                if (this.state.product.measurablePropertiesValue )
+                                    value = this.state.product.measurablePropertiesValue[measurablePropItem.id];
                                 return (
                                     <div className="inputGroup">
                                         <span>{measurablePropItem.propertyName}</span>
                                         <NumberInfoInput
-                                            value={this.state.product.measurablePropertiesValue[measurablePropItem.id]}
-                                            inputName={"measurablePropertiesValue[" + measurablePropItem.id + "]"}
+                                            value={value}
+                                            inputName={"measurablePropertiesValue." + measurablePropItem.id}
                                             onChange={this.onInfoinputChange}
                                             editingEnabled={this.state.editingEnabled}
                                         />

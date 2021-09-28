@@ -1,4 +1,4 @@
-﻿import SortableTree, { addNodeUnderParent, removeNodeAtPath, getFlatDataFromTree, getTreeFromFlatData, changeNodeAtPath, TreeItem, GetNodeKeyFunction } from 'react-sortable-tree';
+﻿import SortableTree, { addNodeUnderParent, removeNodeAtPath, getFlatDataFromTree, getTreeFromFlatData, changeNodeAtPath, TreeItem, GetNodeKeyFunction, getNodeAtPath, SearchData, find, TreeNode, NodeData } from 'react-sortable-tree';
 import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../../router/constants';
@@ -7,6 +7,7 @@ import { Link, useRouteMatch, RouteComponentProps, Redirect } from 'react-router
 import globalStyle from "../../styles/global.module.css";
 import { StaticContext } from 'react-router';
 import { ICategory } from '../../../types/categoryTypes';
+import { clearLine } from 'readline';
 
 //interface ProductCategorySelectionPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { returnUrl: string }> {
 type ProductCategorySelectionPanelProps = {
@@ -19,6 +20,15 @@ type ProductCategorySelectionPanelProps = {
 }
 type ProductCategorySelectionPanelState = {
     treeData: TreeItem[],
+    getNodeKeyFunction: GetNodeKeyFunction,
+}
+interface CategoryTreeNode{
+    id: string,
+    parentId: string,
+    title: string,
+    expanded: boolean,
+    hasChildSelected: boolean,
+    isSelected: boolean,
 }
 
 
@@ -29,75 +39,181 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
 
         this.state = {
             treeData: getTreeFromFlatData({
-                flatData: this.props.categoryTree.map(categoryItem => ({
-                    title: categoryItem.name,
-                    id: categoryItem.id,
-                    parentId: categoryItem.parentId,
-                    isSelected: this.isCategorySelected(categoryItem.id),
-                })),
+                flatData: this.props.categoryTree.map(categoryItem => {
+                    let hasChildSelected = this.hasChildCategorySelected(categoryItem.id);
+                    let isSelected;
+                    if (hasChildSelected)
+                        isSelected = true;
+                    else
+                        isSelected = this.isCategorySelected(categoryItem.id);
+
+                    return (
+                        {
+                            title: categoryItem.name,
+                            id: categoryItem.id,
+                            parentId: categoryItem.parentId,
+                            isSelected: isSelected,
+                            hasChildSelected: hasChildSelected,
+                            expanded: hasChildSelected,
+                        })
+                }),
                 getKey: (node) => node.id,
                 getParentKey: (node) => node.parentId,
                 rootKey: "00000000-0000-0000-0000-000000000000",
             }),
+            getNodeKeyFunction: ({ treeIndex }: { treeIndex: any }) => { return treeIndex },
         };
 
         this.onSelectedCategoriesChange = this.onSelectedCategoriesChange.bind(this);
         this.generateTreeNodeProps = this.generateTreeNodeProps.bind(this);
         this.isCategorySelected = this.isCategorySelected.bind(this);
+        this.hasChildCategorySelected = this.hasChildCategorySelected.bind(this);
+        this.updateNodeParents = this.updateNodeParents.bind(this);
     }
 
+    onSelectedCategoriesChange(e: React.ChangeEvent<HTMLInputElement>, hasChildSelected: boolean, categoriesIdToDeselect?: string[]) {
+        var categoryId = e.target.value;
+        let resultData = this.props.selectedCategories.slice();
 
-    //onSelectedCategoriesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    //    if (e.target.checked) {
-    //        let resultData = this.state.selectedCategories.slice();
-    //        resultData.push(e.target.value);
-    //        this.setState({
-    //            selectedCategories: resultData,
-    //        });
-    //        this.props.onChange(this.props.inputName, resultData);
-    //    }
-    //    else {
-    //        if (this.state.selectedCategories.length > 1) {
-    //            let resultData = this.state.selectedCategories.splice(this.state.selectedCategories.indexOf(e.target.value), 1)
-    //            this.setState({
-    //                selectedCategories: resultData,
-    //            });
-    //            this.props.onChange(this.props.inputName, resultData)
-    //        }
-    //        else {
-    //            this.setState({
-    //                selectedCategories: []
-    //            });
-    //            this.props.onChange(this.props.inputName, []);
-    //        }
-    //    }
-    //}
+        if (categoriesIdToDeselect != undefined)
+            categoriesIdToDeselect.forEach(idItem => {
+                resultData.splice(resultData.indexOf(idItem), 1);
+            })
 
-    onSelectedCategoriesChange(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.checked) {
-            let resultData = this.props.selectedCategories.slice();
-            resultData.push(e.target.value);
-
+        if (e.target.checked && hasChildSelected == false) {
+            resultData.push(categoryId);
             this.props.onChange(this.props.inputName, resultData);
         }
         else {
-            if (this.props.selectedCategories.length > 1) {
-                let resultData = this.props.selectedCategories.splice(this.props.selectedCategories.indexOf(e.target.value), 1)
-
-                this.props.onChange(this.props.inputName, resultData)
-            }
-            else {
-                this.props.onChange(this.props.inputName, []);
-            }
+            resultData.splice(this.props.selectedCategories.indexOf(categoryId), 1)
+            this.props.onChange(this.props.inputName, resultData)
         }
     }
 
     isCategorySelected(categoryId: string) {
         return this.props.selectedCategories.filter((selCatItem => selCatItem == categoryId)).length > 0
     }
+    hasChildCategorySelected(categoryId: string) {
+        var result = false;
+        var currCatgoryId = categoryId;
+        var categoriesToCheck = this.props.categoryTree.slice();
+
+        var checkCategoryChildrenForSelection = (id: string) => {
+            let currChildren = categoriesToCheck.filter(categoryItem => {
+                return categoryItem.parentId == id;
+            })
+            currChildren.forEach((categoryItem) => {
+                if (this.isCategorySelected(categoryItem.id)) {
+                    result = true;
+                    return result;
+                }
+                checkCategoryChildrenForSelection(categoryItem.id);
+            })
+
+        }
+        checkCategoryChildrenForSelection(categoryId);
+        return result;
+    }
+    OLDupdateNodeParents(childId: string, childValue: boolean) {
+        let searchResult = find({
+            treeData: this.state.treeData,
+            getNodeKey: this.state.getNodeKeyFunction,
+            searchQuery: childId,
+            searchMethod: (data: SearchData) => {
+                if (data.node.id == data.searchQuery)
+                    return true;
+                else
+                    return false;
+            },
+        });
+        let child = searchResult.matches[0].node;
+
+        let parentExists = false;
+        if (child.parentId != Constants.emptyGuid)
+            parentExists = true;
+        var currNode = child;
+        var i = 0;
+        while (parentExists) {
+          //  console.log("first parent iteration: " + currNode.title);
+            let searchResult = find({
+                treeData: this.state.treeData,
+                getNodeKey: this.state.getNodeKeyFunction,
+                searchQuery: currNode.parentId,
+                searchMethod: (data: SearchData) => {
+                    console.log("searchMethod");
+                    console.log(data.treeIndex);
+                    if (data.node.id == data.searchQuery)
+                        return true;
+                    else
+                        return false;
+                },
+            });
+            currNode = searchResult.matches[0].node;
+            console.log("searchResult:");
+            console.log(searchResult.matches[0]);
+            this.setState(state => ({
+                treeData: changeNodeAtPath({
+                    treeData: state.treeData,
+                    path: searchResult.matches[0].path,
+                    getNodeKey: this.state.getNodeKeyFunction,
+                    newNode: {
+                        ...currNode,
+                        hasChildSelected: childValue,
+                        isSelected: childValue,
+                        expanded: true
+                    }
+                })
+            }), () => {
+               
+            })
+            if (currNode.parentId == Constants.emptyGuid)
+                parentExists = false;
+            i++;
+        }
+    }
+    updateNodeParents(childPath: string[] | number[], childValue: boolean) {
+
+        var categoriesIdToDeselect: string[] = [];
+        for (var i = 0; i < childPath.length - 1; i++) {
+            let searchResult = find({
+                treeData: this.state.treeData,
+                getNodeKey: this.state.getNodeKeyFunction,
+                searchQuery: childPath[i],
+                searchMethod: (data: SearchData) => {
+                    if (data.treeIndex !== null && data.treeIndex === data.searchQuery)
+                        return true;
+                    else
+                        return false;
+                }
+            }).matches.filter(nodeItem => {
+                if (nodeItem.treeIndex != null)
+                    return true
+            })[0];
+
+            if (this.isCategorySelected(searchResult.node.id)) {
+                categoriesIdToDeselect.push(searchResult.node.id)
+            }
+            
+            this.setState(state => ({
+                treeData: changeNodeAtPath({
+                    path: searchResult.path,
+                    getNodeKey: this.state.getNodeKeyFunction,
+                    treeData: state.treeData,
+                    newNode: {
+                        ...searchResult.node,
+                        isSelected: childValue,
+                        hasChildSelected: childValue,
+                        expanded: true,
+                    }
+                }),
+
+            }) )
+        }
+        return categoriesIdToDeselect;
+    }
 
     generateTreeNodeProps({ node, path }: { node: any, path: any }) {
-        const getNodeKey: GetNodeKeyFunction = ({ treeIndex }: { treeIndex: any }) => { return treeIndex };
+        const getNodeKey = this.state.getNodeKeyFunction;
         let result =
         {
             buttons: [
@@ -105,7 +221,12 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
                     className="selectedCategory"
                     type="checkbox"
                     onChange={(e) => {
-                        this.onSelectedCategoriesChange(e);
+                        var hasChildSelected = this.hasChildCategorySelected(e.target.value);
+                        var isSelected: boolean = e.target.checked;
+                        if (hasChildSelected)
+                            isSelected = true;
+
+                        let idsToErase = this.updateNodeParents(path, isSelected); // order of updating parent vs children first mattters
                         this.setState((state) => ({
 
                             treeData: changeNodeAtPath({
@@ -114,14 +235,18 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
                                 getNodeKey,
                                 newNode: {
                                     ...node,
-                                    isSelected: !node.isSelected,
+                                    isSelected: isSelected,
+                                    hasChildSelected: hasChildSelected,
                                 }
                             })
                         }))
-                    }}
+                        
+                        this.onSelectedCategoriesChange(e, hasChildSelected, idsToErase);
+                    }
+                    }
                     value={node.id}
-                    checked={node.isSelected}
-
+                    checked={ node.isSelected }
+                    disabled={node.hasChildSelected}
                 />,
             ],
         };

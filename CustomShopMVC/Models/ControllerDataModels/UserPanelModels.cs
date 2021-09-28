@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CustomShopMVC.DataAccess.DatabaseModels;
+using CustomShopMVC.Helpers;
 using CustomShopMVC.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 {
@@ -59,7 +61,6 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	public class SaveProductDataIn
 	{
 		public ProductEditModel Product { get; set; }
-		public List<string> SelectedCategories { get; set; }
 	}
 	public class SaveProductDataOut
 	{
