@@ -82,6 +82,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
         this.saveProduct = this.saveProduct.bind(this);
+        this.saveProductImages = this.saveProductImages.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
 
         this.showCategoriesSelectionWindow = this.showCategoriesSelectionWindow.bind(this);
@@ -317,6 +318,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             })
     }
 
+    saveProductImages() {
+
+    }
     saveProduct() {
         // #region data checks
         let ok = true;
