@@ -71,7 +71,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DbContent\Images\" />
+    <Folder Include="wwwroot\DbContent\Images\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

@@ -20,7 +20,7 @@ namespace CustomShopMVC.Models.ViewModels
 		public List<string> ImagesPath { get; set; }
 		public int Quantity { get; set; }
 
-		// key is the property id ( not the propertyValue id )
+		// key is the property.id ( not the propertyValue.id )
 		public dynamic ChoosablePropertiesValue { get; set; }
 		public dynamic MeasurablePropertiesValue { get; set; }
 

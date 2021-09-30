@@ -19,7 +19,12 @@ interface ProductEditPanelProps extends RouteComponentProps<{ productId: string 
 
 }
 type ProductEditPanelState = {
-    product: IProductEdit ,
+    product: IProduct,
+    newProductImages: {
+        newThumbnailImage: File | null,
+        newImages: File[],
+        imagesToDelete: string[],
+    }
     ajaxResponse: AjaxSaveResponse,
     redirect: string,
     editingEnabled: boolean,
@@ -63,7 +68,12 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 nameError: "",
             },
             
-            product: {} as IProductEdit,
+            product: {} as IProduct,
+            newProductImages: {
+                newThumbnailImage: null,
+                newImages: [],
+                imagesToDelete: [],
+            },
             redirect: "",
             editingEnabled: true,
 
@@ -81,6 +91,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.getProductCustomProperties = this.getProductCustomProperties.bind(this);
 
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
+        this.onSaveProductClick = this.onSaveProductClick.bind(this);
         this.saveProduct = this.saveProduct.bind(this);
         this.saveProductImages = this.saveProductImages.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
@@ -264,6 +275,15 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 }
             })
         }
+        else if (inputName.toUpperCase().includes("IMAGE"))
+        {
+            this.setState({
+                newProductImages: {
+                    ...this.state.newProductImages,
+                    [inputName]: value,
+                }
+            });
+        }
         else
             this.setState({
                 product: {
@@ -318,7 +338,50 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             })
     }
 
+    onSaveProductClick() {
+        this.saveProduct();
+        this.saveProductImages();
+    }
     saveProductImages() {
+        var dataToSend: FormData = new FormData();
+        dataToSend.append("productId", this.state.product.id);
+        var url: string = Constants.baseUrl + "/API/UserPanel/SaveProductImages";
+        let send: boolean = false;
+        var i = 0;
+        if (this.state.newProductImages.newImages) {
+            this.state.newProductImages.newImages.forEach(imageFileItem => {
+                dataToSend.append("newImages[" + i + "]", imageFileItem, imageFileItem.name);
+            });
+            send = true;
+        }
+
+        i = 0;
+        if (this.state.newProductImages.imagesToDelete) {
+            this.state.newProductImages.imagesToDelete.forEach(imageToDeleteItem => {
+                dataToSend.append("imagesToDelete[" + i + "]", imageToDeleteItem);
+            });
+            send = true;
+        }
+
+        if (this.state.newProductImages.newThumbnailImage != null) {
+            dataToSend.append("newThumbnailImage", this.state.newProductImages.newThumbnailImage!, this.state.newProductImages.newThumbnailImage!.name);
+            send = true;
+        }
+
+        if (send)
+            fetch(url, {
+                method: "POST",
+                body: dataToSend,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({
+                        ajaxResponse: {
+                            ...this.state.ajaxResponse,
+                            formError: data.formError,
+                        }
+                    })
+                })
 
     }
     saveProduct() {
@@ -515,7 +578,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         <ImageInfoInput
                             inputName="newThumbnailImage"
                             onChange={this.onInfoinputChange}
-                            image={this.state.product.newThumbnailImage}
+                            image={this.state.newProductImages.newThumbnailImage}
                             imagePath={this.state.product.thumbnailImagePath}
                             editingEnabled={this.state.editingEnabled}
                         />
@@ -523,7 +586,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     <div className="inputGroup" >
                         <span>Images</span>
                         <ImagesInput
-                            value={this.state.product.newImages}
+                            value={this.state.newProductImages.newImages}
                             onChange={this.onInfoinputChange}
                             editingEnabled={this.state.editingEnabled}
                             inputName="newImages"
@@ -600,7 +663,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 </div>
                 <div className="buttonGroup">
                     <button className="" onClick={this.showCategoriesSelectionWindow} >Change Categories</button>
-                    <button className="" onClick={this.saveProduct}>Save</button>
+                    <button className="" onClick={this.onSaveProductClick}>Save</button>
                     <button className="" onClick={this.deleteProduct} >Delete this Product</button>
                 </div>
             </div>

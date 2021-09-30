@@ -17,8 +17,10 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
-namespace CustomShopMVC.Controllers // test
+namespace CustomShopMVC.Controllers
 {
 	[ApiController]
 	[Route("API/{controller}")]
@@ -26,10 +28,13 @@ namespace CustomShopMVC.Controllers // test
 	{
 		private readonly IDatabaseAccess _dataAccess;
 		private readonly IUpload _upload;
-		public UserPanelController(IDatabaseAccess dataAccess, IUpload upload)
+		private readonly IWebHostEnvironment _webHostEnvironment;
+
+		public UserPanelController(IDatabaseAccess dataAccess, IUpload upload, IWebHostEnvironment webHostEnvironmet)
 		{
 			_dataAccess = dataAccess;
 			_upload = upload;
+			_webHostEnvironment = webHostEnvironmet;
 		}
 
 		#region settings
@@ -143,7 +148,7 @@ namespace CustomShopMVC.Controllers // test
 				result.Product.ChoosablePropertiesValue = new Dictionary<string, string>();
 				result.Product.MeasurablePropertiesValue = new Dictionary<string, float>();
 
-				#region custom properties 
+				#region custom properties value
 
 				param = new DynamicParameters();
 				param.Add("@ProductId", model.ProductId);
@@ -206,7 +211,7 @@ namespace CustomShopMVC.Controllers // test
 
 		[HttpPost]
 		[Route("{action}")]
-		public async Task<ActionResult<SaveProductDataOut>> SaveProduct( SaveProductDataIn model)
+		public async Task<ActionResult<SaveProductDataOut>> SaveProduct(SaveProductDataIn model)
 		{
 			model.Product.ChoosablePropertiesValue = JsonConvert.DeserializeObject<Dictionary<string, string>>(model.Product.ChoosablePropertiesValue.ToString());
 			model.Product.MeasurablePropertiesValue = JsonConvert.DeserializeObject<Dictionary<string, float>>(model.Product.MeasurablePropertiesValue.ToString());
@@ -240,12 +245,7 @@ namespace CustomShopMVC.Controllers // test
 					}
 					#endregion
 
-					string thumbnailImagePath = "";
-					if (model.Product.NewThumbnailImage != null && model.Product.NewThumbnailImage.Length > 0)
-						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
-					param.Add("@ThumbnailImagePath", thumbnailImagePath);
-
-					sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @Quantity)";
+					sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @Quantity)";
 					conn.Execute(sql, param);
 
 					#region custom properties value 
@@ -283,26 +283,6 @@ namespace CustomShopMVC.Controllers // test
 						conn.Execute(sql, param);
 					}
 					#endregion custom properties value
-
-					#region images
-					foreach (IFormFile newImage in model.Product.NewImages)
-					{
-						string path = _upload.Image(newImage);
-						ProductImage newDbImage = new ProductImage()
-						{
-							Id = Guid.NewGuid(),
-							ImagePath = path,
-							ProductId = newProductId
-						};
-
-						param = new DynamicParameters();
-						param.Add("@Id", newDbImage.Id);
-						param.Add("@ImagePath", newDbImage.ImagePath);
-						param.Add("@ProductId", newDbImage.ProductId);
-						sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
-						conn.Execute(sql, param);
-					}
-					#endregion images
 				}
 			}
 			else // update
@@ -325,12 +305,8 @@ namespace CustomShopMVC.Controllers // test
 						return result;
 					}
 
-					string thumbnailImagePath = "";
-					if (model.Product.NewThumbnailImage != null && model.Product.NewThumbnailImage.Length > 0)
-						thumbnailImagePath = _upload.Image(model.Product.NewThumbnailImage);
-					param.Add("@ThumbnailImagePath", thumbnailImagePath);
 
-					sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [ThumbnailImagePath] = @ThumbnailImagePath, [Quantity] = @Quantity";
+					sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [Quantity] = @Quantity";
 					int update = conn.Execute(sql, param);
 					if (update == 0)
 					{
@@ -340,66 +316,126 @@ namespace CustomShopMVC.Controllers // test
 					}
 
 					#region product properties value
-					foreach (KeyValuePair<string, string> choosableProperty in model.Product.ChoosablePropertiesValue)
+					foreach (KeyValuePair<string, string> choosablePropertyItem in model.Product.ChoosablePropertiesValue)
 					{
 						param = new DynamicParameters();
-						param.Add("@ChoosablePropertyId", choosableProperty.Key);
-						param.Add("@Value", choosableProperty.Value);
+						param.Add("@ChoosablePropertyId", choosablePropertyItem.Key);
+						param.Add("@Value", choosablePropertyItem.Value);
 						param.Add("@ProductId", model.Product.Id);
 						sql = "UPDATE [ProductChoosablePropertiesValue] SET [Value] = @Value WHERE [ChoosablePropertyId] = @ChoosablePropertyId AND [ProductId] = @ProductId";
 						update = conn.Execute(sql, param);
 						if (update == 0)
 						{
 							param = new DynamicParameters();
-							param.Add("@Id", choosableProperty.Key);
-							sql = "SELECT [PropertyName] FROM [CategoryProductChoosableProperties] WHERE [Id] = @Id";
-							string propertyName = conn.ExecuteScalar<string>(sql, param);
-							result.FormError += $"Could not update the product {propertyName} property value." + Environment.NewLine;
-							result.Success = false;
+							param.Add("@Id", choosablePropertyItem.Key);
+							sql = "SELECT [CategoryId] FROM [CategoryProductChoosableProperties] WHERE [Id] = @Id";
+							Guid categoryId = conn.ExecuteScalar<Guid>(sql, param);
+
+							param = new DynamicParameters();
+							param.Add("@Id", Guid.NewGuid());
+							param.Add("@ProductId", model.Product.Id);
+							param.Add("@CategoryId", categoryId);
+							param.Add("@ChoosablePropertyId", choosablePropertyItem.Key);
+							param.Add("@Value", choosablePropertyItem.Value);
+							sql = "INSERT INTO [ProductChoosablePropertiesValue] VALUES(@Id, @ProductId, @CategoryId, @ChoosablePropertyId, @Value)";
+							conn.Execute(sql, param);
 						}
 					}
 
-					foreach (KeyValuePair<string, float> measurableProperty in model.Product.MeasurablePropertiesValue)
+					foreach (KeyValuePair<string, float> measurablePropertyItem in model.Product.MeasurablePropertiesValue)
 					{
 						param = new DynamicParameters();
-						param.Add("@MeasurablePropertyId", measurableProperty.Key);
-						param.Add("@Value", measurableProperty.Value);
+						param.Add("@MeasurablePropertyId", measurablePropertyItem.Key);
+						param.Add("@Value", measurablePropertyItem.Value);
 						param.Add("@ProductId", model.Product.Id);
 						sql = "UPDATE [ProductMeasurablePropertiesValue] SET [Value] = @Value WHERE [MeasurablePropertyId] = @MeasurablePropertyId AND [ProductId] = @ProductId";
 						update = conn.Execute(sql, param);
 						if (update == 0)
 						{
 							param = new DynamicParameters();
-							param.Add("@Id", measurableProperty.Key);
-							sql = "SELECT [PropertyName] FROM [CategoryProductMeasurableProperties] WHERE [Id] = @Id";
-							string propertyName = conn.ExecuteScalar<string>(sql, param);
-							result.FormError += $"Could not update the product {propertyName} property value." + Environment.NewLine;
-							result.Success = false;
+							param.Add("@Id", measurablePropertyItem.Key);
+							sql = "SELECT [CategoryId] FROM [CategoryProducMeasurableProperties] WHERE [Id] = @Id";
+							Guid categoryId = conn.ExecuteScalar<Guid>(sql, param);
+
+							param = new DynamicParameters();
+							param.Add("@Id", Guid.NewGuid());
+							param.Add("@ProductId", model.Product.Id);
+							param.Add("@CategoryId", categoryId);
+							param.Add("@MeasurablePropertyId", measurablePropertyItem.Key);
+							param.Add("Value", measurablePropertyItem.Value);
+							sql = "INSERT INTO [ProductMeasurablePropertiesValue] VALUES(@Id, @ProductId, @CategoryId, @MeasurablePropertyId, @Value)";
+							conn.Execute(sql, param);
 						}
 					}
 					#endregion product properties value
-
-					#region imagesls
-					if (model.Product.NewImages != null)
-						foreach (IFormFile newImage in model.Product.NewImages)
-						{
-							string path = _upload.Image(newImage);
-							ProductImage newDbImage = new ProductImage()
-							{
-								Id = Guid.NewGuid(),
-								ImagePath = path,
-								ProductId = Guid.Parse(model.Product.Id)
-							};
-
-							param = new DynamicParameters();
-							param.Add("@Id", newDbImage.Id);
-							param.Add("@ImagePath", newDbImage.ImagePath);
-							param.Add("@ProductId", newDbImage.ProductId);
-							sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
-							conn.Execute(sql, param);
-						}
-					#endregion images
 				}
+			}
+			result.Success = true;
+			return result;
+		}
+		[HttpPost]
+		[Route("[action]")]
+		public async Task<ActionResult<SaveProductImagesDataOut>> SaveProductImages([FromForm] SaveProductImagesDataIn model)
+		{
+			SaveProductImagesDataOut result = new SaveProductImagesDataOut();
+			using (IDbConnection conn = _dataAccess.GetDbConnection())
+			{
+				DynamicParameters param;
+				string sql;
+				string thumbnailImagePath = "";
+
+				if (model.NewThumbnailImage != null && model.NewThumbnailImage.Length > 0)
+				{
+					param = new DynamicParameters();
+					param.Add("@Id", model.ProductId);
+					sql = "SELECT [ThumbnailImagePath] FROM [Products] WHERE [Id] = @Id";
+					string oldThumbnailPath = conn.ExecuteScalar<string>(sql, param);
+					oldThumbnailPath = _webHostEnvironment.WebRootPath + oldThumbnailPath;
+					System.IO.File.Delete(oldThumbnailPath);
+
+					thumbnailImagePath = _upload.Image(model.NewThumbnailImage);
+				}
+				param = new DynamicParameters();
+				param.Add("@ThumbnailImagePath", thumbnailImagePath);
+				sql = "UPDATE [Products] SET [ThumbnailImagePath] = @ThumbnailImagePath";
+				conn.Execute(sql, param);
+
+				if (model.ImagesToDelete != null)
+				{
+					foreach (string imagePath in model.ImagesToDelete)
+					{
+						string absolutePath = _webHostEnvironment.WebRootPath + imagePath;
+						System.IO.File.Delete(absolutePath);
+
+						param = new DynamicParameters();
+						param.Add("@ImagePath", imagePath);
+						param.Add("@ProductId", model.ProductId);
+						sql = "DELETE FROM [ProductImages] WHERE [ImagePath] = @ImagePath AND [ProductId] = @ProductId";
+						conn.Execute(sql, param);
+					}
+				}
+
+				if (model.NewImages != null)
+					foreach (IFormFile newImageItem in model.NewImages)
+					{
+						string path = _upload.Image(newImageItem);
+						ProductImage newImage = new ProductImage()
+						{
+							Id = Guid.NewGuid(),
+							ImagePath = path,
+							ProductId = Guid.Parse(model.ProductId)
+						};
+
+						param = new DynamicParameters();
+						param.Add("@Id", newImage.Id);
+						param.Add("@ImagePath", newImage.ImagePath);
+						param.Add("@ProductId", newImage.ProductId);
+						sql = "INSERT INTO [ProductImages] VALUES(@Id, @ImagePath, @ProductId)";
+						conn.Execute(sql, param);
+					};
+
+
+
 			}
 			result.Success = true;
 			return result;

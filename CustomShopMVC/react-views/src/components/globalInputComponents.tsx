@@ -232,11 +232,11 @@ export type ImageInfoInputProps = {
     onChange: onChangeFunction,
     editingEnabled: boolean,
     inputName: string,
-    image: File,
+    image: File | null,
     imagePath: string,
 }
 type ImageInfoInputState = {
-    uploadedImage: File,
+    uploadedImage: File | null,
     imageUrl: string,
 }
 export class ImageInfoInput extends React.Component<ImageInfoInputProps, ImageInfoInputState>{
@@ -257,16 +257,20 @@ export class ImageInfoInput extends React.Component<ImageInfoInputProps, ImageIn
         })
     }
     render() {
+        var imageUrl = this.state.imageUrl;
+        if (this.state.imageUrl == undefined)
+            imageUrl = this.props.imagePath;
+
         var content;
         if (this.props.editingEnabled)
             content = (
                 <div className="inputGroup">
-                    <img src={this.state.imageUrl} className="info" />
+                    <img src={imageUrl} className="info" />
                     <input type="file" onChange={this.onInputChange} />
                 </div>
                 )
         else
-            content = <img src={""} className="info" />
+            content = <img src={imageUrl} className="info" />
         return (
             <div className="ImageInfoInput">
                 {content}

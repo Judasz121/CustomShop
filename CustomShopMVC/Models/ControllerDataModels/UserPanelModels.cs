@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CustomShopMVC.DataAccess.DatabaseModels;
 using CustomShopMVC.Helpers;
 using CustomShopMVC.Models.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
@@ -60,13 +61,25 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 
 	public class SaveProductDataIn
 	{
-		public ProductEditModel Product { get; set; }
+		public ProductViewModel Product { get; set; }
 	}
 	public class SaveProductDataOut
 	{
 		public bool Success { get; set; }
 		public string FormError { get; set; }
 		public string NameError { get; set; }
+	}
+
+	public class SaveProductImagesDataIn
+	{
+		public string ProductId { get; set; }
+		public IFormFile NewThumbnailImage { get; set; }
+		public List<IFormFile> NewImages { get; set; }
+		public List<string> ImagesToDelete { get; set; }
+	}
+	public class SaveProductImagesDataOut
+	{
+		public bool Success { get; set; }
 	}
 	
 	public class GetProductCategoriesDataIn

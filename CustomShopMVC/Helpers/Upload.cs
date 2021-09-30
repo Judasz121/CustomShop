@@ -6,7 +6,6 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CustomShopMVC.Helpers
 {
@@ -23,14 +22,14 @@ namespace CustomShopMVC.Helpers
 		}
         public string Image(IFormFile file)
         {
-            string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "DbContent/Images");
+            string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "DbContent",  "Images");
             string fileName = Guid.NewGuid().ToString() + "_" + file.FileName;
             string filePath = Path.Combine(uploadFolder, fileName);
             using(FileStream fs = new FileStream(filePath, FileMode.Create))
 			{
                 file.CopyTo(fs);
 			}
-            return filePath;
+            return "\\DbContent\\Images\\" + fileName;
         }
     }
 }
