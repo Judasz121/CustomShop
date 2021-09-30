@@ -9,7 +9,6 @@ export class RegisterUserBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            registerUrl: Constants.registerUrl,
             inputs: {
                 username: "",
                 email: "",
@@ -37,12 +36,13 @@ export class RegisterUserBox extends React.Component {
     }
     submit(e) {
         e.preventDefault();
+        var url = Constants.baseUrl + "/API/Auth/Register";
         var dataToSend = {
             "Email": this.state.inputs.email,
             "Password": this.state.inputs.password,
             "Username": this.state.inputs.username
         }
-        fetch(this.state.registerUrl, {
+        fetch(url, {
             method: "POST",
             headers: {
                 'Content-Type': "application/json",
