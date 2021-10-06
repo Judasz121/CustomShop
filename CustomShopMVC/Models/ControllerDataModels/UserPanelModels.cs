@@ -59,6 +59,16 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public bool Success { get; set; }
 	}
 
+	public class AddProductDataIn
+    {
+		public ProductViewModel Product { get; set; }
+    }
+	public class AddProductDataOut
+    {
+		public bool Success { get; set; }
+		public string FormError { get; set; }
+		public string NameError { get; set; }
+    }
 	public class SaveProductDataIn
 	{
 		public ProductViewModel Product { get; set; }

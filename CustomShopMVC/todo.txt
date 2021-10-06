@@ -13,8 +13,9 @@ test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
 add frontEnd checks before sending http request to save
-write a proper model binder
-
+write a proper model binder (ProductViewModel Dictionaries)
+handle category inheritance when its moved in the tree
+implement proper async
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,

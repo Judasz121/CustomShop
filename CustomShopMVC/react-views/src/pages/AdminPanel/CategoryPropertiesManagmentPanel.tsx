@@ -613,7 +613,7 @@ export class MeasurablePropertyInfoEditPanel extends React.Component<MeasurableP
                 <div className="buttonGroup" >
                     <button className="" onClick={this.enableEditing}>Edit</button>
                     <button className="" onClick={this.saveProperty}>Save</button>
-                    <button className="" onClick={this.deleteProperty}><Icon.X width={25} height={25} /></button>
+                    <button className="" onClick={this.deleteProperty}>Delete</button>
                 </div>
             </div>
         )
@@ -827,7 +827,7 @@ class ChoosablePropertyInfoEditPanel extends React.Component <ChoosablePropertyI
                 <div className="buttonGroup">
                     <button className="" onClick={this.enableEditing}>Edit</button>
                     <button className="" onClick={this.saveProperty}>Save</button>
-                    <button className="" onClick={this.deleteProperty} ><Icon.X width={25} height={25} /></button>
+                    <button className="" onClick={this.deleteProperty} >Delete</button>
                 </div>
             </div>
             
