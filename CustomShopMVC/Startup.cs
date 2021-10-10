@@ -50,8 +50,6 @@ namespace CustomShopMVC
 				options.Password.RequireUppercase = false;
 				options.Password.RequireLowercase = false;
 			});
-			//services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			//services.AddSingleton<IConfiguration>(Configuration);
 			services.AddSpaStaticFiles(config =>
 			{
 				config.RootPath = "react-views/build";

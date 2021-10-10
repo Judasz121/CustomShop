@@ -68,7 +68,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 nameError: "",
             },
             
-            product: {} as IProduct,
+            product: {
+                id: this.props.match.params.productId,
+            } as IProduct,
             newProductImages: {
                 newThumbnailImage: null,
                 newImages: [],
@@ -89,17 +91,21 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         };
         this.getProduct = this.getProduct.bind(this);
         this.getProductCustomProperties = this.getProductCustomProperties.bind(this);
+        this.getNewProductCustomProperties = this.getNewProductCustomProperties.bind(this);
 
         this.onInfoinputChange = this.onInfoinputChange.bind(this);
-        this.onSaveProductClick = this.onSaveProductClick.bind(this);
-        this.saveProduct = this.saveProduct.bind(this);
-        this.saveProductImages = this.saveProductImages.bind(this);
-        this.deleteProduct = this.deleteProduct.bind(this);
 
+        this.onSaveSelectedCategoriesClick = this.onSaveSelectedCategoriesClick.bind(this);
+        this.onFinishedSelectingCategories = this.onFinishedSelectingCategories.bind(this);
+        this.saveSelectedCategories = this.saveSelectedCategories.bind(this);
         this.showCategoriesSelectionWindow = this.showCategoriesSelectionWindow.bind(this);
         this.closeCategoriesSelectionWindow = this.closeCategoriesSelectionWindow.bind(this);
-        this.saveSelectedCategories = this.saveSelectedCategories.bind(this);
-        this.finishedSelectingCategories = this.finishedSelectingCategories.bind(this);
+
+        this.onSaveProductClick = this.onSaveProductClick.bind(this);
+        this.saveProductImages = this.saveProductImages.bind(this);
+        this.saveProduct = this.saveProduct.bind(this);
+        this.addNewProduct = this.addNewProduct.bind(this);
+        this.deleteProduct = this.deleteProduct.bind(this);
     }
 
     componentDidMount() {
@@ -170,7 +176,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         //#region getCategoryData
 
         url = Constants.baseUrl + "/API/UserPanel/GetProductCategories"
-        let dataToSend = { productId: this.props.match.params.productId }
+        let dataToSend = { productId: this.state.product.id }
         fetch(url, {
             method: "POST",
             headers: {
@@ -181,10 +187,20 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    if (this.state.product.id == "new") {
+                        this.setState({
+                            categoryTree: data.categoryTree,
+                            selectedCategories: data.productCategoriesId,
+                            categoriesWindowVisible: false,
+                        })
+                        this.setState({
+                            categoriesWindowVisible: true,
+                        })
+                    }
                     this.setState({
                         categoryTree: data.categoryTree,
                         selectedCategories: data.productCategoriesId,
-                    })
+                    });
                 }
                 else {
                     this.setState({
@@ -192,14 +208,14 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             ...this.state.ajaxResponse,
                             formError: data.error,
                         }
-                    })
+                    });
                 }
             })
         //#endregion getCategoryData
     }
     getProduct() {
             let url = Constants.baseUrl + "/API/UserPanel/GetProduct";
-            let dataToSend = { productId: this.props.match.params.productId }
+            let dataToSend = { productId: this.state.product.id }
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -221,7 +237,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     }
     getProductCustomProperties() {
         let url = Constants.baseUrl + "/API/UserPanel/GetProductCustomProperties"
-        let dataToSend = { productId: this.props.match.params.productId }
+        let dataToSend = { productId: this.state.product.id }
         fetch(url, {
             method: "POST",
             headers: {
@@ -245,7 +261,35 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         }
                     })
             })
-
+    }
+    getNewProductCustomProperties(selectedCategories: string[]) {
+        let url = Constants.baseUrl + "/API/UserPanel/GetNewProductCustomProperties"
+        let dataToSend = {
+            selectedCategories: selectedCategories,
+        }
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setState({
+                        measurableProperties: data.measurableProperties,
+                        choosableProperties: data.choosableProperties,
+                    })
+                }
+                else
+                    this.setState({
+                        ajaxResponse: {
+                            ...this.state.ajaxResponse,
+                            formError: data.formError,
+                        }
+                    })
+            })
     }
 
     onInfoinputChange(inputName: string, value: string | number | boolean | string[] | undefined | null) {
@@ -293,27 +337,24 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             });
     }
 
-    showCategoriesSelectionWindow(e: React.MouseEvent<HTMLButtonElement>) {
-        this.setState({
-            categoriesWindowVisible: true,
-        });
+    onSaveSelectedCategoriesClick(selCat: string[]) {
+        if (this.state.product.id == "new")
+            this.getNewProductCustomProperties(selCat);
+        else {
+            this.saveSelectedCategories(selCat);
+            this.getProductCustomProperties();
+        }
     }
-    closeCategoriesSelectionWindow(e: React.MouseEvent<HTMLElement>) {
-        this.setState({
-            categoriesWindowVisible: false,
-        });
-        this.getProductCustomProperties();
-    }
-
-    finishedSelectingCategories(selCat: string[]) {
+    onFinishedSelectingCategories(selCat: string[]) {
         this.setState({
             categoriesWindowVisible: false,
         });
-        this.saveSelectedCategories(selCat);
-        this.getProductCustomProperties();
-
+        this.onSaveSelectedCategoriesClick(selCat);
     }
-    saveSelectedCategories(selCat: string[]) {
+    saveSelectedCategories(selCat?: string[]) {
+        if (selCat == undefined || selCat == null)
+            selCat = this.state.selectedCategories;
+
         let url = Constants.baseUrl + "/API/UserPanel/SaveProductCategories";
         let dataToSend = {
             productId: this.state.product.id,
@@ -337,9 +378,23 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 })
             })
     }
+    showCategoriesSelectionWindow(e: React.MouseEvent<HTMLButtonElement>) {
+        this.setState({
+            categoriesWindowVisible: true,
+        });
+    }
+    closeCategoriesSelectionWindow(e: React.MouseEvent<HTMLElement>) {
+        this.setState({
+            categoriesWindowVisible: false,
+        });
+        this.getProductCustomProperties();
+    }
 
     onSaveProductClick() {
-        this.saveProduct();
+        if (this.state.product.id == "new")
+            this.addNewProduct();
+        else
+            this.saveProduct();
         this.saveProductImages();
     }
     saveProductImages() {
@@ -407,7 +462,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             });
         // #endregion data checks
         if (ok) {
-            let url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
+            var url = Constants.baseUrl + "/API/UserPanel/SaveProduct";
             let dataToSend = {
                 product: this.state.product,
             }
@@ -465,12 +520,94 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 })
         }
     }
+    addNewProduct() {
+        // #region data checks
+        let ok = true;
+        let nameError = "";
+        let formError = "";
+        if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
+            ok = false;
+            nameError += "Name cannot be empty.";
+        }
+        if (this.state.product.ownerId == undefined || this.state.product.ownerId == null || this.state.product.ownerId == "") {
+            ok = false;
+            formError += "The product has to have an Owner.";
+        }
+        if (!ok)
+            this.setState({
+                ajaxResponse: {
+                    ...this.state.ajaxResponse,
+                    formError: formError,
+                    nameError: nameError,
+                }
+            });
+        // #endregion data checks
+        if (ok) {
+            var url = Constants.baseUrl + "/API/UserPanel/AddProduct";
+            let dataToSend = {
+                product: this.state.product,
+            }
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            })
+                .then((response) => response.json())
+                .then((data: AjaxSaveResponse) => {
+                    if (data.success && data.newId != null && data.newId.length > 0) {
+                        this.setState({
+                            product: {
+                                ...this.state.product,
+                                id: data.newId,
+                            },
+                            ajaxResponse: data,
+                        }, () => {
+                            this.saveSelectedCategories();
+                            setTimeout(() => {
+                                this.setState({
+                                    ajaxResponse: {
+                                        ...this.state.ajaxResponse,
+                                        formError: "",
+                                        nameError: "",
+                                    }
+                                });
+                            }, 8000)
+                        });
+
+                    }
+                    else if (data.success) {
+                        this.setState({
+                            ajaxResponse: data,
+                        }, () => {
+                            setTimeout(() => {
+                                this.setState({
+                                    ajaxResponse: {
+                                        ...this.state.ajaxResponse,
+                                        formError: "",
+                                        nameError: "",
+                                    },
+                                });
+                            }, 8000);
+                        }
+                        );
+                    }
+                    else {
+                        this.setState({
+                            ajaxResponse: data,
+                        });
+                    }
+
+                })
+        }
+    }
     deleteProduct() {
         let confirmed: boolean = window.confirm("Are you sure you want to delete this product?");
         if (confirmed) {
             let url = Constants.baseUrl + "/API/UserPanel/DeleteProduct";
             let dataToSend = {
-                propertyId: this.state.product.id,
+                productId: this.state.product.id,
             }
             fetch(url, {
                 method: "POST",
@@ -511,12 +648,12 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         var categoriesSelectionWindow;
         // #region categoriesSelectionWindow
         if (this.state.categoriesWindowVisible) {
-             const content = <ProductCategorySelectionPanel
+            const content = <ProductCategorySelectionPanel
                 categoryTree={this.state.categoryTree}
                 selectedCategories={this.state.selectedCategories}
                 onChange={this.onInfoinputChange}
-                onFinishedSelecting={this.finishedSelectingCategories}
-                onSaveClick={this.saveSelectedCategories}
+                onFinishedSelecting={this.onFinishedSelectingCategories}
+                onSaveClick={this.onSaveSelectedCategoriesClick}
                 inputName="selectedCategories"
             />
 

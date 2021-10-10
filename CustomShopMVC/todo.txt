@@ -1,7 +1,6 @@
 ﻿
 == EASY ==
-create user managment in admin panel
-
+fix custom properties value inputs not dissapearing on selectedCategories change in productEdit
 == FOCUS DEMANDING ==
 
 == TO DO ==
@@ -13,9 +12,11 @@ test globalInputComponents/InfoInputObjectList
 add tags
 add separate table for categoryProductChoosableProperty.itemsToChoose
 add frontEnd checks before sending http request to save
-write a proper model binder (ProductViewModel Dictionaries)
+write a proper jsonConverter/modelBinder (ProductViewModel Dictionaries)
 handle category inheritance when its moved in the tree
 implement proper async
+create react class that reflects back-end controllers for calling controller's methods
+
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,

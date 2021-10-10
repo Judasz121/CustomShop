@@ -36,7 +36,7 @@ interface CategoryTreeNode{
 export class ProductCategorySelectionPanel extends React.Component<ProductCategorySelectionPanelProps, ProductCategorySelectionPanelState> {
     constructor(props: ProductCategorySelectionPanelProps) {
         super(props);
-
+        console.log(this.props);
         this.state = {
             treeData: getTreeFromFlatData({
                 flatData: this.props.categoryTree.map(categoryItem => {
@@ -73,7 +73,9 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
 
     onSelectedCategoriesChange(e: React.ChangeEvent<HTMLInputElement>, hasChildSelected: boolean, categoriesIdToDeselect?: string[]) {
         var categoryId = e.target.value;
-        let resultData = this.props.selectedCategories.slice();
+        let resultData: string[] = [];
+        if(this.props.selectedCategories != null)
+            resultData = this.props.selectedCategories.slice();
 
         if (categoriesIdToDeselect != undefined)
             categoriesIdToDeselect.forEach(idItem => {
@@ -89,9 +91,9 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
             this.props.onChange(this.props.inputName, resultData)
         }
     }
-
     isCategorySelected(categoryId: string) {
-        return this.props.selectedCategories.filter((selCatItem => selCatItem == categoryId)).length > 0
+        if (this.props.selectedCategories != null)
+            return this.props.selectedCategories.filter((selCatItem => selCatItem == categoryId)).length > 0;
     }
     hasChildCategorySelected(categoryId: string) {
         var result = false;
@@ -113,63 +115,6 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
         }
         checkCategoryChildrenForSelection(categoryId);
         return result;
-    }
-    OLDupdateNodeParents(childId: string, childValue: boolean) {
-        let searchResult = find({
-            treeData: this.state.treeData,
-            getNodeKey: this.state.getNodeKeyFunction,
-            searchQuery: childId,
-            searchMethod: (data: SearchData) => {
-                if (data.node.id == data.searchQuery)
-                    return true;
-                else
-                    return false;
-            },
-        });
-        let child = searchResult.matches[0].node;
-
-        let parentExists = false;
-        if (child.parentId != Constants.emptyGuid)
-            parentExists = true;
-        var currNode = child;
-        var i = 0;
-        while (parentExists) {
-          //  console.log("first parent iteration: " + currNode.title);
-            let searchResult = find({
-                treeData: this.state.treeData,
-                getNodeKey: this.state.getNodeKeyFunction,
-                searchQuery: currNode.parentId,
-                searchMethod: (data: SearchData) => {
-                    console.log("searchMethod");
-                    console.log(data.treeIndex);
-                    if (data.node.id == data.searchQuery)
-                        return true;
-                    else
-                        return false;
-                },
-            });
-            currNode = searchResult.matches[0].node;
-            console.log("searchResult:");
-            console.log(searchResult.matches[0]);
-            this.setState(state => ({
-                treeData: changeNodeAtPath({
-                    treeData: state.treeData,
-                    path: searchResult.matches[0].path,
-                    getNodeKey: this.state.getNodeKeyFunction,
-                    newNode: {
-                        ...currNode,
-                        hasChildSelected: childValue,
-                        isSelected: childValue,
-                        expanded: true
-                    }
-                })
-            }), () => {
-               
-            })
-            if (currNode.parentId == Constants.emptyGuid)
-                parentExists = false;
-            i++;
-        }
     }
     updateNodeParents(childPath: string[] | number[], childValue: boolean) {
 
@@ -265,7 +210,6 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
                     onChange={(treeData) => this.setState({ treeData: treeData })}
                     generateNodeProps={({ node, path }) => this.generateTreeNodeProps({ node, path })}
                     canDrag={false}
-                    
                 />
             </div>
         );

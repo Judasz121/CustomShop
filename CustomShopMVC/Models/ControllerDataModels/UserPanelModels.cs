@@ -66,6 +66,7 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 	public class AddProductDataOut
     {
 		public bool Success { get; set; }
+		public string newProductId { get; set; }
 		public string FormError { get; set; }
 		public string NameError { get; set; }
     }
@@ -130,6 +131,15 @@ namespace CustomShopMVC.Models.ControllerDataModels.UserPanel
 		public string FormError { get; set; }
 		public List<CategoryProductChoosablePropertyViewModel> ChoosableProperties { get; set; }
 		public List<CategoryProductMeasurablePropertyViewModel> MeasurableProperties { get; set; }
+	}
+	public class GetNewProductCustomPropertiesDataIn
+	{
+		public List<string> SelectedCategories { get; set; }
+
+	}
+	public class GetNewProductCustomPropertiesDataOut : GetProductCustomPropertiesDataOut
+	{
+		
 	}
 	#endregion category product properties
 }

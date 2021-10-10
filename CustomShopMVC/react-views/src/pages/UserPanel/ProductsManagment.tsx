@@ -38,6 +38,7 @@ export default class ProductsManagmentPanel extends React.Component<ProductsMana
         };
         this.addProduct = this.addProduct.bind(this);
         this.onProductEditClick = this.onProductEditClick.bind(this);
+        this.deleteProduct = this.deleteProduct.bind(this);
     }
     componentDidMount() {
         let dataUrl = Constants.baseUrl + "/API/UserPanel/GetProducts"
@@ -55,7 +56,7 @@ export default class ProductsManagmentPanel extends React.Component<ProductsMana
 
     addProduct() {
         this.setState({
-            redirect: "./products/productEdit/categorySelection/new",
+            redirect: "./products/productEdit/new",
         })
     }
     onProductEditClick(id: string) {
@@ -77,20 +78,29 @@ export default class ProductsManagmentPanel extends React.Component<ProductsMana
         })
             .then((response) => { return response.json() })
             .then((data: ProductsManagmentPanelAjaxResponse) => {
-                if (data.success)
+                if (data.success) {
+                    
+                    let deletedProduct: IProduct = this.state.products.filter(productItem => {
+                        return productItem.id == id ? true : false;
+                    })[0];
+                    let newProducts = this.state.products.slice();
+                    newProducts.splice(this.state.products.indexOf(deletedProduct), 1)
+
                     this.setState({
                         ajaxResponse: data,
+                        products: newProducts,
                     }, () => {
                         setTimeout(() => {
                             this.setState({
                                 ajaxResponse: {
                                     ...this.state.ajaxResponse,
                                     formErrors: [],
-                                }
+                                },
                             })
                         });
                     }
-                    )
+                    );
+                }
                 else
                     this.setState({
                         ajaxResponse: data,

@@ -1,9 +1,11 @@
 ﻿using CustomShopMVC.Helpers;
+using CustomShopMVC.Helpers.JsonConverters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CustomShopMVC.Models.ViewModels
@@ -18,6 +20,7 @@ namespace CustomShopMVC.Models.ViewModels
 		public string Description { get; set; }
 		public string ThumbnailImagePath { get; set; }
 		public List<string> ImagesPath { get; set; }
+		[JsonConverter(typeof (IntConverter))]
 		public int Quantity { get; set; }
 
 		// key is the property.id ( not the propertyValue.id )
