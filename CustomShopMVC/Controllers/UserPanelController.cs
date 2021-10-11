@@ -534,8 +534,9 @@ namespace CustomShopMVC.Controllers
 						param = new DynamicParameters();
 						param.Add("@CategoryId", selectedCategoryIdItem);
 						param.Add("@ProductId", model.ProductId);
+						param.Add("@Id", Guid.NewGuid());
 
-						sql = "INSERT INTO [Categories_Products] VALUES(@ProductId, @CategoryId)";
+						sql = "INSERT INTO [Categories_Products] VALUES(@Id, @ProductId, @CategoryId)";
 						conn.Execute(sql, param);
 
 						#region parent categories properties
