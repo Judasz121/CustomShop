@@ -342,14 +342,17 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             this.getNewProductCustomProperties(selCat);
         else {
             this.saveSelectedCategories(selCat);
-            this.getProductCustomProperties();
         }
     }
     onFinishedSelectingCategories(selCat: string[]) {
         this.setState({
             categoriesWindowVisible: false,
         });
-        this.onSaveSelectedCategoriesClick(selCat);
+        if (this.state.product.id == "new")
+            this.getNewProductCustomProperties(selCat);
+        else {
+            this.saveSelectedCategories(selCat);
+        }
     }
     saveSelectedCategories(selCat?: string[]) {
         if (selCat == undefined || selCat == null)
@@ -375,7 +378,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                         formError: data.error,
                         success: data.success,
                     }
-                })
+                });
+                this.getProductCustomProperties();
             })
     }
     showCategoriesSelectionWindow(e: React.MouseEvent<HTMLButtonElement>) {

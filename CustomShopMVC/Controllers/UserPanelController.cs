@@ -589,33 +589,31 @@ namespace CustomShopMVC.Controllers
 						sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @Id";
 						Guid parentId = conn.ExecuteScalar<Guid>(sql, param);
 
-						while (parentId != Guid.Empty)
-						{
-							if (!newCategoriesParentsId.Any(id => id == parentId))
-							{
-								param = new DynamicParameters();
-								param.Add("@CategoryId", parentId);
-
-								sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [CategoryId] = @CategoryId";
-								conn.Execute(sql, param);
-
-								sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [CategoryId] = @CategoryId";
-								conn.Execute(sql, param);
-
-								sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @CategoryId";
-								parentId = conn.ExecuteScalar<Guid>(sql, param);
-							}
-						}
-						#endregion
-						if (!newCategoriesParentsId.Any(id => id == categoryIdItem))
-						{
+                        while (parentId != Guid.Empty)
+                        {
 							param = new DynamicParameters();
-							param.Add("@CategoryId", categoryIdItem);
-							param.Add("@ProductId", model.ProductId);
-							sql = "DELETE FROM [Categories_Products] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
-							conn.Execute(sql, param);
+							param.Add("@CategoryId", parentId);
+							if (!newCategoriesParentsId.Any(id => id == parentId) && !model.SelectedCategories.Any(id => id == parentId.ToString()))
+                            {
+                                sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [CategoryId] = @CategoryId";
+                                conn.Execute(sql, param);
 
+                                sql = "DELETE FROM [ProductMeasurablePropertiesValue] WHERE [CategoryId] = @CategoryId";
+                                conn.Execute(sql, param);
+                            }
+                            sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @CategoryId";
+                            parentId = conn.ExecuteScalar<Guid>(sql, param);
 
+                        }
+                        #endregion
+                        param = new DynamicParameters();
+						param.Add("@CategoryId", categoryIdItem);
+						param.Add("@ProductId", model.ProductId);
+						sql = "DELETE FROM [Categories_Products] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
+						conn.Execute(sql, param);
+
+						if (!newCategoriesParentsId.Any(id => id == categoryIdItem))
+						{ 
 							sql = "DELETE FROM [ProductChoosablePropertiesValue] WHERE [CategoryId] = @CategoryId AND [ProductId] = @ProductId";
 							conn.Execute(sql, param);
 
@@ -645,7 +643,6 @@ namespace CustomShopMVC.Controllers
 				string sql = "SELECT [CategoryId] FROM [Categories_Products] WHERE [ProductId] = @ProductId";
 				IEnumerable<Guid> productCategoriesId = conn.Query<Guid>(sql, param);
 
-
 				foreach (Guid categoryIdItem in productCategoriesId)
 				{
 					Guid currCatId = categoryIdItem;
@@ -665,7 +662,7 @@ namespace CustomShopMVC.Controllers
 						sql = "SELECT [ParentId] FROM [Categories] WHERE [Id] = @CategoryId";
 						currCatId = conn.ExecuteScalar<Guid>(sql, param);
 					}
-					while (currCatId != Guid.Empty);
+					while(currCatId != Guid.Empty);
 				}
 			}
 

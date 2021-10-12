@@ -204,7 +204,6 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
             <div style={{ height: 400 }}>
                 <button className="saveButton" onClick={() => { this.props.onFinishedSelecting(this.props.selectedCategories) }}>Save & Exit</button>
                 <button className="saveButton" onClick={() => { this.props.onSaveClick(this.props.selectedCategories) }}>Save</button>
-
                 <SortableTree
                     treeData={this.state.treeData}
                     onChange={(treeData) => this.setState({ treeData: treeData })}
