@@ -5,7 +5,7 @@ import style from '../../styles/userPanel.module.css';
 import globalStyle from '../../styles/global.module.css';
 import { IProduct } from '../../types/productTypes';
 import { Link, matchPath, Redirect } from 'react-router-dom';
-import { ProductEditCard, ProductHorizontalCard } from '../../components/globalComponents';
+import { ProductEditCard } from '../../components/productComponents';
 
 
 type ProductsManagmentPanelProps = {

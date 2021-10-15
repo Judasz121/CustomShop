@@ -11,7 +11,7 @@ import { IUser } from '../../../types/authTypes';
 import { StaticContext } from 'react-router';
 import { Location } from 'history';
 import { PopupWindow } from '../../../components/globalComponents';
-import { ProductCategorySelectionPanel } from './ProductCategorySelection';
+import { CategorySelectionPanel } from './../../../components/categoryComponents';
 import { ICategory } from '../../../types/categoryTypes';
 import { IChoosableProperty, IMeasurableProperty } from '../../../types/categoryPropertyTypes';
 
@@ -652,7 +652,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         var categoriesSelectionWindow;
         // #region categoriesSelectionWindow
         if (this.state.categoriesWindowVisible) {
-            const content = <ProductCategorySelectionPanel
+            const content = <CategorySelectionPanel
                 categoryTree={this.state.categoryTree}
                 selectedCategories={this.state.selectedCategories}
                 onChange={this.onInfoinputChange}
