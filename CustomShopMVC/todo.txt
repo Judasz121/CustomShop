@@ -14,7 +14,6 @@ add separate table for categoryProductChoosableProperty.itemsToChoose
 add frontEnd checks before sending http request to save
 write a proper jsonConverter/modelBinder (ProductViewModel Dictionaries)
 handle category inheritance when its moved in the tree
-implement proper async
 create react class that reflects back-end controllers for calling controller's methods
 
 == REQUIREMENTS ==

@@ -31,9 +31,7 @@ function App() {
                         <Route path="/adminPanel" component={AdminPanelPage} />
                         <Route path="/userPanel" component={UserPanelPage} />
 
-                        <Route path="/"  >
-                            <HomePage />
-                        </Route>
+                        <Route path="/" component={HomePage} />
                     </Switch>
 
                 </main>

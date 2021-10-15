@@ -3,10 +3,9 @@ import style from '../styles/userPanel.module.css';
 import { INavItem } from '../types/navTypes';
 import { match, Switch, Route } from 'react-router-dom';
 import { SubNavMenu } from '../components/navComponents';
-import AccountSettingsPanel from './UserPanel/AccountSettingsPanel';
+import AccountSettingsPanel from './UserPanel/AccountSettings';
 import ProductEditPanel  from './UserPanel/ProductsManagment/ProductEdit';
 import ProductsManagmentPanel from './UserPanel/ProductsManagment';
-import { ProductCategorySelectionPanel } from './UserPanel/ProductsManagment/ProductCategorySelection';
 
 type UserPanelPageProps = {
     match: match,
@@ -33,7 +32,6 @@ export default class UserPanelPage extends React.Component <UserPanelPageProps, 
                     <Route path={`${this.props.match.url}/settings`} >
                         <AccountSettingsPanel />
                     </Route>
-                    <Route path={`${this.props.match.url}/products/productEdit/categorySelection/:productId`} component={ProductCategorySelectionPanel} />
                     <Route path={`${this.props.match.url}/products/productEdit/:productId`} component={ProductEditPanel} />
                     <Route path={`${this.props.match.url}/products`} component={ProductsManagmentPanel} />
                 </Switch>

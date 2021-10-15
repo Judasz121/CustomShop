@@ -1,16 +1,17 @@
 ﻿import SortableTree, { addNodeUnderParent, removeNodeAtPath, getFlatDataFromTree, getTreeFromFlatData, changeNodeAtPath, TreeItem, GetNodeKeyFunction, getNodeAtPath, SearchData, find, TreeNode, NodeData } from 'react-sortable-tree';
 import React from 'react';
 import 'react-sortable-tree/style.css';
-import Constants from '../../../router/constants';
+import Constants from '../router/constants';
 import * as Icon from 'react-bootstrap-icons';
 import { Link, useRouteMatch, RouteComponentProps, Redirect } from 'react-router-dom';
 import globalStyle from "../../styles/global.module.css";
 import { StaticContext } from 'react-router';
-import { ICategory } from '../../../types/categoryTypes';
+import { ICategory } from '../types/categoryTypes';
 import { clearLine } from 'readline';
+import { HomeController } from '../router/HomeController';
 
-//interface ProductCategorySelectionPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { returnUrl: string }> {
-type ProductCategorySelectionPanelProps = {
+//#region CategorySelectionPanel
+type CategorySelectionPanelProps = {
     categoryTree: ICategory[],
     selectedCategories: string[],
     onChange: Function,
@@ -18,7 +19,7 @@ type ProductCategorySelectionPanelProps = {
     onFinishedSelecting: Function,
     onSaveClick: Function,
 }
-type ProductCategorySelectionPanelState = {
+type CategorySelectionPanelState = {
     treeData: TreeItem[],
     getNodeKeyFunction: GetNodeKeyFunction,
 }
@@ -31,10 +32,8 @@ interface CategoryTreeNode{
     isSelected: boolean,
 }
 
-
-
-export class ProductCategorySelectionPanel extends React.Component<ProductCategorySelectionPanelProps, ProductCategorySelectionPanelState> {
-    constructor(props: ProductCategorySelectionPanelProps) {
+export class CategorySelectionPanel extends React.Component<CategorySelectionPanelProps, CategorySelectionPanelState> {
+    constructor(props: CategorySelectionPanelProps) {
         super(props);
         console.log(this.props);
         this.state = {
@@ -215,5 +214,43 @@ export class ProductCategorySelectionPanel extends React.Component<ProductCatego
     }
 }
 
+// #endregion CategorySelectionPanel
 
+// #region SubcategoriesSelectionPanel
+
+type SubcategorySelectionPanelVerticalProps = {
+    parentCategoryId: string,
+    onSubcategoryChosen: Function,
+}
+
+type SubcategorySelectionPanelVerticalState = {
+
+}
+
+export class SubcategorySelectionPanelVertical extends React.Component<SubcategorySelectionPanelVerticalProps, SubcategorySelectionPanelVerticalState>{
+    constructor(props: SubcategorySelectionPanelVerticalProps) {
+        super(props);
+
+        this.onSubcategoryClick = this.onSubcategoryClick.bind(this);
+    }
+
+    onSubcategoryClick(categoryId: string) {
+        this.props.onSubcategoryChosen(this.onSubcategoryClick(categoryId));
+    }
+    componentWillMount() {
+        HomeController.GetCategoryChildren(this.props.parentCategoryId)
+    }
+
+    render() {
+
+
+        return (
+            <div className="SubCategoriesSelectionPanel">
+
+
+            </div>
+        )
+    }
+}
+// #endregion SubcategoriesSelectionPanel
 

@@ -87,7 +87,6 @@ namespace CustomShopMVC.Helpers
 				;
 			});
 		}
-
 		public static MapperConfiguration UserPanel()
 		{
 			return new MapperConfiguration((cfg) =>
@@ -148,6 +147,18 @@ namespace CustomShopMVC.Helpers
 				#endregion
 			});
 		}
+		public static MapperConfiguration Home()
+        {
+			return new MapperConfiguration(cfg =>
+			{
+				cfg.CreateMap<Category, CategoryViewModel>()
+					.ForMember(src => src.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(src => src.ParentId, opt => opt.MapFrom(src => src.ParentId.ToString()))
+				;
+
+
+			});
+        }
 	}
 	public class CategoryChoosablePropertyValueResolver : IValueResolver<CategoryProductChoosablePropertyViewModel, CategoryProductChoosableProperty, string>
 	{
