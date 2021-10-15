@@ -1,12 +1,13 @@
 ﻿import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../router/constants';
-import { TextInfoInput, CheckBoxInfoInput, InfoInputStringList } from '../../components/globalInputComponents';
 import style from "../../styles/adminPanel.module.css";
 import { IMeasurableProperty, IChoosableProperty, ICategoryProductProperty } from "../../types/categoryPropertyTypes";
 import { RouteComponentProps, useParams } from 'react-router-dom';
 import globalStyle from "../../styles/global.module.css";
 import * as Icon from 'react-bootstrap-icons';
+import { InfoInputStringList, TextInfoInput } from '../../components/inputComponents/Text';
+import { CheckBoxInfoInput } from '../../components/inputComponents/Boolean';
 
 interface CategoryPropertiesManagmentPanelProps extends RouteComponentProps<{ categoryId: string }> {
 

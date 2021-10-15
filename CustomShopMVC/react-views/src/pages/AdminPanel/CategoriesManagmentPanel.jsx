@@ -7,9 +7,6 @@ import { Link, useRouteMatch } from 'react-router-dom';
 import globalStyle from "../../styles/global.module.css";
 
 
-
-
-
 export class CategoriesManagmentPanel extends React.Component {
     constructor(props) {
         super(props);

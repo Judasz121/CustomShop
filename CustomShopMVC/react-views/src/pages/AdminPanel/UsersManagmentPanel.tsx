@@ -1,11 +1,11 @@
-﻿import SortableTree, { addNodeUnderParent, removeNodeAtPath, getFlatDataFromTree, getTreeFromFlatData, changeNodeAtPath } from 'react-sortable-tree';
-import React from 'react';
+﻿import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../router/constants';
 import { Router as BrowserRouter, Link, Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
-import { TextInfoInput, CheckBoxInfoInput } from '../../components/globalInputComponents';
 import { type } from 'os';
 import { IUser } from '../../types/authTypes';
+import { TextInfoInput } from '../../components/inputComponents/Text';
+import { CheckBoxInfoInput } from '../../components/inputComponents/Boolean';
 
 // #region typescripted categoriesManagmentComponents
 /*

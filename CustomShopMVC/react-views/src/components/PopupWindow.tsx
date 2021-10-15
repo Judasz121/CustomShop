@@ -1,9 +1,8 @@
 ﻿import React, { MouseEventHandler } from 'react';
 import style from '../styles/globalComponents.module.css';
 import * as Icon from 'react-bootstrap-icons';
-import { IProduct } from '../types/productTypes';
 
-//#region PopupWindow
+
 
 type PopupWindowProps = {
     onCloseClick: MouseEventHandler<HTMLButtonElement>,
@@ -25,19 +24,4 @@ export function PopupWindow(props: PopupWindowProps) {
     )
 }
 
-//#endregion 
-
-// #region ClickDropDown
-type ClickDropDownProps = {
-    clickContent: any,
-    dropDownContent: any,
-
-}
-export class ClickDropDown extends React.Component {
-
-}
-
-
-
-// #endregion ClickDropDown
 

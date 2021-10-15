@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { RegisterUserBox } from "../components/authComponents";
+import RegisterUserBox  from "../components/authorizationComponents/RegisterUserBox";
 
 class RegisterPage extends React.Component {
     render() {
@@ -8,18 +8,6 @@ class RegisterPage extends React.Component {
                 this is register page content
                 <RegisterUserBox/>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
         )
     }
 }

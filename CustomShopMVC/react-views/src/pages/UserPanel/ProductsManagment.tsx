@@ -1,11 +1,11 @@
 ﻿import React from 'react';
-import { CheckBoxSwitch, TextInfoInput } from '../../components/globalInputComponents';
+import { CheckBoxSwitch } from '../../components/inputComponents/Boolean';
 import Constants from '../../router/constants';
 import style from '../../styles/userPanel.module.css';
 import globalStyle from '../../styles/global.module.css';
 import { IProduct } from '../../types/productTypes';
 import { Link, matchPath, Redirect } from 'react-router-dom';
-import { ProductEditCard } from '../../components/productComponents';
+import { ProductEditCard } from '../../components/productComponents/ProductEditCard';
 
 
 type ProductsManagmentPanelProps = {

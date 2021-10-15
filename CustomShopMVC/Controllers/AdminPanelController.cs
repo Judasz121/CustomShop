@@ -230,7 +230,7 @@ namespace CustomShopMVC.Controllers
 							parentMeasurables.Add(parentProp);
 						}
 						
-						if (parentMeasurables != null);
+						if (parentMeasurables != null)
 							result.ParentsMeasurableProperties = result.ParentsMeasurableProperties.Concat(parentMeasurables).ToList();
 						#endregion measurables
 						param = new DynamicParameters();

@@ -2,7 +2,7 @@
 import style from '../styles/userPanel.module.css';
 import { INavItem } from '../types/navTypes';
 import { match, Switch, Route } from 'react-router-dom';
-import { SubNavMenu } from '../components/navComponents';
+import { SubNavMenu } from '../components/navigationComponents/SubNavMenu';
 import AccountSettingsPanel from './UserPanel/AccountSettings';
 import ProductEditPanel  from './UserPanel/ProductsManagment/ProductEdit';
 import ProductsManagmentPanel from './UserPanel/ProductsManagment';

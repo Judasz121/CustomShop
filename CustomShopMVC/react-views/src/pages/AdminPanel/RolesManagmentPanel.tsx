@@ -3,9 +3,9 @@ import React from 'react';
 import 'react-sortable-tree/style.css';
 import Constants from '../../router/constants';
 import { Router as BrowserRouter, Link, Switch, Route, useRouteMatch, useParams } from 'react-router-dom';
-import { TextInfoInput, CheckBoxInfoInput } from '../../components/globalInputComponents';
 import { type } from 'os';
 import { IRole } from '../../types/authTypes';
+import { TextInfoInput } from '../../components/inputComponents/Text';
 
 
 type RolesManagmentPanelProps = {

@@ -5,29 +5,52 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="react-views\src\components\authorizationComponents\EmailInput.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\LogInUserBox.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\PasswordInput.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\RegisterUserBox.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\RememberMeInput.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\UsernameInput.jsx" />
+    <None Remove="react-views\src\components\authorizationComponents\UsernameOrEmailInput.jsx" />
     <None Remove="react-views\src\components\categoriesManagmentComponents.jsx" />
     <None Remove="react-views\src\components\LogInPage.tsx" />
     <None Remove="react-views\src\pages\Register.tsx" />
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Remove="react-views\src\components\globalComponents.tsx" />
-    <TypeScriptCompile Remove="react-views\src\components\globalInputComponents.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\categoryComponents\CategorySelectionPanel.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\categoryComponents\SubcategorySelectionPanel.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\inputComponents\Boolean.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\inputComponents\ComplexObject.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\inputComponents\Image.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\inputComponents\Numeric.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\inputComponents\Text.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\PopupWindow.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\rolesManagmentComponents.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\usersManagmentComponents.tsx" />
-    <TypeScriptCompile Remove="react-views\src\pages\AdminPanel\CategoryPropertiesManagmentPanel.tsx" />
     <TypeScriptCompile Remove="react-views\src\pages\UserPanel\ProductsManagment\ProductCategorySelection.tsx" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="react-views\src\components\globalComponents.tsx" />
+    <Content Include="react-views\src\components\authorizationComponents\LogInUserBox.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\RememberMeInput.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\UsernameOrEmailInput.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\EmailInput.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\PasswordInput.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\UsernameInput.jsx" />
+    <Content Include="react-views\src\components\authorizationComponents\RegisterUserBox.jsx" />
+    <Content Include="react-views\src\components\categoryComponents\SubcategorySelectionPanel.tsx" />
+    <Content Include="react-views\src\components\categoryComponents\CategorySelectionPanel.tsx" />
+    <Content Include="react-views\src\components\inputComponents\Boolean.tsx" />
+    <Content Include="react-views\src\components\inputComponents\ComplexObject.tsx" />
+    <Content Include="react-views\src\components\inputComponents\Image.tsx" />
+    <Content Include="react-views\src\components\inputComponents\Numeric.tsx" />
+    <Content Include="react-views\src\components\inputComponents\Text.tsx" />
+    <Content Include="react-views\src\components\PopupWindow.tsx" />
     <Content Include="react-views\src\pages\AdminPanel\CategoriesManagmentPanel.jsx" />
     <Content Include="react-views\src\pages\AdminPanel\RolesManagmentPanel.tsx" />
     <Content Include="react-views\src\pages\AdminPanel\CategoryPropertiesManagmentPanel.tsx" />
     <Content Include="react-views\src\pages\AdminPanel\UsersManagmentPanel.tsx" />
-    <Content Include="react-views\src\components\authComponents.jsx" />
-    <Content Include="react-views\src\components\globalInputComponents.tsx" />
-    <Content Include="react-views\src\components\categoryComponents.tsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,10 +70,6 @@
     </PackageReference>
     <PackageReference Include="React.AspNet" Version="5.2.11" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="react-views\src\components\globalInputComponents.tsx" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,10 @@
 ﻿import React from 'react';
-import $ from 'jquery';
-import Constants from "../router/constants"
-import style from "../styles/auth.module.css";
+import Constants from "../../router/constants"
+import style from "../../styles/auth.module.css";
 
 
 
-export class RegisterUserBox extends React.Component {
+export default class RegisterUserBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

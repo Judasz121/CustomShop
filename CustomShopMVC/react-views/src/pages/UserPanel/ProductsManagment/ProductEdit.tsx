@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import { CheckBoxSwitch, ImageInfoInput, ImagesInput, NumberInfoInput, TextAreaInfoInput, TextInfoInput } from '../../../components/globalInputComponents';
 import Constants from '../../../router/constants';
 import style from '../../styles/userPanel.module.css';
 import globalStyle from '../../styles/global.module.css';
@@ -10,10 +9,13 @@ import ReactSelect from 'react-select';
 import { IUser } from '../../../types/authTypes';
 import { StaticContext } from 'react-router';
 import { Location } from 'history';
-import { PopupWindow } from '../../../components/globalComponents';
-import { CategorySelectionPanel } from './../../../components/categoryComponents';
+import { PopupWindow } from '../../../components/PopupWindow';
+import { CategoriesSelectionPanel } from './../../../components/categoryComponents/CategorySelectionPanel';
 import { ICategory } from '../../../types/categoryTypes';
 import { IChoosableProperty, IMeasurableProperty } from '../../../types/categoryPropertyTypes';
+import { TextAreaInfoInput, TextInfoInput } from '../../../components/inputComponents/Text';
+import { NumberInfoInput } from '../../../components/inputComponents/Numeric';
+import { ImageInfoInput, ImagesInput } from '../../../components/inputComponents/Image';
 
 interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { selectedCategories: string[] } >{
 
@@ -652,7 +654,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         var categoriesSelectionWindow;
         // #region categoriesSelectionWindow
         if (this.state.categoriesWindowVisible) {
-            const content = <CategorySelectionPanel
+            const content = <CategoriesSelectionPanel
                 categoryTree={this.state.categoryTree}
                 selectedCategories={this.state.selectedCategories}
                 onChange={this.onInfoinputChange}

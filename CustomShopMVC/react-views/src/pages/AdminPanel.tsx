@@ -4,7 +4,7 @@ import { Route, Switch, BrowserRouter as Router, useRouteMatch, useParams, match
 import { CategoriesManagmentPanel } from "./AdminPanel/CategoriesManagmentPanel";
 import { UsersManagmentPanel } from "./AdminPanel/UsersManagmentPanel";
 import { RolesManagmentPanel } from "./AdminPanel/RolesManagmentPanel";
-import { SubNavMenu } from "../components/navComponents";
+import { SubNavMenu } from "../components/navigationComponents/SubNavMenu";
 import Constants from "../router/constants";
 import { INavItem } from "../types/navTypes";
 import { useHistory, useLocation } from 'react-router';

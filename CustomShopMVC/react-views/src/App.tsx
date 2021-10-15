@@ -2,7 +2,7 @@
 import logo from './logo.svg';
 import './App.css';
 import AppRouter from "./router";
-import MainUpperNavbar from "./components/navComponents";
+import MainUpperNavbar from "./components/navigationComponents/MainUpperNavbar";
 import HomePage from "./pages/Home";
 import LogInPage from "./pages/LogIn";
 import RegisterPage from "./pages/Register";
