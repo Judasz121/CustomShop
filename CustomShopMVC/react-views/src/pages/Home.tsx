@@ -45,7 +45,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
                     onSubcategoryChosen={this.onNewSubcategoryChosen}
                 />
                 <ProductFilterVertical onChange={this.onFilterQueryChange} categoriesId={ this.state.currCategoriesId } />
-                <ProductList filterQuery={this.state.productFilterQuery} />
+                <ProductList filterQuery={this.state.productFilterQuery} categoriesId={this.state.currCategoriesId}  />
             </div>
         )
     }

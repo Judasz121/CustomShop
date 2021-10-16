@@ -229,6 +229,7 @@ namespace CustomShopMVC.Controllers
             param.Add("@Description", model.Product.Description);
 
             param.Add("@Quantity", model.Product.Quantity);
+			param.Add("@Price", model.Product.Price);
             using (IDbConnection conn = _dataAccess.GetDbConnection())
             {
                 sql = "SELECT COUNT(*) FROM [Products] WHERE [Id] != @Id AND [Name] = @Name";
@@ -241,7 +242,7 @@ namespace CustomShopMVC.Controllers
                 }
 
 
-                sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [Quantity] = @Quantity";
+                sql = "UPDATE [Products] SET [AuthorId] = @AuthorId, [OwnerId] = @OwnerId, [Name] = @Name, [Description] = @Description, [Quantity] = @Quantity, [Price] = @Price";
                 conn.Execute(sql, param);
 
                 #region product properties value
@@ -322,6 +323,7 @@ namespace CustomShopMVC.Controllers
             param.Add("@Description", model.Product.Description);
 			param.Add("@ThumbnailImagePath", "");
             param.Add("@Quantity", model.Product.Quantity);
+			param.Add("@Price", model.Product.Price);
             using (IDbConnection conn = _dataAccess.GetDbConnection())
             {
                 #region product name check
@@ -335,7 +337,7 @@ namespace CustomShopMVC.Controllers
                 }
                 #endregion
 
-                sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @Quantity)";
+                sql = "INSERT INTO [Products] VALUES(@Id, @AuthorId, @OwnerId, @Name, @Description, @ThumbnailImagePath, @Quantity, @Price)";
                 conn.Execute(sql, param);
 
                 #region custom properties value 

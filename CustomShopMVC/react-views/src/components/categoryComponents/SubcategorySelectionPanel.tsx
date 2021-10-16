@@ -3,6 +3,7 @@ import 'react-sortable-tree/style.css';
 import { HomeController } from '../../router/HomeController';
 
 
+
 type SubcategorySelectionPanelVerticalProps = {
     parentCategoryId: string,
     onSubcategoryChosen: Function,
@@ -11,6 +12,8 @@ type SubcategorySelectionPanelVerticalProps = {
 type SubcategorySelectionPanelVerticalState = {
 
 }
+
+//#region vertical
 
 export class SubcategorySelectionPanelVertical extends React.Component<SubcategorySelectionPanelVerticalProps, SubcategorySelectionPanelVerticalState>{
     constructor(props: SubcategorySelectionPanelVerticalProps) {
@@ -38,3 +41,4 @@ export class SubcategorySelectionPanelVertical extends React.Component<Subcatego
     }
 }
 
+// #endregion vertical

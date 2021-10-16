@@ -65,7 +65,20 @@ export class HomeController {
 
     public static GetMaxProductPriceInCategories(categoriesId: string[]): GetMaxProductPriceInCategoriesResult {
         let url = this.controllerUrl + "/GetMaxProductPriceInCategories";
+        let dataToSend = {
+            categoriesId: categoriesId,
+        };
+        let result = fetch(url, {
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+        })
+            .then(response => response.json())
 
+        console.log("fetch result:");
+        console.log(result);
         return {} as GetMaxProductPriceInCategoriesResult;
     }
 

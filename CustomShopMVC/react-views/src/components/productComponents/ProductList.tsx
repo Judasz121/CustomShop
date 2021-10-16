@@ -9,7 +9,7 @@ import { GetCategoriesCustomPropertiesResult, HomeController } from "../../route
 
 interface ProductListProps {
     filterQuery: Record<string, string>,
-
+    categoriesId: string[],
 }
 
 type ProductListState = {

@@ -9,6 +9,7 @@ export interface IProduct {
     thumbnailImagePath: string,
     imagesPath: string[],
     quantity: number,
+    price: number,
     // property key is an id of a property object ( not the id of a propertyValue object)
     choosablePropertiesValue: Record<string, string>,
     measurablePropertiesValue: Record<string, number>,

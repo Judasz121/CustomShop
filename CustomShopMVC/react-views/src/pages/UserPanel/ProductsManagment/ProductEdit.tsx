@@ -744,6 +744,15 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             inputName="quantity"
                         />
                     </div>
+                    <div className="inputGroup">
+                        <span>Price</span>
+                        <NumberInfoInput
+                            value={this.state.product.price}
+                            onChange={this.onInfoinputChange}
+                            editingEnabled={this.state.editingEnabled}
+                            inputName="price"
+                        />
+                    </div>
                     <div className="Properties">
                         <h3>Choosable Properties</h3>
                         <hr />

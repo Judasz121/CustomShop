@@ -16,6 +16,7 @@ export function ProductHorizontalCard(props: ProductHorizontalCardProps) {
             <img className="thumbnail" src={props.product.thumbnailImagePath} />
             <div className="content" >
                 <h1>{props.product.name}</h1>
+                <span className="price">{props.product.price}</span>
                 <span className="description">{props.product.description}</span>
             </div>
         </div>

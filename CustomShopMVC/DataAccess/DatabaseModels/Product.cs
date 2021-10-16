@@ -13,6 +13,7 @@ namespace CustomShopMVC.DataAccess.DatabaseModels
 		public string Description { get; set; }
 		public string ThumbnailImagePath { get; set; }
 		public int Quantity { get; set; }
+		public float Price { get; set; }
 
 		#region relations
 		public ICollection<ProductImage> Images { get; set; }

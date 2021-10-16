@@ -22,6 +22,7 @@ namespace CustomShopMVC.Models.ViewModels
 		public List<string> ImagesPath { get; set; }
 		[JsonConverter(typeof (IntConverter))]
 		public int Quantity { get; set; }
+		public float Price { get; set; }
 
 		// key is the property.id ( not the propertyValue.id )
 		public dynamic ChoosablePropertiesValue { get; set; }
