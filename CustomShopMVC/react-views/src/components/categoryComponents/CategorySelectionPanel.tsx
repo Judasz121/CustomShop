@@ -29,7 +29,7 @@ interface CategoryTreeNode{
 export class CategoriesSelectionPanel extends React.Component<CategoriesSelectionPanelProps, CategoriesSelectionPanelState> {
     constructor(props: CategoriesSelectionPanelProps) {
         super(props);
-        console.log(this.props);
+
         this.state = {
             treeData: getTreeFromFlatData({
                 flatData: this.props.categoryTree.map(categoryItem => {

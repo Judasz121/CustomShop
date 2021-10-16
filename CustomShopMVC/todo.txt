@@ -15,7 +15,7 @@ add frontEnd checks before sending http request to save
 write a proper jsonConverter/modelBinder (ProductViewModel Dictionaries)
 handle category inheritance when its moved in the tree
 create react class that reflects back-end controllers for calling controller's methods
-
+implement errorViewModel instead of string[] or string as error 
 == REQUIREMENTS ==
 
 1. standard shop functionallity: payments, user accounts, various user account types, discounts, product managment,

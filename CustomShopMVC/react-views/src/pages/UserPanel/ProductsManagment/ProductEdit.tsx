@@ -16,6 +16,7 @@ import { IChoosableProperty, IMeasurableProperty } from '../../../types/category
 import { TextAreaInfoInput, TextInfoInput } from '../../../components/inputComponents/Text';
 import { NumberInfoInput } from '../../../components/inputComponents/Numeric';
 import { ImageInfoInput, ImagesInput } from '../../../components/inputComponents/Image';
+import { IError } from '../../../types/errorTypes';
 
 interface ProductEditPanelProps extends RouteComponentProps<{ productId: string }, StaticContext, { selectedCategories: string[] } >{
 
@@ -43,9 +44,8 @@ type ProductEditPanelState = {
 }
 type AjaxSaveResponse = {
     success: boolean,
-    formError: string,
+    errors: IError[],
     newId: string,
-    nameError: string,
 }
 
 type ReactSelectItem = { label: string, value: string, }
@@ -54,10 +54,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     constructor(props: ProductEditPanelProps) {
         super(props);
 
-        if ( this.props.location.state != undefined) {
-            console.log(this.props.location.state);
-        }
-
         let showCategoriesWindow: boolean = false;
         if (this.props.match.params.productId == "new")
             showCategoriesWindow = true;
@@ -65,9 +61,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         this.state = {
             ajaxResponse: {
                 success: false,
-                formError: "",
+                errors: [],
                 newId: "",
-                nameError: "",
             },
             
             product: {
@@ -153,7 +148,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formError: data.formError,
+                            errors: data.errors,
                         },
 
                     })
@@ -208,7 +203,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formError: data.error,
+                            errors: data.errors,
                         }
                     });
                 }
@@ -259,7 +254,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formError: data.formError,
+                            errors: data.errors,
                         }
                     })
             })
@@ -288,7 +283,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formError: data.formError,
+                            errors: data.errors,
                         }
                     })
             })
@@ -377,7 +372,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 this.setState({
                     ajaxResponse: {
                         ...this.state.ajaxResponse,
-                        formError: data.error,
+                        errors: data.errors,
                         success: data.success,
                     }
                 });
@@ -401,7 +396,6 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
             this.addNewProduct();
         else
             this.saveProduct();
-        this.saveProductImages();
     }
     saveProductImages() {
         var dataToSend: FormData = new FormData();
@@ -439,7 +433,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                     this.setState({
                         ajaxResponse: {
                             ...this.state.ajaxResponse,
-                            formError: data.formError,
+                            errors: this.state.ajaxResponse.errors.concat(data.errors),
                         }
                     })
                 })
@@ -448,22 +442,26 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     saveProduct() {
         // #region data checks
         let ok = true;
-        let nameError = "";
-        let formError = "";
+        let errors: IError[] = [];
         if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
             ok = false;
-            nameError += "Name cannot be empty.";
+            errors.push({
+                fieldName: "name",
+                message: "Name cannot be empty.",
+            });
         }
         if (this.state.product.ownerId == undefined || this.state.product.ownerId == null || this.state.product.ownerId == "") {
             ok = false;
-            formError += "The product has to have an Owner.";
+            errors.push({
+                fieldName: "name",
+                message: "The product has to have an Owner."
+            })
         }
         if (!ok)
             this.setState({
                 ajaxResponse: {
                     ...this.state.ajaxResponse,
-                    formError: formError,
-                    nameError: nameError,
+                    errors: errors,
                 }
             });
         // #endregion data checks
@@ -482,6 +480,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 .then((response) => response.json())
                 .then((data: AjaxSaveResponse) => {
                     if (data.success && data.newId != null && data.newId.length > 0) {
+                        this.saveProductImages();
+
                         this.setState({
                             product: {
                                 ...this.state.product,
@@ -493,8 +493,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formError: "",
-                                        nameError: "",
+                                        errors: [],
                                     }
                                 });
                             }, 8000)
@@ -502,6 +501,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
                     }
                     else if (data.success) {
+                        this.saveProductImages();
+
                         this.setState({
                             ajaxResponse: data,
                         }, () => {
@@ -509,8 +510,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formError: "",
-                                        nameError: "",
+                                        errors: [],
                                     },
                                 });
                             }, 8000);
@@ -528,23 +528,34 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
     }
     addNewProduct() {
         // #region data checks
-        let ok = true;
-        let nameError = "";
-        let formError = "";
+        var ok = true;
+        var errors: IError[] = [];
         if (this.state.product.name == undefined || this.state.product.name == null || this.state.product.name == "") {
             ok = false;
-            nameError += "Name cannot be empty.";
+            errors.push({
+                fieldName: "name",
+                message: "Name cannot be empty."
+            });
         }
         if (this.state.product.ownerId == undefined || this.state.product.ownerId == null || this.state.product.ownerId == "") {
             ok = false;
-            formError += "The product has to have an Owner.";
+            errors.push({
+                fieldName: "owner",
+                message: "The prodct has to have an Owner."
+            });
+        }
+        if (this.state.product.price == undefined || this.state.product.price == null) {
+            ok = false;
+            errors.push({
+                fieldName: "price",
+                message: "Price cannot be empty."
+            })
         }
         if (!ok)
             this.setState({
                 ajaxResponse: {
                     ...this.state.ajaxResponse,
-                    formError: formError,
-                    nameError: nameError,
+                    errors: errors
                 }
             });
         // #endregion data checks
@@ -563,6 +574,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                 .then((response) => response.json())
                 .then((data: AjaxSaveResponse) => {
                     if (data.success && data.newId != null && data.newId.length > 0) {
+                        this.saveProductImages();
                         this.setState({
                             product: {
                                 ...this.state.product,
@@ -575,8 +587,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formError: "",
-                                        nameError: "",
+                                        errors: [],
                                     }
                                 });
                             }, 8000)
@@ -584,6 +595,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
                     }
                     else if (data.success) {
+                        this.saveProductImages();
+
                         this.setState({
                             ajaxResponse: data,
                         }, () => {
@@ -591,8 +604,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                                 this.setState({
                                     ajaxResponse: {
                                         ...this.state.ajaxResponse,
-                                        formError: "",
-                                        nameError: "",
+                                        errors: [],
                                     },
                                 });
                             }, 8000);
@@ -675,6 +687,19 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
         else
             categoriesSelectionWindow = '';
         //#endregion categoriesSelectionWindow
+        //#region errors
+        var priceErrors = "", nameErrors = "", formErrors = "";
+
+        this.state.ajaxResponse.errors.forEach((errorItem) => {
+            if (errorItem.fieldName == "price")
+                priceErrors += errorItem.message + "\n";
+            else if (errorItem.fieldName == "name")
+                nameErrors += errorItem.message + "\n";
+            else
+                formErrors += errorItem.message + "\n";
+        })
+   
+        //#endregion errors
         return (
             <div className={`ProductPanel-${this.state.product.id}`} >
                 {redirectElement}
@@ -689,7 +714,7 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             placeholderValue="name"
                         />
                         <span className="error">
-                            {this.state.ajaxResponse.nameError}
+                            {nameErrors}
                         </span>
                     </h1>
                 </div>
@@ -752,6 +777,9 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
                             editingEnabled={this.state.editingEnabled}
                             inputName="price"
                         />
+                        <div className="error">
+                            {priceErrors}
+                        </div>
                     </div>
                     <div className="Properties">
                         <h3>Choosable Properties</h3>
@@ -810,8 +838,8 @@ export default class ProductEditPanel extends React.Component<ProductEditPanelPr
 
                     </div>
                 </div>
-                <div className="formError">
-                    {this.state.ajaxResponse.formError}
+                <div className="errors">
+                    {formErrors}
                 </div>
                 <div className="buttonGroup">
                     <button className="" onClick={this.showCategoriesSelectionWindow} >Change Categories</button>
