@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Remove="react-views\src\components\categoryComponents\CategorySelectionPanel.tsx" />
+    <TypeScriptCompile Remove="react-views\src\components\categoryComponents\CategoriesInheritedSelectionPanel.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\categoryComponents\SubcategorySelectionPanel.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\inputComponents\Boolean.tsx" />
     <TypeScriptCompile Remove="react-views\src\components\inputComponents\ComplexObject.tsx" />
@@ -40,7 +40,7 @@
     <Content Include="react-views\src\components\authorizationComponents\UsernameInput.jsx" />
     <Content Include="react-views\src\components\authorizationComponents\RegisterUserBox.jsx" />
     <Content Include="react-views\src\components\categoryComponents\SubcategorySelectionPanel.tsx" />
-    <Content Include="react-views\src\components\categoryComponents\CategorySelectionPanel.tsx" />
+    <Content Include="react-views\src\components\categoryComponents\CategoriesInheritedSelectionPanel.tsx" />
     <Content Include="react-views\src\components\inputComponents\Boolean.tsx" />
     <Content Include="react-views\src\components\inputComponents\ComplexObject.tsx" />
     <Content Include="react-views\src\components\inputComponents\Image.tsx" />

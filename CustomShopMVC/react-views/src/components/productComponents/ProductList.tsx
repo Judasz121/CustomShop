@@ -3,6 +3,7 @@ import { IChoosableProperty, IMeasurableProperty } from "../../types/categoryPro
 import { IProduct } from "../../types/productTypes";
 import * as Icon from 'react-bootstrap-icons';
 import { GetCategoriesCustomPropertiesResult, HomeController } from "../../router/HomeController";
+import { IError } from "../../types/errorTypes";
 
 
 
@@ -16,6 +17,9 @@ type ProductListState = {
     allProducts: IProduct[],
     filteredProducts: IProduct[],
     sortQuery: Record<string, string>,
+    ajaxResult: {
+        formErrors: IError[],
+    }
 }
 
 export class ProductList extends React.Component<ProductListProps, ProductListState>{
@@ -32,7 +36,10 @@ export class ProductList extends React.Component<ProductListProps, ProductListSt
     }
 
     downloadProducts() {
-
+        let result = HomeController.GetAllProducts();
+        this.setState({
+            allProducts: result.products,
+        })
     }
     filterProducts(filterQuery: Record<string, string>) {
         if (filterQuery == null || filterQuery == undefined)

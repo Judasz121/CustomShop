@@ -28,4 +28,11 @@ namespace CustomShopMVC.Models.ControllerDataModels
         public List<CategoryViewModel> Children { get; set; }
         public List<string> FormErrors { get; set; }
     }
+
+    public class GetAllProductsDataOut
+    {
+        public bool Success { get; set; }
+        public List<ErrorViewModel> FormErrors { get; set; }
+        public List<ProductViewModel> Products { get; set; }
+    }
 }

@@ -1,7 +1,11 @@
 ﻿import { Controller } from "react-bootstrap-icons";
 import { IChoosableProperty, IMeasurableProperty } from "../types/categoryPropertyTypes";
 import { ICategory } from "../types/categoryTypes";
+import { IError } from "../types/errorTypes";
+import { IProduct } from "../types/productTypes";
 import Constants from "./constants";
+
+
 
 export type GetCategoryChildrenResult = {
     success: boolean,
@@ -20,6 +24,12 @@ export type GetMaxProductPriceInCategoriesResult = {
     succes: boolean,
     formErrors: string[],
     maxPrice: number,
+}
+
+export type GetAllProductsResult = {
+    succcess: boolean,
+    formErrors: IError[],
+    products: IProduct[],
 }
 
 export class HomeController {
@@ -80,6 +90,11 @@ export class HomeController {
         console.log("fetch result:");
         console.log(result);
         return {} as GetMaxProductPriceInCategoriesResult;
+    }
+
+    public static GetAllProducts(): GetAllProductsResult {
+
+        return {} as GetAllProductsResult;
     }
 
 }

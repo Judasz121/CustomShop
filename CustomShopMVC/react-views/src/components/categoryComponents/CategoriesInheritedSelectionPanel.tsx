@@ -5,7 +5,7 @@ import { ICategory } from '../../types/categoryTypes';
 import { HomeController } from '../../router/HomeController';
 
 
-type CategoriesSelectionPanelProps = {
+type CategoriesIheritedSelectionPanelProps = {
     categoryTree: ICategory[],
     selectedCategories: string[],
     onChange: Function,
@@ -13,7 +13,7 @@ type CategoriesSelectionPanelProps = {
     onFinishedSelecting: Function,
     onSaveClick: Function,
 }
-type CategoriesSelectionPanelState = {
+type CategoriesIheritedSelectionPanelState = {
     treeData: TreeItem[],
     getNodeKeyFunction: GetNodeKeyFunction,
 }
@@ -26,8 +26,8 @@ interface CategoryTreeNode{
     isSelected: boolean,
 }
 
-export class CategoriesSelectionPanel extends React.Component<CategoriesSelectionPanelProps, CategoriesSelectionPanelState> {
-    constructor(props: CategoriesSelectionPanelProps) {
+export class CategoriesIheritedSelectionPanel extends React.Component<CategoriesIheritedSelectionPanelProps, CategoriesIheritedSelectionPanelState> {
+    constructor(props: CategoriesIheritedSelectionPanelProps) {
         super(props);
 
         this.state = {

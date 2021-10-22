@@ -155,7 +155,11 @@ namespace CustomShopMVC.Helpers
 					.ForMember(src => src.Id, opt => opt.MapFrom(src => src.Id.ToString()))
 					.ForMember(src => src.ParentId, opt => opt.MapFrom(src => src.ParentId.ToString()))
 				;
-
+				cfg.CreateMap<Product, ProductViewModel>()
+					.ForMember(src => src.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+					.ForMember(src => src.OwnerId, opt => opt.MapFrom(src => src.OwnerId.ToString()))
+					.ForMember(src => src.AuthorId, opt => opt.MapFrom(src => src.AuthorId.ToString()))
+				;
 
 			});
         }

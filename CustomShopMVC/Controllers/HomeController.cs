@@ -73,6 +73,8 @@ namespace CustomShopMVC.Controllers
 			return result;
         }
 
+        [HttpPost]
+        [Route("[action]")]
         public async Task<ActionResult<GetCategoryChildrenDataOut>> GetCategoryChildren(GetCategoryChildrenDataIn model)
         {
             var result = new GetCategoryChildrenDataOut();
@@ -88,6 +90,23 @@ namespace CustomShopMVC.Controllers
                 string sql = "SELECT * FROM [Categories] WHERE [ParentId] = @ParentId";
                 IEnumerable<Category> dbCategories = conn.Query<Category>(sql, param);
                 result.Children = mapper.Map<IEnumerable<Category>, IEnumerable<CategoryViewModel>>(dbCategories).ToList();
+            }
+
+            result.Success = true;
+            return result;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<ActionResult<GetAllProductsDataOut>> GetAllProducts()
+        {
+            var result = new GetAllProductsDataOut();
+            IMapper mapper = AutoMapperConfigs.Home().CreateMapper();
+            using (IDbConnection conn = _databaseAccess.GetDbConnection())
+            {
+                string sql = "SELECT * FROM [Products]";
+                IEnumerable<Product> dbProducts = conn.Query<Product>(sql);
+                result.Products = mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewModel>>(dbProducts).ToList();
             }
 
             result.Success = true;
