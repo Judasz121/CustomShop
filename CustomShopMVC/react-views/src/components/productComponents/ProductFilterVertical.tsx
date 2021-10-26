@@ -42,8 +42,8 @@ export class ProductFilterVertical extends React.Component<ProductFilterVertical
     downloadMaxPrice() {
         HomeController.GetMaxProductPriceInCategories(this.props.categoriesId);
     }
-    downloadCustomProductProperties() {
-        let result: GetCategoriesCustomPropertiesResult = HomeController.GetCategoriesCustomProperties(this.props.categoriesId);
+    async downloadCustomProductProperties() {
+        let result: GetCategoriesCustomPropertiesResult = await HomeController.GetCategoriesCustomProperties(this.props.categoriesId);
         if (result.success)
             this.setState({
                 measurableProperties: result.measurableProperties,
@@ -52,7 +52,7 @@ export class ProductFilterVertical extends React.Component<ProductFilterVertical
         else
             this.setState({
                 ajaxResult: {
-                    formErrors: result.formErrors,
+                    formErrors: result.errors,
                 }
             })
     }

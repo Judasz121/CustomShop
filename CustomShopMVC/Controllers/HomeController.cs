@@ -98,6 +98,22 @@ namespace CustomShopMVC.Controllers
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<ActionResult<GetAllCategoriesDataOut>> GetAllCategories()
+        {
+            var result = new GetAllCategoriesDataOut();
+            IMapper mapper = AutoMapperConfigs.Home().CreateMapper();
+
+            using (IDbConnection conn = _databaseAccess.GetDbConnection())
+            {
+                string sql = "SELECT * FROM [Categories]";
+                result.Categories = mapper.Map<IEnumerable<Category>, IEnumerable<CategoryViewModel>>(conn.Query<Category>(sql)).ToList();
+            }
+            result.Success = true;
+            return result;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         public async Task<ActionResult<GetAllProductsDataOut>> GetAllProducts()
         {
             var result = new GetAllProductsDataOut();
@@ -109,6 +125,28 @@ namespace CustomShopMVC.Controllers
                 result.Products = mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewModel>>(dbProducts).ToList();
             }
 
+            result.Success = true;
+            return result;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<ActionResult<GetMaxProductPriceInCategoriesDataOut>> GetMaxProductPriceInCategories(GetMaxProductPriceInCategoriesDataIn model)
+        {
+            var result = new GetMaxProductPriceInCategoriesDataOut();
+            using (IDbConnection conn = _databaseAccess.GetDbConnection())
+            {
+                var param = new DynamicParameters();            
+                string sql = "EXEC [GetMaxProductsPriceInCategory] @CategoryId";
+
+                foreach(string categoryIdItem in model.CategoriesId)
+                {
+                    param.Add("@CategoryId", categoryIdItem);
+                    int price = conn.ExecuteScalar<int>(sql, param);
+                    if (result.MaxPrice < price)
+                        result.MaxPrice = price;                 
+                }
+            }
             result.Success = true;
             return result;
         }

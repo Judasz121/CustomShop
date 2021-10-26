@@ -9,57 +9,73 @@ import Constants from "./constants";
 
 export type GetCategoryChildrenResult = {
     success: boolean,
-    children: ICategory[],
-    formErrors: string[],
+    childrenCategories: ICategory[],
+    errors: IError[],
 }
 
 export type GetCategoriesCustomPropertiesResult = {
     success: boolean,
-    formErrors: string[],
+    errors: string[],
     choosableProperties: IChoosableProperty[],
     measurableProperties: IMeasurableProperty[],
 }
 
-export type GetMaxProductPriceInCategoriesResult = {
-    succes: boolean,
-    formErrors: string[],
+export interface GetMaxProductPriceInCategoriesResult {
+    success: boolean,
+    errors: string[],
     maxPrice: number,
 }
 
 export type GetAllProductsResult = {
-    succcess: boolean,
-    formErrors: IError[],
+    success: boolean,
+    errors: IError[],
     products: IProduct[],
+}
+
+export type GetAllCategoriesResult = {
+    success: boolean,
+    errors: IError[],
+    categories: ICategory[],
 }
 
 export class HomeController {
     private static controllerUrl = Constants.baseUrl + "/API/Home";
 
-    public static GetCategoriesCustomProperties(categoriesId: string[]): GetCategoriesCustomPropertiesResult {
+    public static async GetAllCategories(): Promise<GetAllCategoriesResult> {
+        let url = this.controllerUrl + "/GetAllCategories";
+        return await fetch(url, {
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json",
+            },
+        })
+            .then(response => response.json())
+    }
+
+    public static async GetCategoriesCustomProperties(categoriesId: string[]): Promise<GetCategoriesCustomPropertiesResult> {
         let url = this.controllerUrl + "/GetCategoriesCustomProperties";
+        let result = {} as GetCategoriesCustomPropertiesResult;
         let dataToSend = {
             categoriesId: categoriesId,
         }
-        let result = fetch(url, {
+        return await fetch(url, {
             "method": "POST",
             "headers": {
                 "content-type": "application/json",
             },
             body: JSON.stringify(dataToSend),
         })
-            .then(response => response.json)
-
-        console.log("fetch result");
-        console.log(result);
-        return {} as GetCategoriesCustomPropertiesResult;
+            .then(response => response.json())
+            ;
     }
 
-    public static GetCategoryChildren(categoryId: string): GetCategoryChildrenResult {
+    public static async GetCategoryChildren(categoryId: string): Promise<GetCategoryChildrenResult> {
         let url = this.controllerUrl + "/GetCategoryChildren";
+        let result = {} as GetCategoryChildrenResult;
         let dataToSend = {
             categoryId: categoryId,
         }
-        let result = fetch(url, {
+        return await fetch(url, {
             "method": "POST",
             body: JSON.stringify(dataToSend),
             "headers": {
@@ -67,18 +83,17 @@ export class HomeController {
             },
         })
             .then(response => response.json())
-        console.log("fetch result");
-        console.log(result);
-
-        return {} as GetCategoryChildrenResult;
+        ;
     }
 
-    public static GetMaxProductPriceInCategories(categoriesId: string[]): GetMaxProductPriceInCategoriesResult {
+    public static async GetMaxProductPriceInCategories(categoriesId: string[]): Promise<GetMaxProductPriceInCategoriesResult>{
         let url = this.controllerUrl + "/GetMaxProductPriceInCategories";
+        let result = {} as GetMaxProductPriceInCategoriesResult;
         let dataToSend = {
             categoriesId: categoriesId,
         };
-        let result = fetch(url, {
+
+        return await fetch(url, {
             "method": "POST",
             "headers": {
                 "content-type": "application/json",
@@ -86,15 +101,20 @@ export class HomeController {
             body: JSON.stringify(dataToSend),
         })
             .then(response => response.json())
-
-        console.log("fetch result:");
-        console.log(result);
-        return {} as GetMaxProductPriceInCategoriesResult;
+            ;
     }
 
-    public static GetAllProducts(): GetAllProductsResult {
-
-        return {} as GetAllProductsResult;
+    public static async GetAllProducts(): Promise<GetAllProductsResult> {
+        let url = this.controllerUrl + "/GetAllProducts";
+        let result = {} as GetAllProductsResult;
+        return await fetch(url, {
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json",
+            },
+        })
+            .then(response => response.json())
+            ;
     }
 
 }

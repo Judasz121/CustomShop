@@ -29,10 +29,24 @@ namespace CustomShopMVC.Models.ControllerDataModels
         public List<string> FormErrors { get; set; }
     }
 
-    public class GetAllProductsDataOut
+    public class GetAllCategoriesDataOut
+    {
+        public bool Success { get; set; }
+        public List<CategoryViewModel> Categories { get; set; }
+    }
+    public class GetAllProductsDataOut 
     {
         public bool Success { get; set; }
         public List<ErrorViewModel> FormErrors { get; set; }
         public List<ProductViewModel> Products { get; set; }
+    }
+    public class GetMaxProductPriceInCategoriesDataIn
+    {
+        public List<string> CategoriesId { get; set; }
+    }
+    public class GetMaxProductPriceInCategoriesDataOut
+    {
+        public bool Success { get; set; }
+        public int MaxPrice { get; set; }
     }
 }

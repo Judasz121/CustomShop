@@ -36,10 +36,12 @@ export class ProductList extends React.Component<ProductListProps, ProductListSt
     }
 
     downloadProducts() {
-        let result = HomeController.GetAllProducts();
-        this.setState({
-            allProducts: result.products,
-        })
+        HomeController.GetAllProducts().then(result => result)
+            .then(result => {
+                this.setState({
+                    allProducts: result.products,
+                })
+            })
     }
     filterProducts(filterQuery: Record<string, string>) {
         if (filterQuery == null || filterQuery == undefined)
